@@ -1,0 +1,61 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/vector_controller
+vclarke_transform
+Z0 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
+Z1 !s110 1601104848
+!i10b 1
+!s100 7=EfRD4aSmUVVcnPzRO?R0
+Z2 !s11b Dg1SIo80bB@j0V0VzS_@n1
+I;R5A09nlj@L?C^UG3Lo?L1
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+S1
+Z4 dC:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/clarke_transform
+w1601104824
+8C:/work/Robocup/phoenix-firmware/FPGA/hdl/clarke_transform.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/hdl/clarke_transform.sv
+!i122 18
+L0 1 90
+Z5 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z6 !s108 1601104848.000000
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/hdl/clarke_transform.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/hdl/clarke_transform.sv|
+!i113 1
+Z7 o-work work -sv
+Z8 tCvgOpt 0
+vtest
+R0
+R1
+!i10b 1
+!s100 P:W`7?612l1[WXBSLXjNG3
+R2
+I6>eoW5FfRTck3lUUJU^i=1
+R3
+S1
+R4
+w1601104465
+8C:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/clarke_transform/clarke_transform_test.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/clarke_transform/clarke_transform_test.sv
+!i122 17
+L0 2 94
+R5
+r1
+!s85 0
+31
+R6
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/clarke_transform/clarke_transform_test.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/clarke_transform/clarke_transform_test.sv|
+!i113 1
+R7
+R8

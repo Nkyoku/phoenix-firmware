@@ -1,0 +1,8 @@
+/.qsys_edit
+/db
+/incremental_db
+/greybox_tmp
+/output_files
+!/output_files/convert.cof
+*.tcl~
+*.log

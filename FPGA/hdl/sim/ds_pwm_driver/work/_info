@@ -1,0 +1,87 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/opt/intelFPGA_lite/20.1
+vDeglitch
+Z0 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
+!s110 1600609322
+!i10b 1
+!s100 VEoQdDj70:U<;o?=mZ7F53
+Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
+I?Gg[P2`@J7a?d_h<a3e_D1
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+S1
+Z3 dC:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/ds_pwm_driver
+w1593009334
+8C:/work/Robocup/phoenix-firmware/FPGA/hdl/deglitch.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/hdl/deglitch.sv
+!i122 25
+L0 1 27
+Z4 OV;L;2020.1;71
+r1
+!s85 0
+31
+!s108 1600609322.000000
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/hdl/deglitch.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/hdl/deglitch.sv|
+!i113 1
+Z5 o-work work -sv
+Z6 tCvgOpt 0
+n@deglitch
+vds_pwm_driver
+R0
+Z7 !s110 1600609321
+!i10b 1
+!s100 ?go5O6dPTX?1CLi;A3T1I2
+R1
+Ie]Q:7_c?m?zXE5<nbz:ai1
+R2
+S1
+R3
+w1600609318
+8C:/work/Robocup/phoenix-firmware/FPGA/hdl/ds_pwm_driver.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/hdl/ds_pwm_driver.sv
+!i122 23
+L0 1 111
+R4
+r1
+!s85 0
+31
+Z8 !s108 1600609321.000000
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/hdl/ds_pwm_driver.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/hdl/ds_pwm_driver.sv|
+!i113 1
+R5
+R6
+vtest
+R0
+R7
+!i10b 1
+!s100 LSFJRIz@2IoV]b>;gPP5J2
+R1
+IDARFgzS4LiJRFXP:^Z@[>0
+R2
+S1
+R3
+w1600609074
+8C:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+!i122 24
+L0 2 145
+R4
+r1
+!s85 0
+31
+R8
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv|
+!i113 1
+R5
+R6

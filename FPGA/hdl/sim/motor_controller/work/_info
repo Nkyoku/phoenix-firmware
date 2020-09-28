@@ -1,0 +1,212 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim
+vavalon_st_clock_bridge
+Z1 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
+Z2 !s110 1593613750
+!i10b 1
+!s100 T9mG^Jz?OJ^`X>R64>YY60
+Z3 !s11b Dg1SIo80bB@j0V0VzS_@n1
+I=2JB;=niHc]5IBJ9CR7J_1
+Z4 VDg1SIo80bB@j0V0VzS_@n1
+S1
+R0
+w1593525580
+8C:/work/Robocup/Firmware/Phoenix_FPGA/ip/avalon_st_clock_bridge/avalon_st_clock_bridge.sv
+FC:/work/Robocup/Firmware/Phoenix_FPGA/ip/avalon_st_clock_bridge/avalon_st_clock_bridge.sv
+!i122 154
+L0 1 57
+Z5 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z6 !s108 1593613750.000000
+!s107 C:/work/Robocup/Firmware/Phoenix_FPGA/ip/avalon_st_clock_bridge/avalon_st_clock_bridge.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/Firmware/Phoenix_FPGA/ip/avalon_st_clock_bridge/avalon_st_clock_bridge.sv|
+!i113 1
+Z7 o-work work -sv
+Z8 tCvgOpt 0
+vcommutator
+R1
+!s110 1593528886
+!i10b 1
+!s100 YQ9@B5JXz0VYa6N[=AM1z1
+R3
+IOXNEeDMh?LMNC^;_5ZzdO0
+R4
+S1
+R0
+w1593524771
+8C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/commutator.sv
+FC:/work/Robocup/Firmware/Phoenix_FPGA/hdl/commutator.sv
+!i122 92
+L0 1 125
+R5
+r1
+!s85 0
+31
+Z9 !s108 1593528886.000000
+!s107 C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/commutator.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/commutator.sv|
+!i113 1
+R7
+R8
+vdrv83x2
+R1
+!s110 1593528887
+!i10b 1
+!s100 LifTPL^];;5ZmgMoTa26l2
+R3
+IB]iV22?N5S;jYo@VHI[FE3
+R4
+S1
+R0
+w1593435933
+8C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/drv83x2.sv
+FC:/work/Robocup/Firmware/Phoenix_FPGA/hdl/drv83x2.sv
+!i122 96
+L0 1 152
+R5
+r1
+!s85 0
+31
+R9
+!s107 C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/drv83x2.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/drv83x2.sv|
+!i113 1
+R7
+R8
+vltc2320
+R1
+R2
+!i10b 1
+!s100 V8843ZXC2n_[aTc0P07<f0
+R3
+IlYM9lNc5n`H78RD9QgZNZ3
+R4
+S1
+R0
+w1593351274
+8C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/ltc2320.sv
+FC:/work/Robocup/Firmware/Phoenix_FPGA/hdl/ltc2320.sv
+!i122 152
+L0 1 112
+R5
+r1
+!s85 0
+31
+Z10 !s108 1593613749.000000
+!s107 C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/ltc2320.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/ltc2320.sv|
+!i113 1
+R7
+R8
+vmotor_controller
+R1
+Z11 !s110 1593613749
+!i10b 1
+!s100 ?_VJ_7JndbZSalWBdZ@gJ2
+R3
+Il]e^gYnh55>k3PVTO`kkS0
+R4
+S1
+R0
+w1593525709
+8C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv
+FC:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv
+!i122 150
+L0 27 70
+R5
+r1
+!s85 0
+31
+R10
+!s107 C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv|
+!i113 1
+R7
+R8
+vMyCIC
+R1
+R2
+!i10b 1
+!s100 zPBXVBO]Xi7KmzMl;fY@k2
+R3
+I<gg44N?z`abFYHNf2:C3o1
+R4
+S1
+R0
+w1593529718
+8C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/mycic.sv
+FC:/work/Robocup/Firmware/Phoenix_FPGA/hdl/mycic.sv
+!i122 153
+L0 5 101
+R5
+r1
+!s85 0
+31
+R6
+!s107 C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/mycic.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/mycic.sv|
+!i113 1
+R7
+R8
+n@my@c@i@c
+vpwm_driver
+R1
+R2
+!i10b 1
+!s100 B4;YOL>VmFHOLPA0C>28e2
+R3
+ILWlcgEPgX[jU5KF4akeN;3
+R4
+S1
+R0
+w1593613692
+8C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv
+FC:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv
+!i122 155
+L0 1 194
+R5
+r1
+!s85 0
+31
+R6
+!s107 C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv|
+!i113 1
+R7
+R8
+vtest
+R1
+R11
+!i10b 1
+!s100 `2jYXE;7jYj:bW7nzcb]72
+R3
+IQ>:Oz=YLjk0M4[CTTQ>TZ0
+R4
+S1
+R0
+w1593613746
+8C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv
+FC:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv
+!i122 151
+L0 2 246
+R5
+r1
+!s85 0
+31
+R10
+!s107 C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv|
+!i113 1
+R7
+R8

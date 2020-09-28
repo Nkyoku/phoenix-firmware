@@ -1,0 +1,395 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 2020  Intel Corporation. All rights reserved.
+# Your use of Intel Corporation's design tools, logic functions 
+# and other software and tools, and any partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Intel Program License 
+# Subscription Agreement, the Intel Quartus Prime License Agreement,
+# the Intel FPGA IP License Agreement, or other applicable license
+# agreement, including, without limitation, that your use is for
+# the sole purpose of programming logic devices manufactured by
+# Intel and sold by Intel or its authorized distributors.  Please
+# refer to the applicable agreement for further details, at
+# https://fpgasoftware.intel.com/eula.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus Prime
+# Version 20.1.0 Build 711 06/05/2020 SJ Lite Edition
+# Date created = 17:19:55  June 21, 2020
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		Phoenix_FPGA_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus Prime software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "Cyclone 10 LP"
+set_global_assignment -name DEVICE 10CL025YU256C8G
+set_global_assignment -name TOP_LEVEL_ENTITY PhoenixFPGA
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 20.1.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "17:19:55  JUNE 21, 2020"
+set_global_assignment -name LAST_QUARTUS_VERSION "20.1.0 Lite Edition"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name DEVICE_FILTER_PACKAGE UFBGA
+set_global_assignment -name DEVICE_FILTER_PIN_COUNT 256
+set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 8
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
+set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
+set_global_assignment -name EDA_SIMULATION_TOOL "<None>"
+set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT NONE -section_id eda_simulation
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_timing
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_symbol
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_signal_integrity
+set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_board_design_boundary_scan
+set_global_assignment -name ENABLE_OCT_DONE OFF
+set_global_assignment -name ENABLE_CONFIGURATION_PINS OFF
+set_global_assignment -name ENABLE_BOOT_SEL_PIN OFF
+set_global_assignment -name USE_CONFIGURATION_DEVICE ON
+set_global_assignment -name CYCLONEIII_CONFIGURATION_DEVICE EPCQ16
+set_global_assignment -name CRC_ERROR_OPEN_DRAIN OFF
+set_global_assignment -name CONFIGURATION_VCCIO_LEVEL AUTO
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVCMOS"
+set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DATA1_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_FLASH_NCE_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DCLK_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -rise
+set_global_assignment -name OUTPUT_IO_TIMING_NEAR_END_VMEAS "HALF VCCIO" -fall
+set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -rise
+set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -fall
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
+set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
+set_location_assignment PIN_B1 -to FPGA_SPI_MOSI
+set_location_assignment PIN_C2 -to FPGA_SPI_SCLK
+set_location_assignment PIN_D1 -to FPGA_SPI_MISO
+set_location_assignment PIN_K1 -to FPGA_INT
+set_location_assignment PIN_N2 -to FPGA_UART_RX
+set_location_assignment PIN_N1 -to FPGA_UART_TX
+set_location_assignment PIN_R1 -to MOTOR5_SW_EN
+set_location_assignment PIN_R3 -to ADC2_SCL
+set_location_assignment PIN_T2 -to MOTOR5_PWM_B
+set_location_assignment PIN_T4 -to MOTOR5_PWM_C
+set_location_assignment PIN_N5 -to ADC2_SDA
+set_location_assignment PIN_N6 -to MOTOR5_LED
+set_location_assignment PIN_P6 -to MOTOR4_LED
+set_location_assignment PIN_R7 -to MOTOR4_PWM_A
+set_location_assignment PIN_R6 -to MOTOR5_PWM_A
+set_location_assignment PIN_P8 -to MOTOR4_SW_EN
+set_location_assignment PIN_R8 -to MOTOR4_ENC_A
+set_location_assignment PIN_T8 -to MOTOR4_ENC_B
+set_location_assignment PIN_R9 -to MOTOR3_ENC_B
+set_location_assignment PIN_T9 -to MOTOR3_ENC_A
+set_location_assignment PIN_N9 -to MOTOR3_SW_EN
+set_location_assignment PIN_T10 -to MOTOR4_PWM_B
+set_location_assignment PIN_R11 -to MOTOR4_PWM_C
+set_location_assignment PIN_T12 -to MOTOR3_PWM_A
+set_location_assignment PIN_P11 -to MOTOR3_LED
+set_location_assignment PIN_T13 -to MOTOR3_PWM_B
+set_location_assignment PIN_N11 -to HALL2_DOUT
+set_location_assignment PIN_P14 -to HALL2_CLK
+set_location_assignment PIN_R14 -to MOTOR3_PWM_C
+set_location_assignment PIN_P15 -to PSRAM2_SIO2
+set_location_assignment PIN_P16 -to PSRAM2_SIO1
+set_location_assignment PIN_N16 -to PSRAM2_SCLK
+set_location_assignment PIN_N15 -to PSRAM2_SIO0
+set_location_assignment PIN_L16 -to PSRAM1_SIO2
+set_location_assignment PIN_L15 -to PSRAM2_SIO3
+set_location_assignment PIN_K15 -to PSRAM1_SIO1
+set_location_assignment PIN_J16 -to PSRAM1_SCLK
+set_location_assignment PIN_J15 -to PSRAM1_SIO3
+set_location_assignment PIN_J14 -to PSRAM1_SIO0
+set_location_assignment PIN_E15 -to CLK25MHz
+set_location_assignment PIN_E16 -to ADC1_CLKOUT
+set_location_assignment PIN_G16 -to ADC1_SDO8
+set_location_assignment PIN_G15 -to ADC1_SDO7
+set_location_assignment PIN_F16 -to ADC1_SDO6
+set_location_assignment PIN_F15 -to ADC1_SDO5
+set_location_assignment PIN_F14 -to ADC1_SCK
+set_location_assignment PIN_D16 -to ADC1_SDO4
+set_location_assignment PIN_D15 -to ADC1_SDO3
+set_location_assignment PIN_C16 -to ADC1_SDO2
+set_location_assignment PIN_C15 -to ADC1_SDO1
+set_location_assignment PIN_A13 -to IMU_SCLK
+set_location_assignment PIN_B13 -to IMU_MOSI
+set_location_assignment PIN_B14 -to MOTOR2_PWM_A
+set_location_assignment PIN_A12 -to IMU_CLKIN
+set_location_assignment PIN_B11 -to MOTOR2_PWM_B
+set_location_assignment PIN_A15 -to IMU_MISO
+set_location_assignment PIN_A10 -to MOTOR2_PWM_C
+set_location_assignment PIN_D9 -to MOTOR2_SW_EN
+set_location_assignment PIN_A9 -to MOTOR2_ENC_A
+set_location_assignment PIN_B9 -to MOTOR2_ENC_B
+set_location_assignment PIN_A8 -to MOTOR1_ENC_A
+set_location_assignment PIN_B8 -to MOTOR1_ENC_B
+set_location_assignment PIN_C6 -to MOTOR1_SW_EN
+set_location_assignment PIN_A6 -to MOTOR1_PWM_A
+set_location_assignment PIN_A5 -to MOTOR1_PWM_B
+set_location_assignment PIN_B4 -to MOTOR1_PWM_C
+set_location_assignment PIN_A2 -to HALL1_DOUT
+set_location_assignment PIN_B3 -to HALL1_CLK
+set_location_assignment PIN_C3 -to MOTOR2_LED
+set_location_assignment PIN_D3 -to MOTOR1_LED
+set_instance_assignment -name IO_STANDARD "1.8 V" -to MOTOR5_SW_EN
+set_instance_assignment -name IO_STANDARD "1.8 V" -to FPGA_UART_TX
+set_instance_assignment -name IO_STANDARD "1.8 V" -to FPGA_UART_RX
+set_instance_assignment -name IO_STANDARD "1.8 V" -to FPGA_INT
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SDO1
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SDO2
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SDO3
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SDO4
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SCK
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SDO5
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SDO6
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SDO7
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_SDO8
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_CLKOUT
+set_instance_assignment -name IO_STANDARD "1.8 V" -to CLK25MHz
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to PSRAM1_SIO0
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to PSRAM1_SIO3
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to PSRAM1_SCLK
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to PSRAM1_SIO1
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to PSRAM2_SIO3
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to PSRAM1_SIO2
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to PSRAM2_SIO0
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to PSRAM2_SCLK
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to PSRAM2_SIO1
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to PSRAM2_SIO2
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR3_ENC_B
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR3_ENC_A
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to HALL2_DOUT
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR5_SW_EN
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to FPGA_SPI_MISO
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to FPGA_SPI_SCLK
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to FPGA_SPI_MOSI
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to FPGA_UART_TX
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to FPGA_UART_RX
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to FPGA_INT
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR4_ENC_B
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR4_ENC_A
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR4_SW_EN
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR5_PWM_A
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR4_PWM_A
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR4_LED
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR5_LED
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR5_PWM_C
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR5_PWM_B
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to ADC2_SDA
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to ADC2_SCL
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR3_PWM_C
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to HALL2_CLK
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR3_PWM_B
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR3_LED
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR3_PWM_A
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR4_PWM_C
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR4_PWM_B
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR3_SW_EN
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_SDO1
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_SDO2
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_SDO3
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_SDO4
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_SDO5
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_SDO6
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_SDO7
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_SDO8
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to ADC1_CLKOUT
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to CLK25MHz
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to ADC1_SCK
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR2_ENC_B
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR2_ENC_A
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to IMU_MISO
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to HALL1_DOUT
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR1_ENC_B
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR1_ENC_A
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR1_SW_EN
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR1_PWM_A
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR1_PWM_B
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR1_PWM_C
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to HALL1_CLK
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR2_LED
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR1_LED
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to IMU_SCLK
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to IMU_MOSI
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR2_PWM_A
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to IMU_CLKIN
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR2_PWM_B
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR2_PWM_C
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR2_SW_EN
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to ADC2_SCL
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to ADC2_SDA
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to FPGA_UART_RX
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PSRAM1_SIO0
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PSRAM1_SIO1
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PSRAM1_SIO2
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PSRAM1_SIO3
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PSRAM2_SIO0
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PSRAM2_SIO1
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PSRAM2_SIO2
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to PSRAM2_SIO3
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to IMU_MISO
+set_location_assignment PIN_H1 -to DCLK
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to DCLK
+set_location_assignment PIN_D2 -to nCSO
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to nCSO
+set_location_assignment PIN_C1 -to ASDO
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to ASDO
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to ASDO
+set_location_assignment PIN_H2 -to ASDI
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to ASDI
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to ASDI
+set_location_assignment PIN_J1 -to DATA2
+set_instance_assignment -name IO_STANDARD "1.8 V" -to DATA2
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to DATA2
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to DATA2
+set_location_assignment PIN_G1 -to DATA3
+set_instance_assignment -name RESERVE_PIN AS_BIDIRECTIONAL -to DATA3
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to DATA3
+set_location_assignment PIN_B16 -to ADC1_CNV_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to ADC1_CNV_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to ADC1_CNV_N
+set_location_assignment PIN_J2 -to MOD_SLEEP_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to MOD_SLEEP_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOD_SLEEP_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOD_SLEEP_N
+set_location_assignment PIN_R16 -to PSRAM2_CS_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to PSRAM2_CS_N
+set_location_assignment PIN_E1 -to FPGA_SPI_CS0_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to FPGA_SPI_CS0_N
+set_location_assignment PIN_D14 -to GP_STOP_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to GP_STOP_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to GP_STOP_N
+set_location_assignment PIN_A3 -to HALL1_LOAD_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to HALL1_LOAD_N
+set_location_assignment PIN_B12 -to IMU_CS_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to IMU_CS_N
+set_location_assignment PIN_K16 -to PSRAM1_CS_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to PSRAM1_CS_N
+set_location_assignment PIN_R4 -to MOTOR5_RESET_C_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR5_RESET_C_N
+set_location_assignment PIN_A7 -to MOTOR1_OTW_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR1_OTW_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR1_OTW_N
+set_location_assignment PIN_A4 -to MOTOR1_RESET_C_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR1_RESET_C_N
+set_location_assignment PIN_A11 -to MOTOR2_RESET_B_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR2_RESET_B_N
+set_location_assignment PIN_B5 -to MOTOR1_RESET_B_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR1_RESET_B_N
+set_location_assignment PIN_A14 -to MOTOR2_RESET_A_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR2_RESET_A_N
+set_location_assignment PIN_B6 -to MOTOR1_RESET_A_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR1_RESET_A_N
+set_location_assignment PIN_B7 -to MOTOR1_FAULT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR1_FAULT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR1_FAULT_N
+set_location_assignment PIN_B10 -to MOTOR2_RESET_C_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR2_RESET_C_N
+set_location_assignment PIN_C8 -to MOTOR2_SW_FLT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR2_SW_FLT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR2_SW_FLT_N
+set_location_assignment PIN_C11 -to MOTOR2_FAULT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR2_FAULT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR2_FAULT_N
+set_location_assignment PIN_C9 -to MOTOR2_OTW_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR2_OTW_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR2_OTW_N
+set_location_assignment PIN_D8 -to MOTOR1_SW_FLT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR1_SW_FLT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR1_SW_FLT_N
+set_location_assignment PIN_M8 -to MOTOR3_FAULT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR3_FAULT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR3_FAULT_N
+set_location_assignment PIN_T6 -to MOTOR5_RESET_A_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR5_RESET_A_N
+set_location_assignment PIN_P9 -to MOTOR3_SW_FLT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR3_SW_FLT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR3_SW_FLT_N
+set_location_assignment PIN_N8 -to MOTOR3_OTW_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR3_OTW_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR3_OTW_N
+set_location_assignment PIN_R12 -to MOTOR3_RESET_A_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR3_RESET_A_N
+set_location_assignment PIN_R13 -to MOTOR3_RESET_B_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR3_RESET_B_N
+set_location_assignment PIN_T14 -to MOTOR3_RESET_C_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR3_RESET_C_N
+set_location_assignment PIN_M10 -to MOTOR4_SW_FLT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR4_SW_FLT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR4_SW_FLT_N
+set_location_assignment PIN_T5 -to MOTOR4_FAULT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR4_FAULT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR4_FAULT_N
+set_location_assignment PIN_R5 -to MOTOR4_OTW_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR4_OTW_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR4_OTW_N
+set_location_assignment PIN_T11 -to MOTOR4_RESET_C_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR4_RESET_C_N
+set_location_assignment PIN_R10 -to MOTOR4_RESET_B_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR4_RESET_B_N
+set_location_assignment PIN_T7 -to MOTOR4_RESET_A_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR4_RESET_A_N
+set_location_assignment PIN_P1 -to MOTOR5_SW_FLT_N
+set_instance_assignment -name IO_STANDARD "1.8 V" -to MOTOR5_SW_FLT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR5_SW_FLT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR5_SW_FLT_N
+set_location_assignment PIN_P3 -to MOTOR5_FAULT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR5_FAULT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR5_FAULT_N
+set_location_assignment PIN_N3 -to MOTOR5_OTW_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to MOTOR5_OTW_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to MOTOR5_OTW_N
+set_location_assignment PIN_T3 -to MOTOR5_RESET_B_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to MOTOR5_RESET_B_N
+set_location_assignment PIN_T15 -to HALL2_LOAD_N
+set_instance_assignment -name RESERVE_PIN AS_OUTPUT_DRIVING_AN_UNSPECIFIED_SIGNAL -to HALL2_LOAD_N
+set_global_assignment -name ENABLE_SIGNALTAP OFF
+set_location_assignment PIN_C14 -to IMU_INT_N
+set_instance_assignment -name RESERVE_PIN AS_INPUT_TRI_STATED -to IMU_INT_N
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to IMU_INT_N
+set_instance_assignment -name FAST_INPUT_REGISTER ON -to ADC1_SDO*
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ADC1_CNV_N
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name QIP_FILE controller/synthesis/controller.qip
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/avalon_st_clock_bridge.sv
+set_global_assignment -name VHDL_FILE hdl/cdb_module.vhd
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/space_vector_modulator.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/pi_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/current_cic_filter.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/current_fir_filter.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/vector_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/quadrature_decoder.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/position_estimator.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/park_transform.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/clarke_transform.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/ds_pwm_driver.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/serial_to_parallel.sv
+set_global_assignment -name QIP_FILE hdl/pll.qip
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/reset_synchronizer.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/top.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/pwm_driver.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/control_pulse_gen.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/ltc2320.sv
+set_global_assignment -name SYSTEMVERILOG_FILE hdl/deglitch.sv
+set_global_assignment -name SDC_FILE PhoenixFPGA.sdc
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
