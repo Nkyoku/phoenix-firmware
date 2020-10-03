@@ -5,14 +5,25 @@ module controller (
 	adc2_i2c_sda_oe,
 	adc2_i2c_scl_oe,
 	clk_clk,
-	pio_1_export,
-	pio_2_export,
 	imu_spi_mosi,
 	imu_spi_miso,
 	imu_spi_sclk,
 	imu_spi_cs_n,
 	imu_spi_int_n,
+	mc_fault_fault,
+	mc_pwm_data,
+	mc_pwm_valid,
+	mc_pwm_ready,
+	mc_status_driver_otw_n,
+	mc_status_driver_fault_n,
+	mc_status_hall_fault_n,
+	msgdma_source_data,
+	msgdma_source_valid,
+	msgdma_source_ready,
+	msgdma_source_channel,
 	pio_0_export,
+	pio_1_export,
+	pio_2_export,
 	reset_reset_n,
 	vc_encoder_encoder_1_data,
 	vc_encoder_encoder_2_data,
@@ -43,27 +54,33 @@ module controller (
 	vc_status_encoder_fault_n,
 	vc_status_pos_error,
 	vc_status_pos_uncertain,
-	mc_fault_fault,
-	mc_status_driver_otw_n,
-	mc_status_driver_fault_n,
-	mc_status_hall_fault_n,
-	mc_pwm_data,
-	mc_pwm_valid,
-	mc_pwm_ready);	
+	uart_rxd,
+	uart_txd);	
 
 	input		adc2_i2c_sda_in;
 	input		adc2_i2c_scl_in;
 	output		adc2_i2c_sda_oe;
 	output		adc2_i2c_scl_oe;
 	input		clk_clk;
-	input	[31:0]	pio_1_export;
-	output	[10:0]	pio_2_export;
 	output		imu_spi_mosi;
 	input		imu_spi_miso;
 	output		imu_spi_sclk;
 	output		imu_spi_cs_n;
 	input		imu_spi_int_n;
+	output		mc_fault_fault;
+	output	[15:0]	mc_pwm_data;
+	output		mc_pwm_valid;
+	input		mc_pwm_ready;
+	input		mc_status_driver_otw_n;
+	input		mc_status_driver_fault_n;
+	input		mc_status_hall_fault_n;
+	output	[15:0]	msgdma_source_data;
+	output		msgdma_source_valid;
+	input		msgdma_source_ready;
+	output	[7:0]	msgdma_source_channel;
 	input		pio_0_export;
+	input	[31:0]	pio_1_export;
+	output	[10:0]	pio_2_export;
 	input		reset_reset_n;
 	input	[15:0]	vc_encoder_encoder_1_data;
 	input	[15:0]	vc_encoder_encoder_2_data;
@@ -94,11 +111,6 @@ module controller (
 	input	[3:0]	vc_status_encoder_fault_n;
 	input	[3:0]	vc_status_pos_error;
 	input	[3:0]	vc_status_pos_uncertain;
-	output		mc_fault_fault;
-	input		mc_status_driver_otw_n;
-	input		mc_status_driver_fault_n;
-	input		mc_status_hall_fault_n;
-	output	[15:0]	mc_pwm_data;
-	output		mc_pwm_valid;
-	input		mc_pwm_ready;
+	input		uart_rxd;
+	output		uart_txd;
 endmodule

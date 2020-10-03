@@ -41,21 +41,23 @@ module test ();
         in_proc_valid <= 1'b1;
         in_ref_data <= 1000;
         in_proc_data <= 0;
+        trigger <= 1'b1;
         @(posedge clk);
         in_ref_valid <= 1'b0;
         in_proc_valid <= 1'b0;
         in_ref_data <= 'X;
         in_proc_data <= 'X;
-        repeat(2) @(posedge clk);
+        trigger <= 1'b0;
+        repeat(10) @(posedge clk);
         
         fork
-            repeat(30) begin
+            repeat(2) begin
                 trigger <= 1'b1;
                 @(posedge clk);
                 trigger <= 1'b0;
-                repeat(6) @(posedge clk);
+                repeat(10) @(posedge clk);
             end
-            begin
+            /*begin
                 repeat(20) @(posedge trigger);
                 repeat(3) @(posedge clk);
                 reset <= 1'b1;
@@ -70,7 +72,7 @@ module test ();
                 in_ref_valid <= 1'b0;
                 in_proc_valid <= 1'b0;
                 in_ref_data <= 'X;
-            end
+            end*/
         join
         
         $stop;

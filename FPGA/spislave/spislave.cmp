@@ -1,0 +1,18 @@
+	component spislave is
+		port (
+			clk_clk       : in    std_logic                     := 'X';             -- clk
+			reset_reset_n : in    std_logic                     := 'X';             -- reset_n
+			sink_ready    : out   std_logic;                                        -- ready
+			sink_valid    : in    std_logic                     := 'X';             -- valid
+			sink_data     : in    std_logic_vector(15 downto 0) := (others => 'X'); -- data
+			sink_channel  : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- channel
+			source_ready  : in    std_logic                     := 'X';             -- ready
+			source_valid  : out   std_logic;                                        -- valid
+			source_data   : out   std_logic_vector(7 downto 0);                     -- data
+			spi_mosi      : in    std_logic                     := 'X';             -- mosi
+			spi_nss       : in    std_logic                     := 'X';             -- nss
+			spi_miso      : inout std_logic                     := 'X';             -- miso
+			spi_sclk      : in    std_logic                     := 'X'              -- sclk
+		);
+	end component spislave;
+

@@ -21,19 +21,29 @@
 module controller_instruction_rom_0 (
                                       // inputs:
                                        address,
+                                       address2,
                                        byteenable,
+                                       byteenable2,
                                        chipselect,
+                                       chipselect2,
                                        clk,
+                                       clk2,
                                        clken,
+                                       clken2,
                                        debugaccess,
                                        freeze,
                                        reset,
+                                       reset2,
                                        reset_req,
+                                       reset_req2,
                                        write,
+                                       write2,
                                        writedata,
+                                       writedata2,
 
                                       // outputs:
-                                       readdata
+                                       readdata,
+                                       readdata2
                                     )
 ;
 
@@ -41,48 +51,78 @@ module controller_instruction_rom_0 (
 
 
   output  [ 31: 0] readdata;
+  output  [ 31: 0] readdata2;
   input   [ 12: 0] address;
+  input   [ 12: 0] address2;
   input   [  3: 0] byteenable;
+  input   [  3: 0] byteenable2;
   input            chipselect;
+  input            chipselect2;
   input            clk;
+  input            clk2;
   input            clken;
+  input            clken2;
   input            debugaccess;
   input            freeze;
   input            reset;
+  input            reset2;
   input            reset_req;
+  input            reset_req2;
   input            write;
+  input            write2;
   input   [ 31: 0] writedata;
+  input   [ 31: 0] writedata2;
 
 
 wire             clocken0;
+wire             clocken1;
 wire    [ 31: 0] readdata;
+wire    [ 31: 0] readdata2;
 wire             wren;
+wire             wren2;
   assign wren = chipselect & write & debugaccess;
   assign clocken0 = clken & ~reset_req;
+  assign clocken1 = clken2 & ~reset_req2;
+  assign wren2 = chipselect2 & write2 & debugaccess;
   altsyncram the_altsyncram
     (
       .address_a (address),
+      .address_b (address2),
       .byteena_a (byteenable),
+      .byteena_b (byteenable2),
       .clock0 (clk),
+      .clock1 (clk2),
       .clocken0 (clocken0),
+      .clocken1 (clocken1),
       .data_a (writedata),
+      .data_b (writedata2),
       .q_a (readdata),
-      .wren_a (wren)
+      .q_b (readdata2),
+      .wren_a (wren),
+      .wren_b (wren2)
     );
 
-  defparam the_altsyncram.byte_size = 8,
+  defparam the_altsyncram.address_reg_b = "CLOCK1",
+           the_altsyncram.byte_size = 8,
+           the_altsyncram.byteena_reg_b = "CLOCK1",
+           the_altsyncram.indata_reg_b = "CLOCK1",
            the_altsyncram.init_file = INIT_FILE,
            the_altsyncram.lpm_type = "altsyncram",
            the_altsyncram.maximum_depth = 8192,
            the_altsyncram.numwords_a = 8192,
-           the_altsyncram.operation_mode = "SINGLE_PORT",
+           the_altsyncram.numwords_b = 8192,
+           the_altsyncram.operation_mode = "BIDIR_DUAL_PORT",
            the_altsyncram.outdata_reg_a = "UNREGISTERED",
+           the_altsyncram.outdata_reg_b = "UNREGISTERED",
            the_altsyncram.ram_block_type = "AUTO",
-           the_altsyncram.read_during_write_mode_mixed_ports = "DONT_CARE",
-           the_altsyncram.read_during_write_mode_port_a = "DONT_CARE",
+           the_altsyncram.read_during_write_mode_mixed_ports = "OLD_DATA",
            the_altsyncram.width_a = 32,
+           the_altsyncram.width_b = 32,
            the_altsyncram.width_byteena_a = 4,
-           the_altsyncram.widthad_a = 13;
+           the_altsyncram.width_byteena_b = 4,
+           the_altsyncram.widthad_a = 13,
+           the_altsyncram.widthad_b = 13,
+           the_altsyncram.wrcontrol_wraddress_reg_b = "CLOCK1";
 
   //s1, which is an e_avalon_slave
   //s2, which is an e_avalon_slave

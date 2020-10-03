@@ -47,124 +47,136 @@ module park_transform #(
     
     // Multiplier
     logic signed [DATA_WIDTH-1:0] mult_in1;
-    logic signed [TABLE_WIDTH-1:0] mult_in2;
-    logic signed [TABLE_WIDTH+DATA_WIDTH-1:0] mult_out;
-    assign mult_in2 = table_data;
+    wire  signed [TABLE_WIDTH-1:0] mult_in2 = table_data;
+    logic signed [TABLE_WIDTH+DATA_WIDTH-1:0] mult_out_raw;
+    wire  signed [TABLE_WIDTH+DATA_WIDTH-TABLE_SCALE:0] mult_out = mult_out_raw[TABLE_WIDTH+DATA_WIDTH-1:TABLE_SCALE-1];
     always @(posedge clk) begin
-        mult_out <= mult_in1 * mult_in2;
+        mult_out_raw <= mult_in1 * mult_in2;
     end
     
-    
+    logic [2:0] index = '0;
     logic inverse;
     logic unsigned [THETA_WIDTH-1:0] theta;
     wire  unsigned [THETA_WIDTH-1:0] theta_cos = theta + THETA_WIDTH'(2**(THETA_WIDTH-2));
-    logic signed [DATA_WIDTH-1:0] y;
-    logic signed [DATA_WIDTH-1:0] x;
+    logic signed [DATA_WIDTH-1:0] x, y;
     logic [CHANNEL_WIDTH-1:0] channel;
     wire inverse_sin = inverse ^ theta[THETA_WIDTH-1];
     wire inverse_cos = theta[THETA_WIDTH-1] ^ theta[THETA_WIDTH-2];
     
-    logic signed [TABLE_WIDTH+DATA_WIDTH:0] sum;
-    wire  signed [DATA_WIDTH:0] out_unsat = sum[TABLE_SCALE+:DATA_WIDTH+1];
+    logic signed [$bits(mult_out):0] sum;
+    wire  signed [DATA_WIDTH:0] out_unsat = sum[1+:DATA_WIDTH+1];
     wire  signed [DATA_WIDTH:0] out_sat = (out_unsat < DATA_MIN) ? DATA_WIDTH'(DATA_MIN) : ((DATA_MAX < out_unsat) ? DATA_WIDTH'(DATA_MAX) : out_unsat);
     logic signed [DATA_WIDTH-1:0] out_x;
     logic signed [DATA_WIDTH-1:0] out_y;
     
-    logic [7:0] state = '0;
+    always @(posedge clk) begin
+        // sinテーブルを参照する
+        if (in_valid & in_ready) begin
+            table_address <= in_data[2*DATA_WIDTH+:THETA_WIDTH-1];
+        end
+        else if (index == 1) begin
+            table_address <= theta_cos[THETA_WIDTH-2:0];
+        end
+        else if (index == 2) begin
+            table_address <= theta[THETA_WIDTH-2:0];
+        end
+        else if (index == 3) begin
+            table_address <= theta_cos[THETA_WIDTH-2:0];
+        end
+        else begin
+            table_address <= 'X;
+        end
+        
+        // 入力とsin,cosを乗算する
+        if (index == 1) begin
+            mult_in1 <= ~inverse_sin ? y : -y;
+        end
+        else if (index == 2) begin
+            mult_in1 <= ~inverse_cos ? x : -x;
+        end
+        else if (index == 3) begin
+            mult_in1 <= ~inverse_sin ? -x : x;
+        end
+        else if (index == 4) begin
+            mult_in1 <= ~inverse_cos ? y : -y;
+        end
+        else begin
+            mult_in1 <= 'X;
+        end
+        
+        // 乗算結果を加算する
+        if (index == 3) begin
+            sum <= mult_out; // y * sin(theta)
+        end
+        else if (index == 4) begin
+            sum <= sum + mult_out; // x * cos(theta)
+        end
+        else if (index == 5) begin
+            sum <= mult_out; // -x * sin(theta)
+        end
+        else if (index == 6) begin
+            sum <= sum + mult_out; // y * cos(theta)
+        end
+        else begin
+            sum <= 'X;
+        end
+    end
     
-    
+    // Avalon-ST
+    logic assert_ready = 1'b1;
     assign out_data = {out_x, out_y};
     assign out_channel = channel;
-    
-    logic assert_ready = 1'b1;
-    
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
             out_valid <= 1'b0;
             in_ready <= 1'b0;
-            state <= '0;
+            index <= '0;
             assert_ready <= 1'b1;
             inverse <= 1'b0;
             theta <= '0;
             x <= '0;
             y <= '0;
             channel <= '0;
+            out_x <= '0;
+            out_y <= '0;
         end
         else begin
             assert_ready <= 1'b0;
             if (assert_ready == 1'b1) begin
                 in_ready <= 1'b1;
             end
+            else if (in_valid & in_ready) begin
+                in_ready <= 1'b0;
+            end
+            else if (out_valid & out_ready) begin
+                in_ready <= 1'b1;
+            end
             
-            state <= {state[$bits(state)-2:0], 1'b0};
             if (in_valid & in_ready) begin
                 inverse <= in_data[2*DATA_WIDTH+THETA_WIDTH];
                 theta <= in_data[2*DATA_WIDTH+:THETA_WIDTH];
                 x <= in_data[DATA_WIDTH+:DATA_WIDTH];
                 y <= in_data[0+:DATA_WIDTH];
                 channel <= in_channel;
-                state <= 1'b1;
                 in_ready <= 1'b0;
+                index <= 1'b1;
+            end
+            else if (index != 0) begin
+                index <= (index < 7) ? (index + 1'b1) : '0;
             end
             
-            if (state[7] == 1'b1) begin
+            if (index == 7) begin
                 out_valid <= 1'b1;
             end
-            if (out_valid & out_ready) begin
+            else if (out_valid & out_ready) begin
                 out_valid <= 1'b0;
-                in_ready <= 1'b1;
-            end
-            
-            // sinテーブルを参照する
-            if (state[0] == 1'b1) begin
-                table_address <= theta_cos[THETA_WIDTH-2:0];
-            end
-            else if (state[1] == 1'b1) begin
-                table_address <= theta[THETA_WIDTH-2:0];
-            end
-            else if (state[3] == 1'b1) begin
-                table_address <= theta_cos[THETA_WIDTH-2:0];
-            end
-            
-            // 入力とsin,cosを乗算する
-            if (state[1] == 1'b1) begin
-                mult_in1 <= x;
-            end
-            else if (state[2] == 1'b1) begin
-                mult_in1 <= y;
-            end
-            else if (state[3] == 1'b1) begin
-                mult_in1 <= x;
-            end
-            else if (state[4] == 1'b1) begin
-                mult_in1 <= y;
-            end
-            else begin
-                mult_in1 <= 'X;
-            end
-            
-            // 乗算結果を加算する
-            if (state[3] == 1'b1) begin
-                sum <= ~inverse_cos ? mult_out : -mult_out; // x * cos
-            end
-            else if (state[4] == 1'b1) begin
-                sum <= sum + (~inverse_sin ? mult_out : -mult_out); // y * sin
-            end
-            else if (state[5] == 1'b1) begin
-                sum <= (inverse_sin ? mult_out : -mult_out); // -x * sin
-            end
-            else if (state[6] == 1'b1) begin
-                sum <= sum + (~inverse_cos ? mult_out : -mult_out); // y * cos
-            end
-            else begin
-                sum <= 'X;
             end
             
             // 飽和演算を行って出力する
-            if (state[5] == 1'b1) begin
+            if (index == 5) begin
                 out_x <= out_sat[DATA_WIDTH-1:0];
             end
-            if (state[7] == 1'b1) begin
+            if (index == 7) begin
                 out_y <= out_sat[DATA_WIDTH-1:0];
             end
         end

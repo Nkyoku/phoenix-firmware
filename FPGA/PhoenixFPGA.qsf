@@ -370,6 +370,16 @@ set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to ADC1_CNV_N
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to HALL*_CLK
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to HALL*_LOAD_N
+set_instance_assignment -name FAST_INPUT_REGISTER ON -to HALL*_DOUT
+set_instance_assignment -name FAST_INPUT_REGISTER ON -to GP_STOP_N
+set_instance_assignment -name FAST_INPUT_REGISTER ON -to MOD_SLEEP_N
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to MOTOR*_PWM_*
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to MOTOR*_RESET_*_N
+set_instance_assignment -name FAST_INPUT_REGISTER ON -to MOTOR*_OTW_N
+set_instance_assignment -name FAST_INPUT_REGISTER ON -to MOTOR*_FAULT_N
+set_global_assignment -name QIP_FILE spislave/synthesis/spislave.qip
 set_global_assignment -name QIP_FILE controller/synthesis/controller.qip
 set_global_assignment -name SYSTEMVERILOG_FILE hdl/avalon_st_clock_bridge.sv
 set_global_assignment -name VHDL_FILE hdl/cdb_module.vhd

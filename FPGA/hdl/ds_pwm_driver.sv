@@ -2,7 +2,7 @@ module ds_pwm_driver #(
         parameter int INITIAL_DIRECTION = 0,
         parameter int PERIOD            = 3000,
         parameter int MAX_ON_CYCLES     = 2980,
-        parameter int DATA_WIDTH        = 16
+        parameter int DATA_WIDTH        = 12
     ) (
         input  wire                    clk,
         input  wire                    reset,
@@ -73,16 +73,22 @@ module ds_pwm_driver #(
     end
     
     // PWM Wave Output
+    logic [2:0] driver_pwm_ff = '0;
+    logic driver_reset_n_ff = '0;
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
-            driver_pwm <= 3'b000;
-            driver_reset_n <= 3'b000;
+            driver_pwm_ff <= '0;
+            driver_reset_n_ff <= 1'b0;
+            driver_pwm <= '0;
+            driver_reset_n <= '0;
         end
         else begin
-            driver_pwm[0] <= drive & (counter < u_compare);
-            driver_pwm[1] <= drive & (counter < v_compare);
-            driver_pwm[2] <= drive & (counter < w_compare);
-            driver_reset_n <= {3{drive}};
+            driver_pwm_ff[0] <= drive & (counter < u_compare);
+            driver_pwm_ff[1] <= drive & (counter < v_compare);
+            driver_pwm_ff[2] <= drive & (counter < w_compare);
+            driver_reset_n_ff <= drive;
+            driver_pwm <= driver_pwm_ff;
+            driver_reset_n <= {3{driver_reset_n_ff}};
         end
     end
 endmodule

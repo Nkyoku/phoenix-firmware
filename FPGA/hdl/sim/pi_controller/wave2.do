@@ -11,10 +11,8 @@ add wave -noupdate /test2/u0
 add wave -noupdate /test2/u1
 add wave -noupdate /test2/out_valid
 add wave -noupdate /test2/trigger
-add wave -noupdate /test2/fault
 add wave -noupdate -divider {New Divider}
-add wave -noupdate /test2/pi/count
-add wave -noupdate /test2/pi/state
+add wave -noupdate -radix unsigned /test2/pi/index
 add wave -noupdate {/test2/pi/r[0]}
 add wave -noupdate {/test2/pi/r[1]}
 add wave -noupdate {/test2/pi/y[0]}
@@ -27,12 +25,12 @@ add wave -noupdate /test2/pi/gain_in1
 add wave -noupdate /test2/pi/gain_in2
 add wave -noupdate /test2/pi/gain_out
 add wave -noupdate /test2/pi/integ
-add wave -noupdate /test2/pi/u_raw
+add wave -noupdate /test2/pi/u_sat
 add wave -noupdate /test2/pi/u
 add wave -noupdate {/test2/pi/u_z[0]}
 add wave -noupdate {/test2/pi/u_z[1]}
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {12045 ps} 0}
+WaveRestoreCursors {{Cursor 1} {668376 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 157
 configure wave -valuecolwidth 125
@@ -48,4 +46,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {50682 ps}
+WaveRestoreZoom {34498 ps} {290611 ps}

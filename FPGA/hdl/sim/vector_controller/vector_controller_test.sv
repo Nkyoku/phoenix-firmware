@@ -9,6 +9,7 @@ module test ();
     real Motor_J = 0.0000181; // Kgm^2
     real Motor_D = 0.001;
     real F_PWM = 50000;
+    real FILTER_GAIN = 6.591796875;
     
     int param_kp = 10000;
     int param_ki = 1000;
@@ -124,14 +125,14 @@ module test ();
             domega_dt = -Motor_D / Motor_J * omega + T / Motor_J;
             omega = omega + domega_dt / F_PWM;
             theta <= theta + omega / F_PWM / Motor_P;
-            current_u_data <= $rtoi((I_u < -13.6 ? -13.6 : (13.6 < I_u ? 13.6 : I_u)) * 0.003 * 50 / 2.048 * 4096 * 6.18);
-            current_v_data <= $rtoi((I_v < -13.6 ? -13.6 : (13.6 < I_v ? 13.6 : I_v)) * 0.003 * 50 / 2.048 * 4096 * 6.18);
+            current_u_data <= $rtoi((I_u < -13.6 ? -13.6 : (13.6 < I_u ? 13.6 : I_u)) * 0.003 * 50 / 2.048 * 4096 * FILTER_GAIN);
+            current_v_data <= $rtoi((I_v < -13.6 ? -13.6 : (13.6 < I_v ? 13.6 : I_v)) * 0.003 * 50 / 2.048 * 4096 * FILTER_GAIN);
             current_w_data <= -current_u_data - current_v_data;
             current_uv_valid <= 1'b1;
-            current_a <= $rtoi((I_u - 0.5 * I_v - 0.5 * (-I_u - I_v)) * 0.003 * 50 / 2.048 * 4096 * 6.18 * 0.816496581);
-            current_b <= $rtoi((0.866025404 * I_u + 0.866025404 * 2 * I_v) * 0.003 * 50 / 2.048 * 4096 * 6.18 * 0.816496581);
-            current_d <= $rtoi((I_u * $cos(theta * Motor_P) + I_v * $cos(theta * Motor_P - 2 * PI / 3) + I_w * $cos(theta * Motor_P + 2 * PI / 3)) * 0.003 * 50 / 2.048 * 4096 * 6.18 * 0.816496581);
-            current_q <= $rtoi((I_u * $sin(theta * Motor_P) + I_v * $sin(theta * Motor_P - 2 * PI / 3) + I_w * $sin(theta * Motor_P + 2 * PI / 3)) * 0.003 * 50 / 2.048 * 4096 * 6.18 * -0.816496581);
+            current_a <= $rtoi((I_u - 0.5 * I_v - 0.5 * (-I_u - I_v)) * 0.003 * 50 / 2.048 * 4096 * FILTER_GAIN * 0.816496581);
+            current_b <= $rtoi((0.866025404 * I_u + 0.866025404 * 2 * I_v) * 0.003 * 50 / 2.048 * 4096 * FILTER_GAIN * 0.816496581);
+            current_d <= $rtoi((I_u * $cos(theta * Motor_P) + I_v * $cos(theta * Motor_P - 2 * PI / 3) + I_w * $cos(theta * Motor_P + 2 * PI / 3)) * 0.003 * 50 / 2.048 * 4096 * FILTER_GAIN * 0.816496581);
+            current_q <= $rtoi((I_u * $sin(theta * Motor_P) + I_v * $sin(theta * Motor_P - 2 * PI / 3) + I_w * $sin(theta * Motor_P + 2 * PI / 3)) * 0.003 * 50 / 2.048 * 4096 * FILTER_GAIN * -0.816496581);
         end
         else begin
             current_u_data <= 'X;
@@ -185,10 +186,8 @@ module test ();
         .status_driver_fault_n(status_driver_fault_n),
         .status_hall_fault_n(status_hall_fault_n),
         .status_encoder_fault_n(status_encoder_fault_n),
-        .current_u_data(current_u_data),
-        .current_u_valid(current_uv_valid),
-        .current_v_data(current_v_data),
-        .current_v_valid(current_uv_valid),
+        .current_uv_data({current_u_data, current_v_data}),
+        .current_uv_valid(current_uv_valid),
         .current_reference_data({current_ref_d_data, current_ref_q_data}),
         .current_reference_valid(current_ref_dq_valid),
         .current_measurement_data(),

@@ -5,12 +5,12 @@ module test ();
     
     logic in_inverse;
     logic unsigned [8:0] in_theta;
-    logic signed [15:0] in_y;
     logic signed [15:0] in_x;
+    logic signed [15:0] in_y;
     logic in_valid = 1'b0;
     logic in_ready;
-    logic signed [15:0] out_y;
     logic signed [15:0] out_x;
+    logic signed [15:0] out_y;
     logic out_valid;
     logic out_ready = 1'b1;
     
@@ -20,11 +20,11 @@ module test ();
     ) park_0 (
         .clk(clk),
         .reset(reset),
-        .in_data({in_inverse, in_theta, in_y, in_x}),
+        .in_data({in_inverse, in_theta, in_x, in_y}),
         .in_channel(1'b0),
         .in_valid(in_valid),
         .in_ready(in_ready),
-        .out_data({out_y, out_x}),
+        .out_data({out_x, out_y}),
         .out_channel(),
         .out_valid(out_valid),
         .out_ready(out_ready)
@@ -50,11 +50,11 @@ module test ();
         $stop;
     end
     
-    task write_data(input inverse, input [8:0] theta, input [15:0] y, input [15:0] x);
+    task write_data(input inverse, input [8:0] theta, input [15:0] x, input [15:0] y);
         in_inverse <= inverse;
         in_theta <= theta;
-        in_y <= y;
         in_x <= x;
+        in_y <= y;
         in_valid <= 1'b1;
         @(posedge clk);
         while (in_ready == 1'b0) begin
@@ -62,8 +62,8 @@ module test ();
         end
         in_inverse <= 1'bX;
         in_theta <= 'X;
-        in_y <= 'X;
         in_x <= 'X;
+        in_y <= 'X;
         in_valid <= 1'b0;
     endtask
     

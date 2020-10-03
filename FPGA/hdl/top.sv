@@ -308,127 +308,54 @@ module PhoenixFPGA (
         .out (mod_sleep_filtered_n)
     );
     
-    // ADC1 (LTC2320-12)
-    logic ain_valid;
-    logic signed [12:0] ain_data[1:8];
-    ltc2320 ltc2320_0 (
-        .clk_100mhz   (clk_100mhz),
-        .reset_100mhz (reset_100mhz),
-        .clk_150mhz   (clk_150mhz),
-        .reset_150mhz (reset_150mhz),
-        .adc_sck      (ADC1_SCK),
-        .adc_cnv_n    (ADC1_CNV_N),
-        .adc_sdo      ({ADC1_SDO8, ADC1_SDO7, ADC1_SDO6, ADC1_SDO5, ADC1_SDO4, ADC1_SDO3, ADC1_SDO2, ADC1_SDO1}),
-        .adc_clkout   (ADC1_CLKOUT),
-        .ain_valid    (ain_valid),
-        .ain1_data    (ain_data[1]),
-        .ain2_data    (ain_data[2]),
-        .ain3_data    (ain_data[3]),
-        .ain4_data    (ain_data[4]),
-        .ain5_data    (ain_data[5]),
-        .ain6_data    (ain_data[6]),
-        .ain7_data    (ain_data[7]),
-        .ain8_data    (ain_data[8])
+    // ADC1 (LTC2320-12) and filters
+    logic adc1_valid;
+    logic signed [15:0] adc1_u_data [1:4];
+    logic signed [15:0] adc1_v_data [1:4];
+    logic pwm_trigger_150mhz;
+    adc_and_filters adc1 (
+        .clk_sys            (clk_75mhz),
+        .reset_sys          (reset_75mhz),
+        .clk_100mhz         (clk_100mhz),
+        .reset_100mhz       (reset_100mhz),
+        .clk_150mhz         (clk_150mhz),
+        .reset_150mhz       (reset_150mhz),
+        .adc_sck            (ADC1_SCK),
+        .adc_cnv_n          (ADC1_CNV_N),
+        .adc_sdo            ({ADC1_SDO8, ADC1_SDO7, ADC1_SDO6, ADC1_SDO5, ADC1_SDO4, ADC1_SDO3, ADC1_SDO2, ADC1_SDO1}),
+        .adc_clkout         (ADC1_CLKOUT),
+        .ain_valid          (adc1_valid),
+        .ain1_data          (adc1_u_data[4]),
+        .ain2_data          (adc1_v_data[4]),
+        .ain3_data          (adc1_u_data[1]),
+        .ain4_data          (adc1_v_data[1]),
+        .ain5_data          (adc1_u_data[2]),
+        .ain6_data          (adc1_v_data[2]),
+        .ain7_data          (adc1_u_data[3]),
+        .ain8_data          (adc1_v_data[3]),
+        .pwm_trigger_150mhz (pwm_trigger_150mhz)
     );
-    
-    // ADC1 CIC Filters
-    logic [1:8] cic_valid_150mhz;
-    logic [1:8] cic_valid;
-    logic signed [15:0] cic_data_150mhz[1:8];
-    logic signed [15:0] cic_data[1:8];
-    logic signed [15:0] cic_u_data[1:4];
-    wire [1:4] cic_u_valid = {cic_valid[3], cic_valid[5], cic_valid[7], cic_valid[1]};
-    logic signed [15:0] cic_v_data[1:4];
-    wire [1:4] cic_v_valid = {cic_valid[4], cic_valid[6], cic_valid[8], cic_valid[2]};
-    assign {cic_u_data[1], cic_u_data[2], cic_u_data[3], cic_u_data[4]} = {cic_data[3], cic_data[5], cic_data[7], cic_data[1]};
-    assign cic_v_data[1] = cic_data[4];
-    assign cic_v_data[2] = cic_data[6];
-    assign cic_v_data[3] = cic_data[8];
-    assign cic_v_data[4] = cic_data[2];
-    genvar i;
-    generate
-        for (i = 1; i <= 8; i = i + 1) begin : filters
-            current_cic_filter cic (
-                .clk(clk_150mhz),
-                .reset(reset_150mhz),
-                .in_valid(ain_valid),
-                .in_data(ain_data[i]),
-                .out_valid(cic_valid_150mhz[i]),
-                .out_data(cic_data_150mhz[i])
-            );
-            avalon_st_clock_bridge #(
-                .DATA_WIDTH(16)
-            ) bridge (
-                .clk1(clk_150mhz),
-                .reset1(reset_150mhz),
-                .sink_data(cic_data_150mhz[i]),
-                .sink_valid(cic_valid_150mhz[i]),
-                .clk2(clk_75mhz),
-                .reset2(reset_75mhz),
-                .source_data(cic_data[i]),
-                .source_valid(cic_valid[i]),
-                .source_ready(1'b1)
-            );
-            /*cdb_data_module #(
-                .DATA_BITWIDTH(16)
-            ) bridge (
-                .in_rst(reset_150mhz),
-                .in_clk(clk_150mhz),
-                .in_valid(cic_valid_150mhz[i]),
-                .in_data(cic_data_150mhz[i]),
-                .out_rst(reset_75mhz),
-                .out_clk(clk_75mhz),
-                .out_valid(cic_valid[i]),
-                .out_data(cic_data[i])
-            );*/
-        end
-    endgenerate
     
     // PWM drivers
     // Controller 1...4 -> Driver 1...4 -> Motor 1...4 (Wheel motors)
     // Controller 5     -> Driver 5     -> Motor 5 (Dribble motor)
-    wire pwm_trigger = cic_valid_150mhz[1];
-    logic pwm_fault, pwm_fault_5;
-    logic pwm_fault_150mhz, pwm_fault_5_150mhz;
-    logic [47:0] controller_pwm_data [1:4];
+    logic pwm_fault, pwm_fault_150mhz;
+    logic pwm_fault_5, pwm_fault_5_150mhz;
     logic [15:0] controller_5_pwm_data;
-    logic [1:5] controller_pwm_valid;
-    logic [1:5] controller_pwm_ready;
-    logic [47:0] driver_pwm_data [1:4];
-    logic [15:0] driver_5_pwm_data;
-    logic [1:5] driver_pwm_valid;
-    logic [2:0] driver_pwm [1:5];
+    logic controller_5_pwm_valid;
+    logic controller_5_pwm_ready;
+    logic [2:0] driver_pwm [1:5]; // {U, V, W}
     logic [2:0] driver_reset_n [1:5];
-    assign MOTOR1_PWM_A = driver_pwm[1][0];
-    assign MOTOR1_PWM_B = driver_pwm[1][1];
-    assign MOTOR1_PWM_C = driver_pwm[1][2];
-    assign MOTOR2_PWM_A = driver_pwm[2][0];
-    assign MOTOR2_PWM_B = driver_pwm[2][1];
-    assign MOTOR2_PWM_C = driver_pwm[2][2];
-    assign MOTOR3_PWM_A = driver_pwm[3][0];
-    assign MOTOR3_PWM_B = driver_pwm[3][1];
-    assign MOTOR3_PWM_C = driver_pwm[3][2];
-    assign MOTOR4_PWM_A = driver_pwm[4][0];
-    assign MOTOR4_PWM_B = driver_pwm[4][1];
-    assign MOTOR4_PWM_C = driver_pwm[4][2];
-    assign MOTOR5_PWM_A = driver_pwm[5][0];
-    assign MOTOR5_PWM_B = driver_pwm[5][1];
-    assign MOTOR5_PWM_C = driver_pwm[5][2];
-    assign MOTOR1_RESET_A_N = driver_reset_n[1][0];
-    assign MOTOR1_RESET_B_N = driver_reset_n[1][1];
-    assign MOTOR1_RESET_C_N = driver_reset_n[1][2];
-    assign MOTOR2_RESET_A_N = driver_reset_n[2][0];
-    assign MOTOR2_RESET_B_N = driver_reset_n[2][1];
-    assign MOTOR2_RESET_C_N = driver_reset_n[2][2];
-    assign MOTOR3_RESET_A_N = driver_reset_n[3][0];
-    assign MOTOR3_RESET_B_N = driver_reset_n[3][1];
-    assign MOTOR3_RESET_C_N = driver_reset_n[3][2];
-    assign MOTOR4_RESET_A_N = driver_reset_n[4][0];
-    assign MOTOR4_RESET_B_N = driver_reset_n[4][1];
-    assign MOTOR4_RESET_C_N = driver_reset_n[4][2];
-    assign MOTOR5_RESET_A_N = driver_reset_n[5][0];
-    assign MOTOR5_RESET_B_N = driver_reset_n[5][1];
-    assign MOTOR5_RESET_C_N = driver_reset_n[5][2];
+    assign {MOTOR1_PWM_C, MOTOR1_PWM_B, MOTOR1_PWM_A} = driver_pwm[1];
+    assign {MOTOR2_PWM_C, MOTOR2_PWM_B, MOTOR2_PWM_A} = driver_pwm[2];
+    assign {MOTOR3_PWM_C, MOTOR3_PWM_B, MOTOR3_PWM_A} = driver_pwm[3];
+    assign {MOTOR4_PWM_C, MOTOR4_PWM_B, MOTOR4_PWM_A} = driver_pwm[4];
+    assign {MOTOR5_PWM_A, MOTOR5_PWM_B, MOTOR5_PWM_C} = driver_pwm[5];
+    assign {MOTOR1_RESET_C_N, MOTOR1_RESET_B_N, MOTOR1_RESET_A_N} = driver_reset_n[1];
+    assign {MOTOR2_RESET_C_N, MOTOR2_RESET_B_N, MOTOR2_RESET_A_N} = driver_reset_n[2];
+    assign {MOTOR3_RESET_C_N, MOTOR3_RESET_B_N, MOTOR3_RESET_A_N} = driver_reset_n[3];
+    assign {MOTOR4_RESET_C_N, MOTOR4_RESET_B_N, MOTOR4_RESET_A_N} = driver_reset_n[4];
+    assign {MOTOR5_RESET_A_N, MOTOR5_RESET_B_N, MOTOR5_RESET_C_N} = driver_reset_n[5];
     wire [1:5] driver_otw_n = {MOTOR1_OTW_N, MOTOR2_OTW_N, MOTOR3_OTW_N, MOTOR4_OTW_N, MOTOR5_OTW_N};
     wire [1:5] driver_fault_n = {MOTOR1_FAULT_N, MOTOR2_FAULT_N, MOTOR3_FAULT_N, MOTOR4_FAULT_N, MOTOR5_FAULT_N};
     wire [1:4] sensor_encoder_a = {MOTOR1_ENC_A, MOTOR2_ENC_A, MOTOR3_ENC_A, MOTOR4_ENC_A};
@@ -446,129 +373,112 @@ module PhoenixFPGA (
     logic signed [15:0] encoder_data [1:4];
     logic signed [15:0] param_kp;
     logic signed [15:0] param_ki;
+    genvar i;
     generate
-        for (i = 1; i <= 4; i = i + 1) begin : drivers // Motor 1...4 PWM driver
-            ds_pwm_driver #(
-                .PERIOD(3000),
-                .MAX_ON_CYCLES(2985)
-            ) driver (
-                .clk(clk_150mhz),
-                .reset(reset_150mhz),
-                .trigger(pwm_trigger),
-                .fault(pwm_fault_150mhz),
-                .pwm_valid(driver_pwm_valid[i]),
-                .pwm_data(driver_pwm_data[i]),
-                .driver_pwm(driver_pwm[i]),
-                .driver_reset_n(driver_reset_n[i])
-            );
-            avalon_st_clock_bridge #(
-                .DATA_WIDTH(48)
-            ) bridge (
-                .clk1(clk_75mhz),
-                .reset1(reset_75mhz),
-                .sink_data(controller_pwm_data[i]),
-                .sink_valid(controller_pwm_valid[i]),
-                .sink_ready(controller_pwm_ready[i]),
-                .clk2(clk_150mhz),
-                .reset2(reset_150mhz),
-                .source_data(driver_pwm_data[i]),
-                .source_valid(driver_pwm_valid[i]),
-                .source_ready(1'b1)
-            );
-            /*cdb_data_module #(
-                .DATA_BITWIDTH(48)
-            ) bridge (
-                .in_rst(reset_75mhz),
-                .in_clk(clk_75mhz),
-                .in_valid(controller_pwm_valid[i]),
-                .in_data(controller_pwm_data[i]),
-                .in_ready(controller_pwm_ready[i]),
-                .out_rst(reset_150mhz),
-                .out_clk(clk_150mhz),
-                .out_valid(driver_pwm_valid[i]),
-                .out_data(driver_pwm_data[i])
-            );*/
-            vector_controller #(
-                .INVERSE_ENCODER(1)
-            ) controller (
-                .clk(clk_75mhz),
-                .reset(reset_75mhz),
-                .fault(pwm_fault),
-                .pulse_1khz(pulse_1khz),
-                .pulse_8khz(pulse_8khz),
-                .sensor_hall_uvw(sensor_hall_uvw[i]),
-                .sensor_encoder_ab({sensor_encoder_a[i], sensor_encoder_b[i]}),
-                .driver_otw_n(driver_otw_n[i]),
-                .driver_fault_n(driver_fault_n[i]),
-                .driver_pwm_data(controller_pwm_data[i]),
-                .driver_pwm_valid(controller_pwm_valid[i]),
-                .driver_pwm_ready(controller_pwm_ready[i]),
-                .status_driver_otw_n(status_driver_otw_n[i]),
-                .status_driver_fault_n(status_driver_fault_n[i]),
-                .status_hall_fault_n(status_hall_fault_n[i]),
-                .status_encoder_fault_n(status_encoder_fault_n[i]),
-                .position_theta(),
-                .position_error(status_pos_error[i]),
-                .position_uncertain(status_pos_uncertain[i]),
-                .current_u_data(cic_u_data[i]),
-                .current_u_valid(cic_u_valid[i]),
-                .current_v_data(cic_v_data[i]),
-                .current_v_valid(cic_v_valid[i]),
-                .current_reference_data(current_reference_data[i]), // {d, q}
-                .current_reference_valid(current_reference_valid[i]),
-                .current_measurement_data(current_measurement_data[i]), // {d, q}
-                .current_measurement_valid(current_measurement_valid[i]),
-                .encoder_data(encoder_data[i]),
-                .param_kp(param_kp),
-                .param_ki(param_ki)
-            );
+        for (i = 1; i <= 5; i = i + 1) begin : drivers
+            logic driver_pwm_valid;
+            if (i <= 4) begin // Motor 1...4 PWM driver
+                logic [35:0] driver_pwm_data;
+                logic [35:0] controller_pwm_data;
+                logic controller_pwm_valid;
+                logic controller_pwm_ready;
+                ds_pwm_driver #(
+                    .PERIOD(3000),
+                    .MAX_ON_CYCLES(2985)
+                ) driver (
+                    .clk(clk_150mhz),
+                    .reset(reset_150mhz),
+                    .trigger(pwm_trigger_150mhz),
+                    .fault(pwm_fault_150mhz),
+                    .pwm_valid(driver_pwm_valid),
+                    .pwm_data(driver_pwm_data),
+                    .driver_pwm(driver_pwm[i]),
+                    .driver_reset_n(driver_reset_n[i])
+                );
+                avalon_st_clock_bridge #(
+                    .DATA_WIDTH(36)
+                ) bridge (
+                    .clk1(clk_75mhz),
+                    .reset1(reset_75mhz),
+                    .sink_data(controller_pwm_data),
+                    .sink_valid(controller_pwm_valid),
+                    .sink_ready(controller_pwm_ready),
+                    .clk2(clk_150mhz),
+                    .reset2(reset_150mhz),
+                    .source_data(driver_pwm_data),
+                    .source_valid(driver_pwm_valid),
+                    .source_ready(1'b1)
+                );
+                vector_controller #(
+                    .INVERSE_ENCODER(1)
+                ) controller (
+                    .clk(clk_75mhz),
+                    .reset(reset_75mhz),
+                    .fault(pwm_fault),
+                    .pulse_1khz(pulse_1khz),
+                    .pulse_8khz(pulse_8khz),
+                    .sensor_hall_uvw(sensor_hall_uvw[i]),
+                    .sensor_encoder_ab({sensor_encoder_a[i], sensor_encoder_b[i]}),
+                    .driver_otw_n(driver_otw_n[i]),
+                    .driver_fault_n(driver_fault_n[i]),
+                    .driver_pwm_data(controller_pwm_data),
+                    .driver_pwm_valid(controller_pwm_valid),
+                    .driver_pwm_ready(controller_pwm_ready),
+                    .status_driver_otw_n(status_driver_otw_n[i]),
+                    .status_driver_fault_n(status_driver_fault_n[i]),
+                    .status_hall_fault_n(status_hall_fault_n[i]),
+                    .status_encoder_fault_n(status_encoder_fault_n[i]),
+                    .position_theta(),
+                    .position_error(status_pos_error[i]),
+                    .position_uncertain(status_pos_uncertain[i]),
+                    .current_uv_data({adc1_u_data[i], adc1_v_data[i]}), // {Iu, Iv}
+                    .current_uv_valid(adc1_valid),
+                    .current_reference_data(current_reference_data[i]), // {Id, Iq}
+                    .current_reference_valid(current_reference_valid[i]),
+                    .current_measurement_data(current_measurement_data[i]), // {Id, Iq}
+                    .current_measurement_valid(current_measurement_valid[i]),
+                    .encoder_data(encoder_data[i]),
+                    .param_kp(param_kp),
+                    .param_ki(param_ki)
+                );
+            end
+            else begin // Motor 5 PWM driver
+                logic [15:0] driver_pwm_data;
+                pwm_driver #(
+                    .PWM_MAX_ON_CYCLES(2985)
+                ) driver_5 (
+                    .clk(clk_150mhz),
+                    .reset(reset_150mhz),
+                    .trigger(pwm_trigger_150mhz),
+                    .fault(pwm_fault_5_150mhz),
+                    .pwm_sink_data(driver_pwm_data),
+                    .pwm_sink_valid(driver_pwm_valid),
+                    .sensor_hall_uvw(sensor_hall_uvw[i]),
+                    .driver_otw_n(driver_otw_n[i]),
+                    .driver_fault_n(driver_fault_n[i]),
+                    .driver_pwm(driver_pwm[i]),
+                    .driver_reset_n(driver_reset_n[i]),
+                    .status_driver_otw_n(status_driver_otw_n[i]),
+                    .status_driver_fault_n(status_driver_fault_n[i]),
+                    .status_hall_fault_n(status_hall_fault_n[i])
+                );
+                avalon_st_clock_bridge #(
+                    .DATA_WIDTH(16)
+                ) bridge_5 (
+                    .clk1(clk_75mhz),
+                    .reset1(reset_75mhz),
+                    .sink_data(controller_5_pwm_data),
+                    .sink_valid(controller_5_pwm_valid),
+                    .sink_ready(controller_5_pwm_ready),
+                    .clk2(clk_150mhz),
+                    .reset2(reset_150mhz),
+                    .source_data(driver_pwm_data),
+                    .source_valid(driver_pwm_valid),
+                    .source_ready(1'b1)
+                );
+            end
         end
     endgenerate
-    pwm_driver #( // Motor 5 PWM driver
-        .PWM_MAX_ON_CYCLES(2985)
-    ) driver_5 (
-        .clk(clk_150mhz),
-        .reset(reset_150mhz),
-        .trigger(pwm_trigger),
-        .fault(pwm_fault_5_150mhz),
-        .pwm_sink_data(driver_5_pwm_data),
-        .pwm_sink_valid(driver_pwm_valid[5]),
-        .sensor_hall_uvw(sensor_hall_uvw[5]),
-        .driver_otw_n(driver_otw_n[5]),
-        .driver_fault_n(driver_fault_n[5]),
-        .driver_pwm(driver_pwm[5]),
-        .driver_reset_n(driver_reset_n[5]),
-        .status_driver_otw_n(status_driver_otw_n[5]),
-        .status_driver_fault_n(status_driver_fault_n[5]),
-        .status_hall_fault_n(status_hall_fault_n[5])
-    );
-    avalon_st_clock_bridge #(
-        .DATA_WIDTH(16)
-    ) bridge_5 (
-        .clk1(clk_75mhz),
-        .reset1(reset_75mhz),
-        .sink_data(controller_5_pwm_data),
-        .sink_valid(controller_pwm_valid[5]),
-        .sink_ready(controller_pwm_ready[5]),
-        .clk2(clk_150mhz),
-        .reset2(reset_150mhz),
-        .source_data(driver_5_pwm_data),
-        .source_valid(driver_pwm_valid[5]),
-        .source_ready(1'b1)
-    );
-    /*cdb_data_module #(
-        .DATA_BITWIDTH(16)
-    ) bridge (
-        .in_rst(reset_75mhz),
-        .in_clk(clk_75mhz),
-        .in_valid(controller_pwm_valid[5]),
-        .in_data(controller_5_pwm_data),
-        .in_ready(controller_pwm_ready[5]),
-        .out_rst(reset_150mhz),
-        .out_clk(clk_150mhz),
-        .out_valid(driver_pwm_valid[5]),
-        .out_data(driver_5_pwm_data)
-    );*/
     cdb_signal_module pwm_fault_bridge (
         .in_rst(reset_75mhz),
         .in_clk(clk_75mhz),
@@ -586,19 +496,10 @@ module PhoenixFPGA (
         .out_sig(pwm_fault_5_150mhz)
     );
     
-    
-    
-    /*wire msgdma_ready;
-    wire msgdma_valid;
-    wire [15:0] msgdma_data;
-    wire [7:0] msgdma_channel;*/
-    
-    
     wire adc2_sda_oe;
     wire adc2_scl_oe;
     assign ADC2_SDA = adc2_sda_oe ? 1'b0 : 1'bz;
     assign ADC2_SCL = adc2_scl_oe ? 1'b0 : 1'bz;
-    
     wire [0:0] pio_0_in = {
         pulse_1khz             // [0]
     };
@@ -648,6 +549,10 @@ module PhoenixFPGA (
     assign MOTOR2_LED   = pio_2_out[2];
     assign MOTOR1_LED   = pio_2_out[1];
     assign FPGA_INT     = pio_2_out[0];
+    wire msgdma_ready;
+    wire msgdma_valid;
+    wire [15:0] msgdma_data;
+    wire [7:0] msgdma_channel;
     controller ctrl (
         .reset_reset_n             (~reset_75mhz),
         .clk_clk                   (clk_75mhz),
@@ -697,24 +602,136 @@ module PhoenixFPGA (
 		.mc_status_driver_fault_n  (status_driver_fault_n[5]),
 		.mc_status_hall_fault_n    (status_hall_fault_n[5]),
 		.mc_pwm_data               (controller_5_pwm_data),
-		.mc_pwm_valid              (controller_pwm_valid[5]),
-		.mc_pwm_ready              (controller_pwm_ready[5])
-		/*.msgdma_source_ready       (msgdma_ready),
-		.msgdma_source_valid       (msgdma_valid),
+		.mc_pwm_valid              (controller_5_pwm_valid),
+		.mc_pwm_ready              (controller_5_pwm_ready),
         .msgdma_source_data        (msgdma_data),
-		.msgdma_source_channel     (msgdma_channel)*/
+		.msgdma_source_channel     (msgdma_channel),
+		.msgdma_source_valid       (msgdma_valid),
+		.msgdma_source_ready       (msgdma_ready),
+        .uart_rxd                  (FPGA_UART_RX),
+		.uart_txd                  (FPGA_UART_TX)
     );
     
-    /*assign FPGA_SPI_MISO = 1'bz;
-    host host_0 (
-		.clk_clk             (clk_75mhz),
-        .reset_reset_n       (~reset_75mhz),
-		.clk100mhz_clk       (clk_100mhz),
-		.reset100mhz_reset_n (~reset_100mhz),
-        .msgdma_sink_ready   (msgdma_ready),
-		.msgdma_sink_valid   (msgdma_valid),
-		.msgdma_sink_data    (msgdma_data),
-		.msgdma_sink_channel (msgdma_channel),
-		.uart_txd_txd        (FPGA_UART_TX)
-	);*/
+    spislave slave (
+		.clk_clk       (clk_75mhz),
+		.reset_reset_n (~reset_75mhz),
+		.spi_mosi      (FPGA_SPI_MOSI),
+		.spi_nss       (FPGA_SPI_CS0_N),
+		.spi_miso      (FPGA_SPI_MISO),
+		.spi_sclk      (FPGA_SPI_SCLK),
+		.sink_data     (msgdma_data),
+		.sink_channel  (msgdma_channel),
+		.sink_valid    (msgdma_valid),
+		.sink_ready    (msgdma_ready),
+		.source_ready  (1'b1),
+		.source_valid  (),
+		.source_data   ()
+	);
+endmodule
+
+module adc_and_filters (
+        input  wire        clk_sys,
+        input  wire        reset_sys,
+        input  wire        clk_100mhz,
+        input  wire        reset_100mhz,
+        input  wire        clk_150mhz,
+        input  wire        reset_150mhz,
+        output wire        adc_sck,
+        output wire        adc_cnv_n,
+        input  wire [7:0]  adc_sdo,
+        input  wire        adc_clkout,
+        output wire        ain_valid,
+        output wire [15:0] ain1_data,
+        output wire [15:0] ain2_data,
+        output wire [15:0] ain3_data,
+        output wire [15:0] ain4_data,
+        output wire [15:0] ain5_data,
+        output wire [15:0] ain6_data,
+        output wire [15:0] ain7_data,
+        output wire [15:0] ain8_data,
+        output reg         pwm_trigger_150mhz
+    );
+    
+    // ADC
+    logic ain_raw_valid_150mhz;
+    logic ain_raw_valid;
+    logic signed [12:0] ain_raw_data [1:8];
+    ltc2320 adc (
+        // 100MHz/150MHz domain
+        .clk_100mhz       (clk_100mhz),
+        .reset_100mhz     (reset_100mhz),
+        .clk_150mhz       (clk_150mhz),
+        .reset_150mhz     (reset_150mhz),
+        .adc_sck          (adc_sck),
+        .adc_cnv_n        (adc_cnv_n),
+        .adc_sdo          (adc_sdo),
+        .adc_clkout       (adc_clkout),
+        .ain_valid_150mhz (ain_raw_valid_150mhz),
+        
+        // clk_sys domain
+        .clk_sys          (clk_sys),
+        .reset_sys        (reset_sys),
+        .ain_valid        (ain_raw_valid),
+        .ain1_data        (ain_raw_data[1]),
+        .ain2_data        (ain_raw_data[2]),
+        .ain3_data        (ain_raw_data[3]),
+        .ain4_data        (ain_raw_data[4]),
+        .ain5_data        (ain_raw_data[5]),
+        .ain6_data        (ain_raw_data[6]),
+        .ain7_data        (ain_raw_data[7]),
+        .ain8_data        (ain_raw_data[8])
+    );
+    
+    // CIC filters (1.5Msps -> 50ksps)
+    logic [1:8] cic_valid;
+    logic signed [15:0] cic_data [1:8];
+    genvar i;
+    generate
+        for (i = 1; i <= 8; i = i + 1) begin : filters
+            current_cic_filter cic (
+                .clk(clk_sys),
+                .reset(reset_sys),
+                .in_valid(ain_raw_valid),
+                .in_data(ain_raw_data[i]),
+                .out_valid(cic_valid[i]),
+                .out_data(cic_data[i])
+            );
+        end
+    endgenerate
+    
+    // FIR filters
+    current_fir_filter #(
+        .DATA_WIDTH(16),
+        .DATA_COUNT(8)
+    ) fir (
+        .clk       (clk_sys),
+        .reset     (reset_sys),
+        .in_data   ({cic_data[1], cic_data[2], cic_data[3], cic_data[4], cic_data[5], cic_data[6], cic_data[7], cic_data[8]}),
+        .in_valid  (cic_valid[1]),
+        .in_ready  (),
+        .out_data  ({ain1_data, ain2_data, ain3_data, ain4_data, ain5_data, ain6_data, ain7_data, ain8_data}),
+        .out_valid (ain_valid),
+        .out_ready (1'b1)
+    );
+    
+    // Generate PWM trigger pulse which is synchronized CIC filter output (50kHz)
+    logic [4:0] counter = '0;
+    always @(posedge clk_150mhz, posedge reset_150mhz) begin
+        if (reset_150mhz == 1'b1) begin
+            pwm_trigger_150mhz <= 1'b0;
+            counter <= '0;
+        end
+        else begin
+            pwm_trigger_150mhz <= 1'b0;
+            if (ain_raw_valid_150mhz == 1'b1) begin
+                if (29 <= counter) begin
+                    pwm_trigger_150mhz <= 1'b1;
+                    counter <= '0;
+                end
+                else begin
+                    counter <= counter + 1'b1;
+                end
+            end
+        end
+    end
 endmodule

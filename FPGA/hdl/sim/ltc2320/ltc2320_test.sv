@@ -1,32 +1,36 @@
 `timescale 1 ps / 1 ps
 module test ();
-    reg reset = 1'b1;
-    reg clk_100mhz = 1'b0;
-    reg clk_150mhz = 1'b0;
-    wire adc_sck;
-    wire adc_cnv_n;
-    reg [7:0] adc_sdo;
-    reg adc_clkout;
+    logic reset = 1'b1;
+    logic clk_sys = 1'b0;
+    logic clk_100mhz = 1'b0;
+    logic clk_150mhz = 1'b0;
+    logic adc_sck;
+    logic adc_cnv_n;
+    logic [7:0] adc_sdo;
+    logic adc_clkout;
     
-    wire ain_valid;
-    wire [12:0] ain1_data;
-    wire [12:0] ain2_data;
-    wire [12:0] ain3_data;
-    wire [12:0] ain4_data;
-    wire [12:0] ain5_data;
-    wire [12:0] ain6_data;
-    wire [12:0] ain7_data;
-    wire [12:0] ain8_data;
+    logic ain_valid;
+    logic [12:0] ain1_data;
+    logic [12:0] ain2_data;
+    logic [12:0] ain3_data;
+    logic [12:0] ain4_data;
+    logic [12:0] ain5_data;
+    logic [12:0] ain6_data;
+    logic [12:0] ain7_data;
+    logic [12:0] ain8_data;
     
     ltc2320 adc (
-		.reset_100mhz   (reset),
-        .reset_150mhz   (reset),
+        .clk_sys        (clk_sys),
+		.reset_sys      (reset),
 		.clk_100mhz     (clk_100mhz),
+        .reset_100mhz   (reset),
 		.clk_150mhz     (clk_150mhz),
-		.adc_sck        (adc_sck),
+		.reset_150mhz   (reset),
+        .adc_sck        (adc_sck),
 		.adc_cnv_n      (adc_cnv_n),
 		.adc_sdo        (adc_sdo),
 		.adc_clkout     (adc_clkout),
+        .ain_valid_150mhz(),
         .ain_valid      (ain_valid),
         .ain1_data      (ain1_data),
         .ain2_data      (ain2_data),
@@ -54,28 +58,33 @@ module test ();
             @(negedge adc_clkout) adc_sdo <= 8'b00000000;
             @(negedge adc_clkout) adc_sdo <= 8'b11111111;
             @(negedge adc_clkout) adc_sdo <= 8'b00000000;
+            @(negedge adc_clkout) adc_sdo <= 8'b00000000;
+            @(negedge adc_clkout) adc_sdo <= 8'b11111111;
             @(negedge adc_clkout) adc_sdo <= 8'b11111111;
             @(negedge adc_clkout) adc_sdo <= 8'b00000000;
             @(negedge adc_clkout) adc_sdo <= 8'b11111111;
-            @(negedge adc_clkout) adc_sdo <= 8'b00000000;
             @(negedge adc_clkout) adc_sdo <= 8'b11111111;
             @(negedge adc_clkout) adc_sdo <= 8'b00000000;
-            @(negedge adc_clkout) adc_sdo <= 8'b11111111;
             @(negedge adc_clkout) adc_sdo <= 8'b00000000;
             @(negedge adc_clkout) adc_sdo <= 8'b11111111;
-            @(negedge adc_clkout) adc_sdo <= 8'b00000000;
+            @(negedge adc_clkout) adc_sdo <= 8'b11111111;
             @(negedge adc_clkout) adc_sdo <= 8'b11111111;
             @(negedge adc_clkout) adc_sdo <= 8'b00000000;
             @(negedge adc_clkout) adc_sdo <= 8'b11111111;
         end
     end
     
-    // CLOCK 100MHz Generation
+    // clk_sys Generation
+    always #6.543ns begin
+        clk_sys <= ~clk_sys;
+    end
+    
+    // clk_100mhz Generation
     always #5ns begin
         clk_100mhz <= ~clk_100mhz;
     end
     
-    // CLOCK 150MHz Generation
+    // clk_150mhz Generation
     always #3.333ns begin
         clk_150mhz <= ~clk_150mhz;
     end

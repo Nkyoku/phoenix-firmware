@@ -2,6 +2,7 @@ module vector_controller #(
         parameter int INVERSE_ENCODER = 0,
         parameter int THETA_WIDTH = 9,
         parameter int PWM_WIDTH = 16,
+        parameter int DRIVER_WIDTH = 12,
         parameter int CURRENT_WIDTH = 16,
         parameter int ENCODER_WIDTH = 16,
         parameter int GAIN_WIDTH = 16,
@@ -16,7 +17,7 @@ module vector_controller #(
         input  wire [1:0]                 sensor_encoder_ab, // {a, b}
         input  wire                       driver_otw_n,
         input  wire                       driver_fault_n,
-        output wire [3*PWM_WIDTH-1:0]     driver_pwm_data, // {u, v, w}
+        output wire [3*DRIVER_WIDTH-1:0]  driver_pwm_data, // {u, v, w}
         output wire                       driver_pwm_valid,
         input  wire                       driver_pwm_ready,
         output wire                       status_driver_otw_n,
@@ -26,10 +27,8 @@ module vector_controller #(
         output reg  [THETA_WIDTH-1:0]     position_theta,
         output reg                        position_error,
         output reg                        position_uncertain,
-        input  wire [CURRENT_WIDTH-1:0]   current_u_data,
-        input  wire                       current_u_valid,
-        input  wire [CURRENT_WIDTH-1:0]   current_v_data,
-        input  wire                       current_v_valid,
+        input  wire [2*CURRENT_WIDTH-1:0] current_uv_data,
+        input  wire                       current_uv_valid,
         input  wire [2*CURRENT_WIDTH-1:0] current_reference_data, // {d, q}
         input  wire                       current_reference_valid,
         output wire [2*CURRENT_WIDTH-1:0] current_measurement_data, // {d, q}
@@ -93,46 +92,27 @@ module vector_controller #(
         .theta_uncertain(theta_uncertain)
     );
     
-    // Current Multiplexer
-    logic [2*CURRENT_WIDTH-1:0] imux_data;
-    logic imux_valid;
-    logic imux_ready;
-    current_mux #(
-        .DATA_WIDTH(CURRENT_WIDTH)
-    ) imux (
-        .clk(clk),
-        .reset(reset),
-        .in_u_data(current_u_data),
-        .in_u_valid(current_u_valid),
-        .in_v_data(current_v_data),
-        .in_v_valid(current_v_valid),
-        .out_uv_data(imux_data),
-        .out_uv_valid(imux_valid),
-        .out_uv_ready(imux_ready)
-    );
-    
     // Clarke Transform
-    logic [CURRENT_WIDTH-1:0] current_a_raw_data;
-    logic [CURRENT_WIDTH-1:0] current_b_raw_data;
-    logic current_ab_raw_valid;
-    logic current_ab_raw_ready;
+    logic [CURRENT_WIDTH-1:0] current_a_data, current_b_data;
+    logic current_ab_valid;
+    logic current_ab_ready;
     clarke_transform #(
         .CHANNEL_WIDTH(1),
         .DATA_WIDTH(CURRENT_WIDTH)
     ) clarke (
         .clk(clk),
         .reset(reset),
-        .in_data(imux_data),
+        .in_data(current_uv_data),
         .in_channel(1'b0),
-        .in_valid(imux_valid),
-        .in_ready(imux_ready),
-        .out_data({current_a_raw_data, current_b_raw_data}),
+        .in_valid(current_uv_valid),
+        .in_ready(),
+        .out_data({current_a_data, current_b_data}),
         .out_channel(),
-        .out_valid(current_ab_raw_valid),
-        .out_ready(current_ab_raw_ready)
+        .out_valid(current_ab_valid),
+        .out_ready(current_ab_ready)
     );
     
-    // Current FIR Filter
+    /*// Current FIR Filter
     logic [CURRENT_WIDTH-1:0] current_a_data;
     logic [CURRENT_WIDTH-1:0] current_b_data;
     logic current_ab_valid;
@@ -149,7 +129,7 @@ module vector_controller #(
         .out_data({current_a_data, current_b_data}),
         .out_valid(current_ab_valid),
         .out_ready(current_ab_ready)
-    );
+    );*/
     
     // Latching Position Estimator's output
     always @(posedge clk, posedge reset) begin
@@ -159,7 +139,7 @@ module vector_controller #(
             position_uncertain <= 1'b1;
         end
         else begin
-            if (current_ab_raw_valid & current_ab_raw_ready) begin
+            if (current_uv_valid == 1'b1) begin
                 position_theta <= theta_data;
                 position_error <= theta_error;
                 position_uncertain <= theta_uncertain;
@@ -168,11 +148,9 @@ module vector_controller #(
     end
     
     // PI Controller
-    logic [PWM_WIDTH-1:0] pi_d_data;
-    logic [PWM_WIDTH-1:0] pi_q_data;
+    logic [PWM_WIDTH-1:0] pi_d_data, pi_q_data;
     logic pi_dq_valid;
-    logic [PWM_WIDTH-1:0] pwm_d_data;
-    logic [PWM_WIDTH-1:0] pwm_q_data;
+    logic [PWM_WIDTH-1:0] pwm_d_data, pwm_q_data;
     logic pwm_dq_available = 1'b0;
     logic pwm_dq_valid = 1'b0;
     logic pwm_dq_ready;
@@ -218,11 +196,9 @@ module vector_controller #(
     end
     
     // (Inverse) Park Transform
-    logic signed [CURRENT_WIDTH-1:0] current_meas_d_data;
-    logic signed [CURRENT_WIDTH-1:0] current_meas_q_data;
+    logic signed [CURRENT_WIDTH-1:0] current_meas_d_data, current_meas_q_data;
     assign current_measurement_data = {current_meas_d_data, current_meas_q_data};
-    logic [PWM_WIDTH-1:0] pwm_a_data;
-    logic [PWM_WIDTH-1:0] pwm_b_data;
+    logic [PWM_WIDTH-1:0] pwm_a_data, pwm_b_data;
     logic pwm_ab_valid;
     logic pwm_ab_ready;
     muxed_park_transform #(
@@ -246,15 +222,14 @@ module vector_controller #(
     );
     
     // Space Vector Modulation
-    logic unsigned [PWM_WIDTH-1:0] driver_pwm_u_data;
-    logic unsigned [PWM_WIDTH-1:0] driver_pwm_v_data;
-    logic unsigned [PWM_WIDTH-1:0] driver_pwm_w_data;
+    logic unsigned [DRIVER_WIDTH-1:0] driver_pwm_u_data, driver_pwm_v_data, driver_pwm_w_data;
     assign driver_pwm_data = {driver_pwm_u_data, driver_pwm_v_data, driver_pwm_w_data};
     space_vector_modulator #(
         .DATA_WIDTH(PWM_WIDTH),
+        .OUT_WIDTH(DRIVER_WIDTH),
         .PERIOD(3000),
-        .DATA_MIN(20),
-        .DATA_MAX(2980)
+        .OUT_MIN(20),
+        .OUT_MAX(2980)
     ) svm (
         .clk(clk),
         .reset(reset | fault),
@@ -265,50 +240,6 @@ module vector_controller #(
         .out_valid(driver_pwm_valid)
         // unused : driver_pwm_ready
     );
-endmodule
-
-module current_mux #(
-        parameter int DATA_WIDTH = 16
-    ) (
-        input  wire                    clk,
-        input  wire                    reset,
-        input  wire [DATA_WIDTH-1:0]   in_u_data,
-        input  wire                    in_u_valid,
-        input  wire [DATA_WIDTH-1:0]   in_v_data,
-        input  wire                    in_v_valid,
-        output wire [2*DATA_WIDTH-1:0] out_uv_data,
-        output wire                    out_uv_valid,
-        input  wire                    out_uv_ready
-    );
-    
-    logic signed [DATA_WIDTH-1:0] u_data;
-    logic signed [DATA_WIDTH-1:0] v_data;
-    logic u_available = 1'b0;
-    logic v_available = 1'b0;
-    assign out_uv_data = {u_data, v_data};
-    assign out_uv_valid = u_available & v_available;
-    always @(posedge clk, posedge reset) begin
-        if (reset == 1'b1) begin
-            u_data <= '0;
-            v_data <= '0;
-            u_available <= 1'b0;
-            v_available <= 1'b0;
-        end
-        else begin
-            if (u_available & v_available & out_uv_ready) begin
-                u_available <= 1'b0;
-                v_available <= 1'b0;
-            end
-            if (in_u_valid == 1'b1) begin
-                u_data <= in_u_data;
-                u_available <= 1'b1;
-            end
-            if (in_v_valid == 1'b1) begin
-                v_data <= in_v_data;
-                v_available <= 1'b1;
-            end
-        end
-    end
 endmodule
 
 module muxed_park_transform #(

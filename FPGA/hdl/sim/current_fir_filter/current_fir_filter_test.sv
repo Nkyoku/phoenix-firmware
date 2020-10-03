@@ -41,7 +41,7 @@ module test ();
     
     initial begin
         @(negedge reset);
-        repeat(1) @(posedge clk);
+        repeat(2) @(posedge clk);
         fork
             begin
                 repeat(10) begin
@@ -60,6 +60,7 @@ module test ();
                 out_ready <= 1'b1;
             end
         join
+        repeat(10) @(posedge clk);
         $stop;
     end
     

@@ -9,15 +9,15 @@ module test2 ();
     
     logic signed [15:0] r0 = 'X;
     logic signed [15:0] r1 = 'X;
-    wire [31:0] in_ref_data = {r1, r0};
+    wire [31:0] in_ref_data = {r0, r1};
     logic in_ref_valid = 1'b0;
     logic signed [15:0] y0 = 'X;
     logic signed [15:0] y1 = 'X;
-    wire [31:0] in_proc_data = {y1, y0};
+    wire [31:0] in_proc_data = {y0, y1};
     logic in_proc_valid = 1'b0;
     logic [31:0] out_data;
-    wire signed [15:0] u0 = out_data[15:0];
-    wire signed [15:0] u1 = out_data[31:16];
+    wire signed [15:0] u0 = out_data[31:16];
+    wire signed [15:0] u1 = out_data[15:0];
     logic out_valid;
     
     pi_controller #(
@@ -49,6 +49,7 @@ module test2 ();
         r1 <= -1000;
         y0 <= 0;
         y1 <= 0;
+        trigger <= 1'b1;
         @(posedge clk);
         in_ref_valid <= 1'b0;
         in_proc_valid <= 1'b0;
@@ -56,14 +57,15 @@ module test2 ();
         r1 <= 0;
         y0 <= 0;
         y1 <= 0;
-        repeat(2) @(posedge clk);
+        trigger <= 1'b0;
+        repeat(20) @(posedge clk);
         
         fork
-            repeat(10) begin
+            repeat(2) begin
                 trigger <= 1'b1;
                 @(posedge clk);
                 trigger <= 1'b0;
-                repeat(11) @(posedge clk);
+                repeat(20) @(posedge clk);
             end
             /*begin
                 repeat(20) @(posedge trigger);

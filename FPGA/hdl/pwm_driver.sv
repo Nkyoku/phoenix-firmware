@@ -90,13 +90,17 @@ module pwm_driver #(
     end
     
     // PWM wave Generation
+    logic [2:0] driver_pwm_ff = '0;
+    logic [2:0] driver_reset_n_ff = '0;
     logic pwm_drive = 1'b0;
     logic unsigned [PWM_COUNTER_WIDTH-1:0] pwm_compare = '0;
     logic unsigned [PWM_COUNTER_WIDTH-1:0] pwm_counter = '0;
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
-            driver_pwm <= 3'b000;
-            driver_reset_n <= 3'b000;
+            driver_pwm <= '0;
+            driver_reset_n <= '0;
+            driver_pwm_ff <= '0;
+            driver_reset_n_ff <= '0;
             pwm_drive <= 1'b0;
             pwm_compare <= '0;
             pwm_counter <= '0;
@@ -115,12 +119,14 @@ module pwm_driver #(
             else begin
                 pwm_counter <= (pwm_counter < '1) ? pwm_counter + 1'b1 : '1;
             end
-            driver_pwm[0] <= pwm_drive & comm_phase_polarity[0] & (pwm_counter < pwm_compare);
-            driver_pwm[1] <= pwm_drive & comm_phase_polarity[1] & (pwm_counter < pwm_compare);
-            driver_pwm[2] <= pwm_drive & comm_phase_polarity[2] & (pwm_counter < pwm_compare);
-            driver_reset_n[0] <= pwm_drive & comm_phase_enable[0];
-            driver_reset_n[1] <= pwm_drive & comm_phase_enable[1];
-            driver_reset_n[2] <= pwm_drive & comm_phase_enable[2];
+            driver_pwm_ff[0] <= pwm_drive & comm_phase_polarity[0] & (pwm_counter < pwm_compare);
+            driver_pwm_ff[1] <= pwm_drive & comm_phase_polarity[1] & (pwm_counter < pwm_compare);
+            driver_pwm_ff[2] <= pwm_drive & comm_phase_polarity[2] & (pwm_counter < pwm_compare);
+            driver_reset_n_ff[0] <= pwm_drive & comm_phase_enable[0];
+            driver_reset_n_ff[1] <= pwm_drive & comm_phase_enable[1];
+            driver_reset_n_ff[2] <= pwm_drive & comm_phase_enable[2];
+            driver_pwm <= driver_pwm_ff;
+            driver_reset_n <= driver_reset_n_ff;
         end
     end
 endmodule

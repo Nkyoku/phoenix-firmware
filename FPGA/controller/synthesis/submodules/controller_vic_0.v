@@ -45,7 +45,7 @@ module controller_vic_0 (
 	altera_vic_csr #(
 		.NUMBER_OF_INT_PORTS (8),
 		.RRS_WIDTH           (6),
-		.RIL_WIDTH           (2),
+		.RIL_WIDTH           (4),
 		.DAISY_CHAIN_ENABLE  (0)
 	) vic_csr (
 		.inr_i1_irq       (irq_input_irq),                                     //        i1.irq
@@ -134,7 +134,7 @@ module controller_vic_0 (
 
 	altera_vic_priority #(
 		.NUMBER_OF_INT_PORTS (8),
-		.PRIORITY_WIDTH      (2),
+		.PRIORITY_WIDTH      (4),
 		.PRIORITY_LATENCY    (3),
 		.DATA_WIDTH          (19)
 	) vic_priority (

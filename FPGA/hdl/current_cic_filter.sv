@@ -1,14 +1,15 @@
 // Original : http://rapidnack.com/?p=1417
 
+// Sinc3フィルタ
 // Gain = RATE^NUM_STAGES / 2^(IN_WIDTH+SCALE_WIDTH-OUT_WIDTH)
-//      = 6.18
+//      = 6.591796875
 
 module current_cic_filter
     #(
-		parameter NUM_STAGES = 4,
+		parameter NUM_STAGES = 3,
         parameter RATE = 30,
 		parameter RATE_WIDTH = 5,
-		parameter SCALE_WIDTH = 20, // ceil(log2(RATE) * NUM_STAGES)
+		parameter SCALE_WIDTH = 15, // ceil(log2(RATE) * NUM_STAGES)
         parameter IN_WIDTH = 13,
 		parameter OUT_WIDTH = 16
     ) (

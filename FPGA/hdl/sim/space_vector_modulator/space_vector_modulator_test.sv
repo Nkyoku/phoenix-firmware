@@ -6,12 +6,15 @@ module test ();
     logic [15:0] a, b;
     logic in_valid = 1'b0;
     logic in_ready;
-    logic [15:0] u, v, w;
+    logic [11:0] u, v, w;
     logic out_valid;
     
     real PI = 3.1415926535;
     
-    space_vector_modulator svm (
+    space_vector_modulator #(
+        .DATA_WIDTH(16),
+        .OUT_WIDTH(12)
+    ) svm (
         .clk(clk),
         .reset(reset),
         .in_data({a, b}),
@@ -51,7 +54,7 @@ module test ();
         b <= 'X;
     endtask
     
-    logic [15:0] u_out, v_out, w_out;
+    logic unsigned [11:0] u_out, v_out, w_out;
     always @(posedge clk) begin
         if (out_valid == 1'b1) begin
             u_out <= u;
