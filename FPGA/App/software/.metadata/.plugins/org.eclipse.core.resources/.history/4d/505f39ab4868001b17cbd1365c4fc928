@@ -1,0 +1,122 @@
+#include "msgdma.hpp"
+#include <sys/unistd.h>
+#include <altera_msgdma_descriptor_regs.h>
+#include <altera_msgdma_csr_regs.h>
+#include <altera_msgdma_response_regs.h>
+
+
+static bool alt_msgdma_write_standard_descriptor (
+    alt_u32 *csr_base,
+    alt_u32 *descriptor_base,
+    alt_msgdma_standard_descriptor *descriptor)
+{
+    if (0 != (IORD_ALTERA_MSGDMA_CSR_STATUS(csr_base) &
+        ALTERA_MSGDMA_CSR_DESCRIPTOR_BUFFER_FULL_MASK))
+    {
+      /*at least one descriptor buffer is full, returning so that this function
+        is non-blocking*/
+        return false;
+    }
+
+    IOWR_ALTERA_MSGDMA_DESCRIPTOR_READ_ADDRESS(descriptor_base,
+        (alt_u32)descriptor->read_address);
+    IOWR_ALTERA_MSGDMA_DESCRIPTOR_WRITE_ADDRESS(descriptor_base,
+    (    alt_u32)descriptor->write_address);
+    IOWR_ALTERA_MSGDMA_DESCRIPTOR_LENGTH(descriptor_base,
+        descriptor->transfer_length);
+    IOWR_ALTERA_MSGDMA_DESCRIPTOR_CONTROL_STANDARD(descriptor_base,
+        descriptor->control);
+        return true;
+}
+
+
+bool MsgdmaTransmitDescriptor::TransmitAsync(alt_msgdma_dev *dev, bool wait) const {
+    alt_u32 control = 0;
+    alt_irq_context context = 0;
+    alt_u16 counter = 0;
+    alt_u32 fifo_read_fill_level = (
+        IORD_ALTERA_MSGDMA_CSR_DESCRIPTOR_FILL_LEVEL(dev->csr_base) &
+        ALTERA_MSGDMA_CSR_READ_FILL_LEVEL_MASK) >>
+        ALTERA_MSGDMA_CSR_READ_FILL_LEVEL_OFFSET;
+    alt_u32 fifo_write_fill_level = (
+        IORD_ALTERA_MSGDMA_CSR_DESCRIPTOR_FILL_LEVEL(dev->csr_base) &
+        ALTERA_MSGDMA_CSR_WRITE_FILL_LEVEL_MASK) >>
+        ALTERA_MSGDMA_CSR_WRITE_FILL_LEVEL_OFFSET;
+
+    /* Return with error immediately if one of read/write buffer is full */
+    if((dev->descriptor_fifo_depth <= fifo_write_fill_level) ||
+        (dev->descriptor_fifo_depth <= fifo_read_fill_level))
+    {
+        /*at least one write or read FIFO descriptor buffer is full,
+        returning so that this function is non-blocking*/
+        return false;
+    }
+
+    /* Stop the msgdma dispatcher from issuing more descriptors to the
+    read or write masters  */
+    /* stop issuing more descriptors */
+    control = ALTERA_MSGDMA_CSR_STOP_DESCRIPTORS_MASK;
+    /* making sure the read-modify-write below can't be pre-empted */
+    context = alt_irq_disable_all();
+    IOWR_ALTERA_MSGDMA_CSR_CONTROL(dev->csr_base, control);
+    /*
+    * Clear any (previous) status register information
+    * that might occlude our error checking later.
+    */
+    IOWR_ALTERA_MSGDMA_CSR_STATUS(
+        dev->csr_base,
+        IORD_ALTERA_MSGDMA_CSR_STATUS(dev->csr_base));
+    alt_irq_enable_all(context);
+
+   /*writing descriptor structure to the dispatcher, wait until descriptor
+      write is succeed*/
+    while(!alt_msgdma_write_standard_descriptor (dev->csr_base, dev->descriptor_base, standard_desc)){
+        usleep(1); /* delay 1us */
+        if(5000 <= counter) /* time_out if waiting longer than 5 msec */
+        {
+            alt_printf("time out after 5 msec while waiting"
+                " free FIFO buffer for storing standard descriptor\n");
+
+            return false;
+        }
+        counter++;
+    }
+
+    /*
+    * If a callback routine has been previously registered which will be
+    * called from the msgdma ISR. Set up controller to:
+    *  - Run
+    *  - Stop on an error with any particular descriptor
+    */
+    if(dev->callback)
+    {
+
+        control |= (dev->control |
+                    ALTERA_MSGDMA_CSR_STOP_ON_ERROR_MASK |
+                    ALTERA_MSGDMA_CSR_GLOBAL_INTERRUPT_MASK );
+        control &=  (~ALTERA_MSGDMA_CSR_STOP_DESCRIPTORS_MASK);
+    /* making sure the read-modify-write below can't be pre-empted */
+        context = alt_irq_disable_all();
+        IOWR_ALTERA_MSGDMA_CSR_CONTROL(dev->csr_base, control);
+        alt_irq_enable_all(context);
+    }
+    /*
+    * No callback has been registered. Set up controller to:
+    *   - Run
+    *   - Stop on an error with any particular descriptor
+    *   - Disable interrupt generation
+    */
+    else
+    {
+        control |= (dev->control |
+                    ALTERA_MSGDMA_CSR_STOP_ON_ERROR_MASK );
+        control &= (~ALTERA_MSGDMA_CSR_STOP_DESCRIPTORS_MASK) &
+                   (~ALTERA_MSGDMA_CSR_GLOBAL_INTERRUPT_MASK);
+        /* making sure the read-modify-write below can't be pre-empted */
+        context = alt_irq_disable_all();
+        IOWR_ALTERA_MSGDMA_CSR_CONTROL(dev->csr_base, control);
+        alt_irq_enable_all(context);
+    }
+
+    return true;
+}

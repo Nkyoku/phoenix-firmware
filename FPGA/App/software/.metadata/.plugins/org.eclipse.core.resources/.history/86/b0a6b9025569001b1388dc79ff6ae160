@@ -1,0 +1,61 @@
+#include "wheel_controller.hpp"
+#include <driver/imu.hpp>
+#include <peripheral/vector_controller.hpp>
+#include "centralized_monitor.hpp"
+#include "shared_memory.hpp"
+#include <math.h>
+
+void WheelController::StartControl(void) {
+    VectorController::SetGainP(3500);
+    VectorController::SetGainI(500);
+    VectorController::ClearFault();
+    VectorController::SetCurrentReferenceQ(1, 0);
+    VectorController::SetCurrentReferenceQ(2, 0);
+    VectorController::SetCurrentReferenceQ(3, 0);
+    VectorController::SetCurrentReferenceQ(4, 0);
+}
+
+void WheelController::StopControl(void){
+    VectorController::SetFault();
+    VectorController::SetCurrentReferenceQ(1, 0);
+    VectorController::SetCurrentReferenceQ(2, 0);
+    VectorController::SetCurrentReferenceQ(3, 0);
+    VectorController::SetCurrentReferenceQ(4, 0);
+    VectorController::SetGainP(0);
+    VectorController::SetGainI(0);
+}
+
+void WheelController::Update(bool new_parameters) {
+    if (VectorController::IsFault() == false) {
+        float motor_1_speed = SharedMemory::GetParameters().wheel_speed[0];
+        //float motor_2_speed = SharedMemory::GetParameters().wheel_speed[1];
+        //float motor_3_speed = SharedMemory::GetParameters().wheel_speed[2];
+        //float motor_4_speed = SharedMemory::GetParameters().wheel_speed[3];
+        if (0.0f <= fabsf(motor_1_speed)) {
+            VectorController::SetCurrentReferenceQ(1, 0);
+            motor_1_speed = fmaxf(-300.0f, fminf(motor_1_speed, 300.0f));
+        }else{
+            motor_1_speed = 0.0f;
+        }
+        VectorController::SetCurrentReferenceQ(1, motor_1_speed);
+    }
+    else if (new_parameters == true) {
+        StartControl();
+    }
+}
+
+void WheelController::SetGains(float kp, float ki) {
+    auto clamp = [](float value) -> int {
+        value = (0.0f <= value) ? value : 0.0f;
+        value = (value * (1u << VectorController::GainScale)) + 0.5f;
+        value = (value <= 65535.0f) ? value : 65535.0f;
+        return static_cast<int>(value);
+    };
+    VectorController::SetGainP(clamp(kp));
+    VectorController::SetGainI(clamp(ki));
+}
+
+void WheelController::GetGains(float *kp, float *ki) {
+    *kp = static_cast<float>(VectorController::GetGainP()) * (1.0f / (1u << VectorController::GainScale));
+    *ki = static_cast<float>(VectorController::GetGainI()) * (1.0f / (1u << VectorController::GainScale));
+}

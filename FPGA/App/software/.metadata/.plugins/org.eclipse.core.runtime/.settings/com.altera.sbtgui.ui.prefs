@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+newBspWizardPage.defaultLocation=C\:\\work\\Robocup\\phoenix-firmware\\FPGA\\App\\software\\controller_bsp
+newBspWizardPage.sopcinfoFile=C\:\\work\\Robocup\\phoenix-firmware\\FPGA\\App\\controller.sopcinfo
+newSoftwareExampleWizardPage.defaultLocation=C\:\\work\\Robocup\\phoenix-firmware\\FPGA\\App\\software\\controller
+newSoftwareExampleWizardPage.sopcinfoFile=C\:\\work\\Robocup\\phoenix-firmware\\FPGA\\App\\controller.sopcinfo
+newSoftwareExampleWizardPage2.newBspLocation=C\:\\work\\Robocup\\phoenix-firmware\\FPGA\\App\\software\\controller_bsp

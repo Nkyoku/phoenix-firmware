@@ -15,18 +15,20 @@
 |----------|-----------|-------------|--------------|
 | reserved | DRV_OTW_N | DRV_FAULT_N | HALL_FAULT_N |
 
-平常時は1でSTATUSの各ビットが0になる瞬間があったら対応するビットが0にクリアされる。
-DRV_OTW_NかDRV_FAULT_Nがクリアされているとフォルト出力と割り込み出力がアサートになる。
-FAULT.FAULT_CLRに1を書き込むと全てのビットが1に戻る。
+平常時は全てのビットが1だがSTATUSの各ビットが0になる瞬間があったら対応するビットが0にクリアされる。
+DRV_OTW_N, DRV_FAULT_N, HALL_FAULT_Nのいずれかがクリアされた瞬間にフォルト出力と割り込み出力がアサートされる。
+読むと全てのビットが1にセットされる。
 
 
-### FAULT (0x4) Write Only
+### FAULT (0x4) Read/Write
 |  15 ~ 2  |     1     |     0     |
 |----------|-----------|-----------|
-| reserved | FAULT_SET | FAULT_CLR |
+| reserved | FAULT_CLR | FAULT_SET |
 
-FAULT_CLRに1を書き込むとINTFLAGが1にセットされ、フォルト出力と割り込み出力がデアサートされる。
-FAULT_SETに1を書き込むとフォルト出力と割り込み出力がアサートされる。
+FAULT_CLRに1を書き込むとフォルト出力がデアサートされる。
+FAULT_SETに1を書き込むとフォルト出力がアサートされる。
+FAULT_CLRよりFAULT_SETのほうが優先される。
+現在のフォルト出力の状態がFAULT_SETの値として読める。
 
 
 ### POWER (0x6) Read/Write
@@ -56,46 +58,64 @@ module motor_controller (
         input  wire [15:0] slave_writedata,
         input  wire        slave_read,
         input  wire        slave_write,
-		output wire        irq
+		output reg         irq
     );
     
-    // Fault output
-    assign irq = fault;
-    logic fault_set, fault_clear;
-    logic status_driver_otw_n_latch = 1'b1;
-    logic status_driver_fault_n_latch = 1'b1;
-    logic status_hall_fault_n_latch = 1'b1;
-    always @(posedge clk, posedge reset) begin
-        if (reset == 1'b1) begin
-            fault <= 1'b0;
-            status_driver_otw_n_latch <= 1'b1;
-            status_driver_fault_n_latch <= 1'b1;
-            status_hall_fault_n_latch <= 1'b1;
-        end
-        else begin
-            if (~status_driver_otw_n_latch | ~status_driver_fault_n_latch) begin
-                // モータードライバの異常検知に対しフォルト出力をアサートする
-                fault <= 1'b1;
-            end
-            else if (fault_clear == 1'b1) begin
-                fault <= 1'b0;
-            end
-            else if (fault_set == 1'b1) begin
-                fault <= 1'b1;
-            end
-            status_driver_otw_n_latch   <= (fault_clear ? 1'b1 : status_driver_otw_n_latch  ) & status_driver_otw_n;
-            status_driver_fault_n_latch <= (fault_clear ? 1'b1 : status_driver_fault_n_latch) & status_driver_fault_n;
-            status_hall_fault_n_latch   <= (fault_clear ? 1'b1 : status_hall_fault_n_latch  ) & status_hall_fault_n;
-        end
-    end
-    
-    // Avalon-MM
+    // Register Address Map
     typedef enum {
         REGISTER_STATUS   = 'h0,
         REGISTER_INTFLAG  = 'h1, 
         REGISTER_FAULT    = 'h2,
         REGISTER_POWER    = 'h3
     } REGISTER_MAP;
+
+    // Fault
+    logic fault_set;
+    logic fault_clear;
+    always @(posedge clk, posedge reset) begin
+        if (reset == 1'b1) begin
+            fault <= 1'b0;
+        end
+        else begin
+            if (~status_driver_otw_n | ~status_driver_fault_n | ~status_hall_fault_n) begin
+                fault <= 1'b1;
+            end
+            else begin
+                fault <= (fault & ~fault_clear) | fault_set;
+            end
+        end
+    end
+    
+    // Interrupt Flag
+    logic status_driver_otw_n_ff = 1'b1;
+    logic status_driver_fault_n_ff = 1'b1;
+    logic status_hall_fault_n_ff = 1'b1;
+    logic intflag_driver_otw_n = 1'b1;
+    logic intflag_driver_fault_n = 1'b1;
+    logic intflag_hall_fault_n = 1'b1;
+    wire intflag_clear = slave_read & (slave_address == REGISTER_INTFLAG);
+    always @(posedge clk, posedge reset) begin
+        if (reset == 1'b1) begin
+            status_driver_otw_n_ff <= 1'b1;
+            status_driver_fault_n_ff <= 1'b1;
+            status_hall_fault_n_ff <= 1'b1;
+            intflag_driver_otw_n <= 1'b1;
+            intflag_driver_fault_n <= 1'b1;
+            intflag_hall_fault_n <= 1'b1;
+            irq <= 1'b0;
+        end
+        else begin
+            status_driver_otw_n_ff   <= fault_clear | status_driver_otw_n;
+            status_driver_fault_n_ff <= fault_clear | status_driver_fault_n;
+            status_hall_fault_n_ff   <= fault_clear | status_hall_fault_n;
+            intflag_driver_otw_n   <= (intflag_clear | intflag_driver_otw_n  ) & (status_driver_otw_n   | ~status_driver_otw_n_ff  );
+            intflag_driver_fault_n <= (intflag_clear | intflag_driver_fault_n) & (status_driver_fault_n | ~status_driver_fault_n_ff);
+            intflag_hall_fault_n   <= (intflag_clear | intflag_hall_fault_n  ) & (status_hall_fault_n   | ~status_hall_fault_n_ff  );
+            irq <= ~intflag_driver_otw_n | ~intflag_driver_fault_n | ~intflag_hall_fault_n;
+        end
+    end
+
+    // Avalon-MM
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
             pwm_source_data <= '0;
@@ -110,16 +130,16 @@ module motor_controller (
             if (slave_read == 1'b1) begin
                 case (slave_address)
                     REGISTER_STATUS  : slave_readdata <= {13'h0000, status_driver_otw_n, status_driver_fault_n, status_hall_fault_n};
-                    REGISTER_INTFLAG : slave_readdata <= {13'h0000, status_driver_otw_n_latch, status_driver_fault_n_latch, status_hall_fault_n_latch};
-                    REGISTER_FAULT   : slave_readdata <= 16'h0000;
+                    REGISTER_INTFLAG : slave_readdata <= {13'h0000, intflag_driver_otw_n, intflag_driver_fault_n, intflag_hall_fault_n};
+                    REGISTER_FAULT   : slave_readdata <= {15'h0000, fault};
                     REGISTER_POWER   : slave_readdata <= pwm_source_data;
                     default          : slave_readdata <= 16'h0000;
                 endcase
             end
             if (slave_write == 1'b1) begin
                 if (slave_address == REGISTER_FAULT) begin
-                    fault_set <= slave_writedata[1];
-                    fault_clear <= slave_writedata[0];
+                    fault_set <= slave_writedata[0];
+                    fault_clear <= slave_writedata[1];
                 end
                 if (slave_address == REGISTER_POWER) begin
                     pwm_source_data <= slave_writedata[15:0];

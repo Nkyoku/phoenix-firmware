@@ -19,14 +19,14 @@ module PhoenixFPGA (
         inout  wire DATA2,
         inout  wire DATA3,
         output wire nCSO,
-        output wire FPGA_INT,
+        input  wire FPGA_MODE,
         output wire FPGA_SPI_MISO,
         input  wire FPGA_SPI_MOSI,
         input  wire FPGA_SPI_SCLK,
         input  wire FPGA_SPI_CS0_N,
         input  wire FPGA_UART_RX,
         output wire FPGA_UART_TX,
-        input  wire GP_STOP_N,
+        input  wire FPGA_STOP_N,
         output wire HALL1_CLK,
         input  wire HALL1_DOUT,
         output wire HALL1_LOAD_N,
@@ -127,7 +127,6 @@ module PhoenixFPGA (
     assign DATA2 = 1'bz;
     assign DATA3 = 1'bz;
     assign nCSO = 1'b1;
-    //assign FPGA_INT = 1'b0;
     //assign FPGA_SPI_MISO = 1'bz;
     //assign FPGA_UART_TX = 1'bz;
     //assign HALL1_CLK = 1'b0;
@@ -250,7 +249,8 @@ module PhoenixFPGA (
     // Hall sensor inputs
     logic [2:0] sensor_hall_uvw [1:5]; // {u, v, w}
     SerialToParallel #(
-        .INVERSE(1)
+        .INVERSE(1),
+        .PRESCALER_WIDTH(1)
     ) serial_0 (
         .reset     (reset_25mhz),
         .clk       (CLK25MHz),
@@ -268,7 +268,8 @@ module PhoenixFPGA (
         .input_h   ()
     );
     SerialToParallel #(
-        .INVERSE(1)
+        .INVERSE(1),
+        .PRESCALER_WIDTH(1)
     ) serial_1 (
         .reset     (reset_25mhz),
         .clk       (CLK25MHz),
@@ -285,27 +286,16 @@ module PhoenixFPGA (
         .input_g   (sensor_hall_uvw[3][2]),
         .input_h   (sensor_hall_uvw[5][0])
     );
-    
-    // Filter of GP_STOP_N
-    logic gp_stop_filtered_n;
+
+    // Filter of FPGA_STOP_N
+    logic fpga_stop_filtered_n;
     deglitch #(
         .COUNTER_VALUE(125),
         .DEFAULT_LOGIC(1)
     ) deglitch_0 (
         .clk (CLK25MHz),
-        .in  (GP_STOP_N),
-        .out (gp_stop_filtered_n)
-    );
-    
-    // Filter of MOD_SLEEP_N
-    logic mod_sleep_filtered_n;
-    deglitch #(
-        .COUNTER_VALUE(125),
-        .DEFAULT_LOGIC(1)
-    ) deglitch_1 (
-        .clk (CLK25MHz),
-        .in  (MOD_SLEEP_N),
-        .out (mod_sleep_filtered_n)
+        .in  (FPGA_STOP_N),
+        .out (fpga_stop_filtered_n)
     );
     
     // ADC1 (LTC2320-12) and filters
@@ -366,13 +356,14 @@ module PhoenixFPGA (
     logic [4:1] status_encoder_fault_n;
     logic [4:1] status_pos_error;
     logic [4:1] status_pos_uncertain;
-    logic [31:0] current_reference_data [1:4];
+    logic [31:0] current_reference_data [1:4]; // {Id, Iq}
     logic [1:4] current_reference_valid;
-    logic [31:0] current_measurement_data [1:4];
+    logic [31:0] current_measurement_data [1:4]; // {Id, Iq}
     logic [1:4] current_measurement_valid;
     logic signed [15:0] encoder_data [1:4];
-    logic signed [15:0] param_kp;
-    logic signed [15:0] param_ki;
+    logic unsigned [15:0] param_kp;
+    logic unsigned [15:0] param_ki;
+    logic unsigned [8:0] pos_theta [1:4];
     genvar i;
     generate
         for (i = 1; i <= 5; i = i + 1) begin : drivers
@@ -384,7 +375,8 @@ module PhoenixFPGA (
                 logic controller_pwm_ready;
                 ds_pwm_driver #(
                     .PERIOD(3000),
-                    .MAX_ON_CYCLES(2985)
+                    .MAX_ON_CYCLES(2985),
+                    .DATA_WIDTH(12)
                 ) driver (
                     .clk(clk_150mhz),
                     .reset(reset_150mhz),
@@ -410,7 +402,7 @@ module PhoenixFPGA (
                     .source_ready(1'b1)
                 );
                 vector_controller #(
-                    .INVERSE_ENCODER(1)
+                    .INVERSE_ENCODER(0)
                 ) controller (
                     .clk(clk_75mhz),
                     .reset(reset_75mhz),
@@ -428,10 +420,10 @@ module PhoenixFPGA (
                     .status_driver_fault_n(status_driver_fault_n[i]),
                     .status_hall_fault_n(status_hall_fault_n[i]),
                     .status_encoder_fault_n(status_encoder_fault_n[i]),
-                    .position_theta(),
+                    .position_theta(pos_theta[i]),
                     .position_error(status_pos_error[i]),
                     .position_uncertain(status_pos_uncertain[i]),
-                    .current_uv_data({adc1_u_data[i], adc1_v_data[i]}), // {Iu, Iv}
+                    .current_uv_data({-adc1_u_data[i], -adc1_v_data[i]}), // {Iu, Iv}
                     .current_uv_valid(adc1_valid),
                     .current_reference_data(current_reference_data[i]), // {Id, Iq}
                     .current_reference_valid(current_reference_valid[i]),
@@ -445,6 +437,7 @@ module PhoenixFPGA (
             else begin // Motor 5 PWM driver
                 logic [15:0] driver_pwm_data;
                 pwm_driver #(
+                    .PWM_PERIOD_CYCLES(3000),
                     .PWM_MAX_ON_CYCLES(2985)
                 ) driver_5 (
                     .clk(clk_150mhz),
@@ -496,6 +489,13 @@ module PhoenixFPGA (
         .out_sig(pwm_fault_5_150mhz)
     );
     
+    logic [31:0] pio3_latch;
+    always @(posedge clk_75mhz) begin
+        if (adc1_valid == 1'b1) begin
+            pio3_latch <= {-adc1_u_data[1], -adc1_v_data[1]};
+        end
+    end
+
     wire adc2_sda_oe;
     wire adc2_scl_oe;
     assign ADC2_SDA = adc2_sda_oe ? 1'b0 : 1'bz;
@@ -528,34 +528,29 @@ module PhoenixFPGA (
         sensor_hall_uvw[1][0], // [10]
         sensor_hall_uvw[1][1], // [9]
         sensor_hall_uvw[1][2], // [8]
-        1'b0,
-        MOTOR5_SW_FLT_N,       // [6]
-        MOTOR4_SW_FLT_N,       // [5]
-        MOTOR3_SW_FLT_N,       // [4]
-        MOTOR2_SW_FLT_N,       // [3]
-        MOTOR1_SW_FLT_N,       // [2]
-        mod_sleep_filtered_n,  // [1]
-        gp_stop_filtered_n     // [0]
+        ~MOTOR5_SW_FLT_N,      // [7]
+        ~MOTOR4_SW_FLT_N,      // [6]
+        ~MOTOR3_SW_FLT_N,      // [5]
+        ~MOTOR2_SW_FLT_N,      // [4]
+        ~MOTOR1_SW_FLT_N,      // [3]
+        ~fpga_stop_filtered_n, // [2]
+        ~MOD_SLEEP_N,          // [1]
+        FPGA_MODE              // [0]
     };
-    wire [10:0] pio_2_out;
-    assign MOTOR1_SW_EN = pio_2_out[10];
-    assign MOTOR2_SW_EN = pio_2_out[9];
-    assign MOTOR3_SW_EN = pio_2_out[8];
-    assign MOTOR4_SW_EN = pio_2_out[7];
-    assign MOTOR5_SW_EN = pio_2_out[6];
-    assign MOTOR5_LED   = pio_2_out[5];
-    assign MOTOR4_LED   = pio_2_out[4];
-    assign MOTOR3_LED   = pio_2_out[3];
-    assign MOTOR2_LED   = pio_2_out[2];
-    assign MOTOR1_LED   = pio_2_out[1];
-    assign FPGA_INT     = pio_2_out[0];
-    wire msgdma_ready;
-    wire msgdma_valid;
-    wire [15:0] msgdma_data;
-    wire [7:0] msgdma_channel;
+    wire [9:0] pio_2_out;
+    assign MOTOR5_SW_EN = pio_2_out[9];
+    assign MOTOR4_SW_EN = pio_2_out[8];
+    assign MOTOR3_SW_EN = pio_2_out[7];
+    assign MOTOR2_SW_EN = pio_2_out[6];
+    assign MOTOR1_SW_EN = pio_2_out[5];
+    assign MOTOR5_LED   = pio_2_out[4];
+    assign MOTOR4_LED   = pio_2_out[3];
+    assign MOTOR3_LED   = pio_2_out[2];
+    assign MOTOR2_LED   = pio_2_out[1];
+    assign MOTOR1_LED   = pio_2_out[0];
     controller ctrl (
-        .reset_reset_n             (~reset_75mhz),
-        .clk_clk                   (clk_75mhz),
+        .reset_sys_reset_n         (~reset_75mhz),
+        .clk_sys_clk               (clk_75mhz),
         .pio_0_export              (pio_0_in),
 		.pio_1_export              (pio_1_in),
         .pio_2_export              (pio_2_out),
@@ -572,9 +567,9 @@ module PhoenixFPGA (
 		.vc_status_driver_otw_n    (status_driver_otw_n[4:1]),
 		.vc_status_driver_fault_n  (status_driver_fault_n[4:1]),
 		.vc_status_hall_fault_n    (status_hall_fault_n[4:1]),
-		.vc_status_encoder_fault_n (status_encoder_fault_n[4:1]),
-		.vc_status_pos_error       (status_pos_error[4:1]),
-        .vc_status_pos_uncertain   (status_pos_uncertain[4:1]),
+		.vc_status_encoder_fault_n (status_encoder_fault_n),
+		.vc_status_pos_error       (status_pos_error),
+        .vc_status_pos_uncertain   (status_pos_uncertain),
         .vc_encoder_encoder_1_data (encoder_data[1]),
 		.vc_encoder_encoder_2_data (encoder_data[2]),
 		.vc_encoder_encoder_3_data (encoder_data[3]),
@@ -597,36 +592,23 @@ module PhoenixFPGA (
 		.vc_iref4_valid            (current_reference_valid[4]),
 		.vc_param_kp               (param_kp),
 		.vc_param_ki               (param_ki),
-        .mc_fault_fault            (pwm_fault_5),
-		.mc_status_driver_otw_n    (status_driver_otw_n[5]),
-		.mc_status_driver_fault_n  (status_driver_fault_n[5]),
-		.mc_status_hall_fault_n    (status_hall_fault_n[5]),
-		.mc_pwm_data               (controller_5_pwm_data),
-		.mc_pwm_valid              (controller_5_pwm_valid),
-		.mc_pwm_ready              (controller_5_pwm_ready),
-        .msgdma_source_data        (msgdma_data),
-		.msgdma_source_channel     (msgdma_channel),
-		.msgdma_source_valid       (msgdma_valid),
-		.msgdma_source_ready       (msgdma_ready),
-        .uart_rxd                  (FPGA_UART_RX),
-		.uart_txd                  (FPGA_UART_TX)
+        .mc5_fault_fault           (pwm_fault_5),
+		.mc5_status_driver_otw_n   (status_driver_otw_n[5]),
+		.mc5_status_driver_fault_n (status_driver_fault_n[5]),
+		.mc5_status_hall_fault_n   (status_hall_fault_n[5]),
+		.mc5_pwm_data              (controller_5_pwm_data),
+		.mc5_pwm_valid             (controller_5_pwm_valid),
+		.mc5_pwm_ready             (controller_5_pwm_ready),
+        .host_spi_mosi_to_the_spislave_inst_for_spichain          (FPGA_SPI_MOSI),
+		.host_spi_nss_to_the_spislave_inst_for_spichain           (FPGA_SPI_CS0_N),
+		.host_spi_miso_to_and_from_the_spislave_inst_for_spichain (FPGA_SPI_MISO),
+		.host_spi_sclk_to_the_spislave_inst_for_spichain          (FPGA_SPI_SCLK),
+        .reset_100mhz_reset_n      (~reset_100mhz),
+        .clk_100mhz_clk            (clk_100mhz),
+		.uart_txd                  (FPGA_UART_TX),
+        .pio3_export(pio3_latch),
+        .pio4_export({14'h0000, status_pos_error[1], status_pos_uncertain[1], 7'h00, pos_theta[1]})
     );
-    
-    spislave slave (
-		.clk_clk       (clk_75mhz),
-		.reset_reset_n (~reset_75mhz),
-		.spi_mosi      (FPGA_SPI_MOSI),
-		.spi_nss       (FPGA_SPI_CS0_N),
-		.spi_miso      (FPGA_SPI_MISO),
-		.spi_sclk      (FPGA_SPI_SCLK),
-		.sink_data     (msgdma_data),
-		.sink_channel  (msgdma_channel),
-		.sink_valid    (msgdma_valid),
-		.sink_ready    (msgdma_ready),
-		.source_ready  (1'b1),
-		.source_valid  (),
-		.source_data   ()
-	);
 endmodule
 
 module adc_and_filters (

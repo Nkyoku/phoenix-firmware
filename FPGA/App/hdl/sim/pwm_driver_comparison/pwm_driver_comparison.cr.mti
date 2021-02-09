@@ -1,0 +1,52 @@
+C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/quadrature_decoder.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/quadrature_decoder.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module quadrature_decoder
+
+Top level modules:
+	quadrature_decoder
+
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pwm_driver.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pwm_driver.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module pwm_driver
+
+Top level modules:
+	pwm_driver
+
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module position_estimator
+
+Top level modules:
+	position_estimator
+
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module deglitch
+-- Compiling module bipolar_sync_deglitch
+
+Top level modules:
+	deglitch
+	bipolar_sync_deglitch
+
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module space_vector_modulator
+
+Top level modules:
+	space_vector_modulator
+
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module ds_pwm_driver
+
+Top level modules:
+	ds_pwm_driver
+
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/park_transform.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/park_transform.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module park_transform
+
+Top level modules:
+	park_transform
+
+} {} {}}

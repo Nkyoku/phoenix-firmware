@@ -30,7 +30,8 @@ set_module_property EDITABLE true
 set_module_property REPORT_TO_TALKBACK false
 set_module_property ALLOW_GREYBOX_GENERATION false
 set_module_property REPORT_HIERARCHY false
-set_module_property VALIDATION_CALLBACK verify_parameters
+#set_module_property VALIDATION_CALLBACK validate
+set_module_property ELABORATION_CALLBACK  elaborate
 
 
 # 
@@ -56,27 +57,48 @@ add_fileset_file avalon_st_uart_tx.sv VERILOG PATH avalon_st_uart_tx.sv
 add_parameter BAUD_RATE INTEGER 9600
 set_parameter_property BAUD_RATE DISPLAY_NAME "Baud rate"
 set_parameter_property BAUD_RATE ALLOWED_RANGES 1:2147483647
-set_parameter_property BAUD_RATE AFFECTS_ELABORATION false
+set_parameter_property BAUD_RATE HDL_PARAMETER false
+set_parameter_property BAUD_RATE AFFECTS_GENERATION true
 
 add_parameter CLOCK_RATE INTEGER 0
-set_parameter_property CLOCK_RATE DISPLAY_NAME "Clock frequency"
 set_parameter_property CLOCK_RATE SYSTEM_INFO {CLOCK_RATE clk}
-set_parameter_property CLOCK_RATE DERIVED true
-set_parameter_property CLOCK_RATE AFFECTS_ELABORATION false
-set_parameter_property CLOCK_RATE VISIBLE true
+set_parameter_property CLOCK_RATE VISIBLE false
+set_parameter_property CLOCK_RATE HDL_PARAMETER false
+set_parameter_property CLOCK_RATE AFFECTS_GENERATION true
 
 add_parameter PRESCALER INTEGER 0
 set_parameter_property PRESCALER DISPLAY_NAME "Prescaler"
 set_parameter_property PRESCALER DERIVED true
 set_parameter_property PRESCALER HDL_PARAMETER true
-set_parameter_property PRESCALER AFFECTS_ELABORATION false
+set_parameter_property PRESCALER AFFECTS_GENERATION true
 
 add_parameter BAUD_RATE_ERROR FLOAT 0.0
 set_parameter_property BAUD_RATE_ERROR DISPLAY_NAME "Baud rate error (%)"
 set_parameter_property BAUD_RATE_ERROR DERIVED true
-set_parameter_property BAUD_RATE_ERROR AFFECTS_ELABORATION false
+set_parameter_property BAUD_RATE_ERROR HDL_PARAMETER false
+set_parameter_property BAUD_RATE_ERROR AFFECTS_GENERATION true
 
-proc verify_parameters {} {
+#proc validate {} {
+#    set baud_rate [get_parameter_value BAUD_RATE]
+#    set clock_rate [get_parameter_value CLOCK_RATE]
+#    set prescaler [expr $clock_rate / $baud_rate]
+#    if {$clock_rate <= 0} {
+#        send_message error "Clock frequency is undetermined or zero."
+#    }
+#    if {$prescaler < 2} {
+#        send_message error "Prescaler value is zero."
+#    }
+#    set_parameter_value PRESCALER $prescaler
+#    if {(0 < $clock_rate) && (2 <= $prescaler)} {
+#        set actual_baud_rate [expr $clock_rate / $prescaler]
+#        set error [expr 100.0 * ($actual_baud_rate - $baud_rate) / $baud_rate]
+#        set_parameter_value BAUD_RATE_ERROR $error
+#    } else {
+#        set_parameter_value BAUD_RATE_ERROR 100.0
+#    }
+#}
+
+proc elaborate {} {
     set baud_rate [get_parameter_value BAUD_RATE]
     set clock_rate [get_parameter_value CLOCK_RATE]
     set prescaler [expr $clock_rate / $baud_rate]
@@ -95,7 +117,6 @@ proc verify_parameters {} {
         set_parameter_value BAUD_RATE_ERROR 100.0
     }
 }
-
 
 # 
 # display items

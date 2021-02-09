@@ -1,0 +1,149 @@
+#include <stdio.h>
+#include <sys/alt_irq.h>
+#include <sys/alt_stdio.h>
+#include <altera_msgdma.h>
+#include "controller.hpp"
+#include "driver/adc2.hpp"
+#include "driver/imu.hpp"
+#include "microshell/core/microshell.h"
+#include "microshell/util/mscmd.h"
+
+static uint32_t xorshift(void) {
+    static uint32_t x = 123456789;
+    static uint32_t y = 362436069;
+    static uint32_t z = 521288629;
+    static uint32_t w = 88675123;
+    uint32_t t;
+    t = x ^ (x << 11);
+    x = y; y = z; z = w;
+    return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+}
+
+static MSCMD_USER_RESULT command_imu(MSOPT *msopt, MSCMD_USER_OBJECT usrobj) {
+    ImuResult_t result;
+    IMU::ReadData(&result);
+    printf("Accel(%d, %d, %d) Gyro(%d, %d, %d)\n", result.AccelDataX, result.AccelDataY, result.AccelDataZ, result.GyroDataX, result.GyroDataY, result.GyroDataY);
+    return 0;
+}
+
+static MSCMD_USER_RESULT command_adc2(MSOPT *msopt, MSCMD_USER_OBJECT usrobj) {
+    float p48v = ADC2::GetDC48V();
+    float dribble = ADC2::GetDribbleCurrent();
+    printf("P48V=%dmV Idribble=%dmA\n", (int)(p48v * 1000), (int)(dribble * 1000));
+    return 0;
+}
+
+static void msgdma_callback(void *context) {
+    struct alt_msgdma_dev *p_msgdma = (alt_msgdma_dev*)context;
+    printf( "<Debug> mSGDMA Callback Function called!!\n" );
+    // mSGDMA の コントロール・レジスタ と ステータス・レジスタ の値を取得
+    int nCtrl = IORD_ALTERA_MSGDMA_CSR_CONTROL( p_msgdma->csr_base );
+    int nStat = IORD_ALTERA_MSGDMA_CSR_STATUS( p_msgdma->csr_base );
+    // 指定バイト数分転送完了したか?
+    if ( nStat & ALTERA_MSGDMA_CSR_DESCRIPTOR_BUFFER_EMPTY_MASK) {
+        // Yes: 転送完了フラグを立てる
+        //xfer_cmp = TRUE;
+    } else {
+        // それ以外の割り込みはエラーとする
+        //xfer_err = TRUE;
+        printf( " mSGDMA_IRQ: stat_reg=%X. ctrl_reg=%X\n", nStat, nCtrl );
+    }
+}
+
+static MSCMD_USER_RESULT command_transport(MSOPT *msopt, MSCMD_USER_OBJECT usrobj) {
+    alt_msgdma_dev *dev = alt_msgdma_open(MSGDMA_0_CSR_NAME);
+    if (dev == nullptr) {
+        printf("mSGDMA was not found\n");
+        return 0;
+    }
+    alt_msgdma_register_callback(dev, msgdma_callback, ALTERA_MSGDMA_CSR_GLOBAL_INTERRUPT_MASK | ALTERA_MSGDMA_CSR_STOP_ON_ERROR_MASK | ALTERA_MSGDMA_CSR_STOP_ON_EARLY_TERMINATION_MASK, dev);
+
+    uint32_t data[32];
+    int channel_count = xorshift() % 4;
+    for(int i = 0; i <= channel_count; i++){
+        int channel = xorshift() % 256;
+        int length = (xorshift() % sizeof(data)) + 1;
+        int length_u32 = (length + 3) >> 2;
+        for(int j = 0; j < length_u32; j++){
+            data[j] = xorshift();
+        }
+        alt_u32 option = ALTERA_MSGDMA_DESCRIPTOR_CONTROL_TRANSFER_COMPLETE_IRQ_MASK;
+        option |= channel << ALTERA_MSGDMA_DESCRIPTOR_CONTROL_TRANSMIT_CHANNEL_OFFSET;
+        if (i == 0) option |= ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GENERATE_SOP_MASK;
+        if (i == channel_count) option |= ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GENERATE_EOP_MASK;
+        alt_msgdma_standard_descriptor desc;
+        alt_msgdma_construct_standard_mm_to_st_descriptor(dev, &desc, reinterpret_cast<uint32_t*>(data), length, option);
+        if (alt_msgdma_standard_descriptor_sync_transfer(dev, &desc) != 0){
+            printf("Failed to transfer\n");
+        }
+    }
+
+    return 0;
+}
+
+static MSCMD_COMMAND_TABLE command_table[] = {
+    {"imu", command_imu},
+    {"adc", command_adc2},
+    {"tx", command_transport}
+};
+
+
+// IRQ handlers
+// msgdma_0  IRQ0, RIL=1, RRS=1
+// timer_0   IRQ1, RIL=3, RRS=3
+// pio_0     IRQ2, RIL=2, RRS=2
+// pio_1     IRQ3, RIL=3, RRS=3
+// uart_0    IRQ4, RIL=1, RRS=1
+// i2cm_0    IRQ5, RIL=1, RRS=1
+// spim_0    IRQ6, RIL=1, RRS=1
+// spim_1    IRQ7, RIL=1, RRS=1
+// vcm_0     IRQ8, RIL=3, RRS=3
+// mc_0      IRQ9, RIL=3, RRS=3
+
+//void msgdma_0_handler(void *context) {}
+
+static bool initialize_peripheral(void) {
+    // mSGDMAの割り込みハンドラを登録する
+    //alt_ic_isr_register(MSGDMA_0_PREFETCHER_CSR_IRQ_INTERRUPT_CONTROLLER_ID, MSGDMA_0_PREFETCHER_CSR_IRQ, msgdma_0_handler, nullptr, nullptr);
+    
+    IMU::Initialize();
+    //ADC2::Initialize();
+    //Controller::Initialize();
+}
+
+static bool start_peripheral(void) {
+    //ADC2::Start();
+    //Controller::Start();
+}
+
+int main(void) {
+    // 割り込みを一時禁止してペリフェラルとハードウェアの初期化を行う
+    //auto context = alt_irq_disable_all();
+    //initialize_peripheral();
+    //start_peripheral();
+    //alt_irq_enable_all(context);
+
+    // MicroShellを初期化する
+    char buf[64];
+    MICROSHELL ms;
+    MSCMD mscmd;
+    microshell_init(
+        &ms,
+        [](char c) { alt_putchar(c); },
+        [](void) -> char { return alt_getchar(); },
+        nullptr);
+    mscmd_init(&mscmd, command_table, sizeof(command_table) / sizeof(command_table[0]), nullptr);
+
+    // 起動メッセージを表示する
+    alt_putstr("Hello from Nios II!\n");
+
+    // コマンド入力を受け付ける
+    while (true) {
+        alt_putchar('>');
+        microshell_getline(&ms, buf, sizeof(buf));
+        MSCMD_USER_RESULT result;
+        mscmd_execute(&mscmd, buf, &result);
+    }
+
+    return 0;
+}

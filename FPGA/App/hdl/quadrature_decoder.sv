@@ -66,6 +66,9 @@ module quadrature_decoder #(
             else if (~inc & dec) begin
                 counter_internal <= (~latch ? counter_internal : '0) - 1'b1;
             end
+            else if (latch == 1'b1) begin
+                counter_internal <= '0;
+            end
         end
     end
 endmodule

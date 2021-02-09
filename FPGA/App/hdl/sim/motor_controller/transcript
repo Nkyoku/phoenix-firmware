@@ -1,0 +1,75 @@
+# vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module motor_controller
+# 
+# Top level modules:
+# 	motor_controller
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/ltc2320.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ltc2320
+# 
+# Top level modules:
+# 	ltc2320
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/mycic.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module MyCIC
+# 
+# Top level modules:
+# 	MyCIC
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/ip/avalon_st_clock_bridge/avalon_st_clock_bridge.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module avalon_st_clock_bridge
+# 
+# Top level modules:
+# 	avalon_st_clock_bridge
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module pwm_driver
+# 
+# Top level modules:
+# 	pwm_driver
+# 
+# 
+# 6 compiles, 0 failed with no errors.
+vsim -gui work.test
+# vsim -gui work.test 
+# Start time: 22:51:23 on Jan 21,2021
+# Loading sv_std.std
+# Loading work.test
+# Loading work.MyCIC
+# Loading work.pwm_driver
+# Loading work.avalon_st_clock_bridge
+# Loading work.motor_controller
+# ** Warning: (vsim-3015) [PCDPC] - Port size (13) does not match connection size (16) for port 'current_sink_w_data'. The port definition is at: C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv(15).
+#    Time: 0 ps  Iteration: 0  Instance: /test/drv File: C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv Line: 122
+# ** Warning: (vsim-2685) [TFMPC] - Too few port connections for 'pwm_bridge'.  Expected 11, found 10.
+#    Time: 0 ps  Iteration: 0  Instance: /test/pwm_bridge File: C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv Line: 149
+# ** Error: (vsim-3063) Port 'reset' not found in the connected module (1st connection).
+#    Time: 0 ps  Iteration: 0  Instance: /test/pwm_bridge File: C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv Line: 149
+# ** Warning: (vsim-3722) C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv(149): [TFMPC] - Missing connection for port 'reset1'.
+# ** Warning: (vsim-3722) C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv(149): [TFMPC] - Missing connection for port 'reset2'.
+# ** Warning: (vsim-2685) [TFMPC] - Too few port connections for 'adc_bridge'.  Expected 11, found 10.
+#    Time: 0 ps  Iteration: 0  Instance: /test/adc_bridge File: C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv Line: 164
+# ** Error: (vsim-3063) Port 'reset' not found in the connected module (1st connection).
+#    Time: 0 ps  Iteration: 0  Instance: /test/adc_bridge File: C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv Line: 164
+# ** Warning: (vsim-3722) C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv(164): [TFMPC] - Missing connection for port 'reset1'.
+# ** Warning: (vsim-3722) C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv(164): [TFMPC] - Missing connection for port 'reset2'.
+# Error loading design
+# End time: 22:51:24 on Jan 21,2021, Elapsed time: 0:00:01
+# Errors: 2, Warnings: 9

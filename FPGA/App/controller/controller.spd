@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="simulation/submodules/controller_nios_0_cpu.sdc"
+   type="SDC"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu.v"
+   type="VERILOG"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_debug_slave_sysclk.v"
+   type="VERILOG"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_debug_slave_tck.v"
+   type="VERILOG"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_debug_slave_wrapper.v"
+   type="VERILOG"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_mult_cell.v"
+   type="VERILOG"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_nios2_waves.do"
+   type="OTHER"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_ociram_default_contents.dat"
+   type="DAT"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_ociram_default_contents.hex"
+   type="HEX"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_ociram_default_contents.mif"
+   type="MIF"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_rf_ram_a.dat"
+   type="DAT"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_rf_ram_a.hex"
+   type="HEX"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_rf_ram_a.mif"
+   type="MIF"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_rf_ram_b.dat"
+   type="DAT"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_rf_ram_b.hex"
+   type="HEX"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_rf_ram_b.mif"
+   type="MIF"
+   library="cpu" />
+ <file
+   path="simulation/submodules/controller_nios_0_cpu_test_bench.v"
+   type="VERILOG"
+   library="cpu" />
+ <file
+   path="simulation/submodules/mentor/altera_nios2_gen2_rtl_module.sv"
+   type="SYSTEM_VERILOG"
+   library="cpu"
+   simulator="modelsim" />
+ <file
+   path="simulation/submodules/read_master.v"
+   type="VERILOG"
+   library="read_mstr_internal" />
+ <file
+   path="simulation/submodules/MM_to_ST_Adapter.v"
+   type="VERILOG"
+   library="read_mstr_internal" />
+ <file
+   path="simulation/submodules/read_burst_control.v"
+   type="VERILOG"
+   library="read_mstr_internal" />
+ <file
+   path="simulation/submodules/altera_msgdma_prefetcher.v"
+   type="VERILOG"
+   library="prefetcher_internal" />
+ <file
+   path="simulation/submodules/altera_msgdma_prefetcher_read.v"
+   type="VERILOG"
+   library="prefetcher_internal" />
+ <file
+   path="simulation/submodules/altera_msgdma_prefetcher_write_back.v"
+   type="VERILOG"
+   library="prefetcher_internal" />
+ <file
+   path="simulation/submodules/altera_msgdma_prefetcher_fifo.v"
+   type="VERILOG"
+   library="prefetcher_internal" />
+ <file
+   path="simulation/submodules/altera_msgdma_prefetcher_interrrupt.v"
+   type="VERILOG"
+   library="prefetcher_internal" />
+ <file
+   path="simulation/submodules/altera_msgdma_prefetcher_csr.v"
+   type="VERILOG"
+   library="prefetcher_internal" />
+ <file
+   path="simulation/submodules/dispatcher.v"
+   type="VERILOG"
+   library="dispatcher_internal" />
+ <file
+   path="simulation/submodules/descriptor_buffers.v"
+   type="VERILOG"
+   library="dispatcher_internal" />
+ <file
+   path="simulation/submodules/csr_block.v"
+   type="VERILOG"
+   library="dispatcher_internal" />
+ <file
+   path="simulation/submodules/response_block.v"
+   type="VERILOG"
+   library="dispatcher_internal" />
+ <file
+   path="simulation/submodules/fifo_with_byteenables.v"
+   type="VERILOG"
+   library="dispatcher_internal" />
+ <file
+   path="simulation/submodules/read_signal_breakout.v"
+   type="VERILOG"
+   library="dispatcher_internal" />
+ <file
+   path="simulation/submodules/write_signal_breakout.v"
+   type="VERILOG"
+   library="dispatcher_internal" />
+ <file
+   path="simulation/submodules/fpoint2_multi.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/fpoint2_multi_datapath.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/fpoint2_multi_dspba_library_package.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/fpoint2_multi_dspba_library.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FPAddSub/FPAddSub.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FPDiv/FPDiv.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FPMult/FPMult.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/IntToFloat/IntToFloat.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FloatToInt/FloatToInt.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FPSqrt/FPSqrt_safe_path.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FPSqrt/FPSqrt.vhd"
+   type="VHDL"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FPSqrt/FPSqrt_memoryC0_uid59_sqrtTableGenerator_lutmem.hex"
+   type="HEX"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FPSqrt/FPSqrt_memoryC1_uid60_sqrtTableGenerator_lutmem.hex"
+   type="HEX"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/FPSqrt/FPSqrt_memoryC2_uid61_sqrtTableGenerator_lutmem.hex"
+   type="HEX"
+   library="fpci_multi" />
+ <file
+   path="simulation/submodules/fpoint2_combi.vhd"
+   type="VHDL"
+   library="fpci_combi" />
+ <file
+   path="simulation/submodules/FPMinMaxFused/FPMinMaxFused.vhd"
+   type="VHDL"
+   library="fpci_combi" />
+ <file
+   path="simulation/submodules/FPCompareFused/FPCompareFused.vhd"
+   type="VHDL"
+   library="fpci_combi" />
+ <file
+   path="simulation/submodules/FPNeg_Abs/FPNeg.vhd"
+   type="VHDL"
+   library="fpci_combi" />
+ <file
+   path="simulation/submodules/FPNeg_Abs/FPAbs.vhd"
+   type="VHDL"
+   library="fpci_combi" />
+ <file
+   path="simulation/submodules/altera_reset_controller.v"
+   type="VERILOG"
+   library="rst_controller" />
+ <file
+   path="simulation/submodules/altera_reset_synchronizer.v"
+   type="VERILOG"
+   library="rst_controller" />
+ <file
+   path="simulation/submodules/altera_reset_controller.sdc"
+   type="SDC"
+   library="rst_controller" />
+ <file
+   path="simulation/submodules/controller_avalon_st_adapter_001.v"
+   type="VERILOG"
+   library="avalon_st_adapter_001" />
+ <file
+   path="simulation/submodules/controller_avalon_st_adapter.v"
+   type="VERILOG"
+   library="avalon_st_adapter" />
+ <file
+   path="simulation/submodules/controller_irq_mapper.sv"
+   type="SYSTEM_VERILOG"
+   library="irq_mapper" />
+ <file
+   path="simulation/submodules/controller_mm_interconnect_4.v"
+   type="VERILOG"
+   library="mm_interconnect_4" />
+ <file
+   path="simulation/submodules/controller_mm_interconnect_3.v"
+   type="VERILOG"
+   library="mm_interconnect_3" />
+ <file
+   path="simulation/submodules/controller_mm_interconnect_2.v"
+   type="VERILOG"
+   library="mm_interconnect_2" />
+ <file
+   path="simulation/submodules/controller_mm_interconnect_1.v"
+   type="VERILOG"
+   library="mm_interconnect_1" />
+ <file
+   path="simulation/submodules/controller_mm_interconnect_0.v"
+   type="VERILOG"
+   library="mm_interconnect_0" />
+ <file
+   path="simulation/submodules/controller_nios_0_custom_instruction_master_multi_xconnect.sv"
+   type="SYSTEM_VERILOG"
+   library="nios_0_custom_instruction_master_multi_xconnect" />
+ <file
+   path="simulation/submodules/altera_customins_slave_translator.sv"
+   type="SYSTEM_VERILOG"
+   library="nios_0_custom_instruction_master_comb_slave_translator0" />
+ <file
+   path="simulation/submodules/controller_nios_0_custom_instruction_master_comb_xconnect.sv"
+   type="SYSTEM_VERILOG"
+   library="nios_0_custom_instruction_master_comb_xconnect" />
+ <file
+   path="simulation/submodules/altera_customins_master_translator.v"
+   type="VERILOG"
+   library="nios_0_custom_instruction_master_translator" />
+ <file
+   path="simulation/submodules/controller_vic_0.v"
+   type="VERILOG"
+   library="vic_0" />
+ <file
+   path="simulation/submodules/vector_controller_master.sv"
+   type="VERILOG"
+   library="vector_controller_master_0" />
+ <file
+   path="simulation/submodules/controller_uart_0.v"
+   type="VERILOG"
+   library="uart_0" />
+ <file
+   path="simulation/submodules/controller_timer_0.v"
+   type="VERILOG"
+   library="timer_0" />
+ <file
+   path="simulation/submodules/controller_sysid_qsys_0.v"
+   type="VERILOG"
+   library="sysid_qsys_0" />
+ <file
+   path="simulation/submodules/altera_avalon_st_packets_to_bytes.v"
+   type="VERILOG"
+   library="st_packets_to_bytes_0" />
+ <file
+   path="simulation/submodules/altera_avalon_st_bytes_to_packets.v"
+   type="VERILOG"
+   library="st_bytes_to_packets_0" />
+ <file
+   path="simulation/submodules/spiphyslave.v"
+   type="VERILOG"
+   library="spislave_0" />
+ <file
+   path="simulation/submodules/controller_spim_0.v"
+   type="VERILOG"
+   library="spim_0" />
+ <file
+   path="simulation/submodules/controller_pio_2.v"
+   type="VERILOG"
+   library="pio_2" />
+ <file
+   path="simulation/submodules/controller_pio_1.v"
+   type="VERILOG"
+   library="pio_1" />
+ <file
+   path="simulation/submodules/controller_pio_0.v"
+   type="VERILOG"
+   library="pio_0" />
+ <file
+   path="simulation/submodules/altera_avalon_packets_to_master.v"
+   type="VERILOG"
+   library="packets_to_master_0" />
+ <file
+   path="simulation/submodules/controller_nios_0.v"
+   type="VERILOG"
+   library="nios_0" />
+ <file
+   path="simulation/submodules/controller_multiplexer_0.sv"
+   type="SYSTEM_VERILOG"
+   library="multiplexer_0" />
+ <file
+   path="simulation/submodules/controller_msgdma_0.v"
+   type="VERILOG"
+   library="msgdma_0" />
+ <file
+   path="simulation/submodules/motor_controller.sv"
+   type="SYSTEM_VERILOG"
+   library="motor_controller_0" />
+ <file
+   path="simulation/submodules/altera_avalon_mm_bridge.v"
+   type="VERILOG"
+   library="mm_bridge_0" />
+ <file
+   path="simulation/submodules/controller_instruction_rom_0.hex"
+   type="HEX"
+   library="instruction_rom_0" />
+ <file
+   path="simulation/submodules/controller_instruction_rom_0.v"
+   type="VERILOG"
+   library="instruction_rom_0" />
+ <file
+   path="simulation/submodules/imu_spim.sv"
+   type="SYSTEM_VERILOG"
+   library="imu_spim" />
+ <file
+   path="simulation/submodules/i2c_master.sv"
+   type="SYSTEM_VERILOG"
+   library="i2c_master_0" />
+ <file
+   path="simulation/submodules/controller_fpu_0.v"
+   type="VERILOG"
+   library="fpu_0" />
+ <file
+   path="simulation/submodules/controller_data_ram_1.hex"
+   type="HEX"
+   library="data_ram_1" />
+ <file
+   path="simulation/submodules/controller_data_ram_1.v"
+   type="VERILOG"
+   library="data_ram_1" />
+ <file
+   path="simulation/submodules/controller_data_ram_0.hex"
+   type="HEX"
+   library="data_ram_0" />
+ <file
+   path="simulation/submodules/controller_data_ram_0.v"
+   type="VERILOG"
+   library="data_ram_0" />
+ <file
+   path="simulation/submodules/controller_counter_0.v"
+   type="VERILOG"
+   library="counter_0" />
+ <file path="simulation/controller.v" type="VERILOG" />
+ <topLevel name="controller" />
+ <deviceFamily name="cyclone10lp" />
+ <modelMap
+   controllerPath="controller.data_ram_0"
+   modelPath="controller.data_ram_0" />
+ <modelMap
+   controllerPath="controller.data_ram_1"
+   modelPath="controller.data_ram_1" />
+ <modelMap
+   controllerPath="controller.instruction_rom_0"
+   modelPath="controller.instruction_rom_0" />
+</simPackage>

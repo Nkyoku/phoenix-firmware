@@ -1,0 +1,136 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/work/Robocup/phoenix-firmware/FPGA/hdl/sim/clarke_transform
+vi2c_master
+Z0 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
+Z1 !s110 1602405179
+!i10b 1
+!s100 ZONTghT;`ZG?13H2kOBU93
+Z2 !s11b Dg1SIo80bB@j0V0VzS_@n1
+I_W7JakHh<D<J]875mFIzC2
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+S1
+Z4 dC:/work/de0nano_test/hdl/sim/i2c_master
+Z5 w1602405107
+Z6 8C:/work/de0nano_test/hdl/i2c_master.sv
+Z7 FC:/work/de0nano_test/hdl/i2c_master.sv
+!i122 135
+L0 63 285
+Z8 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z9 !s108 1602405178.000000
+Z10 !s107 C:/work/de0nano_test/hdl/i2c_master.sv|
+Z11 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/de0nano_test/hdl/i2c_master.sv|
+!i113 1
+Z12 o-work work -sv
+Z13 tCvgOpt 0
+vi2c_master_tx_rx
+R0
+R1
+!i10b 1
+!s100 M_N``RecBh@YCXV@C@6^L3
+R2
+I9XoPX]^keEz^<5P]i^mFI2
+R3
+S1
+R4
+R5
+R6
+R7
+!i122 135
+L0 349 153
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+R12
+R13
+vi2c_slave
+R0
+R1
+!i10b 1
+!s100 G]=J52g5FjHl1gfX:dCQU3
+R2
+Ie2;9BE]31X39ZWOTmCQ553
+R3
+S1
+R4
+Z14 w1602405176
+Z15 8C:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test2.sv
+Z16 FC:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test2.sv
+!i122 137
+L0 147 119
+R8
+r1
+!s85 0
+31
+Z17 !s108 1602405179.000000
+!s107 C:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test2.sv|
+Z18 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test2.sv|
+!i113 1
+R12
+R13
+vtest
+R0
+R1
+!i10b 1
+!s100 >=B4HHF^YYmN?M7O`mfU10
+R2
+I33k_REdTB9mOO1LbLn6XX3
+R3
+S1
+R4
+w1602392924
+8C:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test.sv
+FC:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test.sv
+!i122 136
+L0 2 130
+R8
+r1
+!s85 0
+31
+R17
+!s107 C:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test.sv|
+!i113 1
+R12
+R13
+vtest2
+R0
+R1
+!i10b 1
+!s100 z@WdYW:O5YLcoem3^XzST1
+R2
+I]`MI;1HeYeE6O@WHUH@:K2
+R3
+S1
+R4
+R14
+R15
+R16
+!i122 137
+L0 2 142
+R8
+r1
+!s85 0
+31
+R17
+Z19 !s107 C:/work/de0nano_test/hdl/sim/i2c_master/i2c_master_test2.sv|
+R18
+!i113 1
+R12
+R13

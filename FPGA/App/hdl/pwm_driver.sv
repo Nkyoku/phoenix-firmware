@@ -1,24 +1,25 @@
 module pwm_driver #(
+        parameter int PWM_PERIOD_CYCLES = 1,
         parameter int PWM_MAX_ON_CYCLES = 1,
         parameter int DATA_WIDTH = 16
     ) (
-        input  wire                  clk,
-        input  wire                  reset,
-        input  wire                  trigger,
-        input  wire                  fault,
-        input  wire [DATA_WIDTH-1:0] pwm_sink_data,
-        input  wire                  pwm_sink_valid,
-        input  wire [2:0]            sensor_hall_uvw,
-        input  wire                  driver_otw_n,
-        input  wire                  driver_fault_n,
-        output reg  [2:0]            driver_pwm,
-        output reg  [2:0]            driver_reset_n,
-        output wire                  status_driver_otw_n,
-        output wire                  status_driver_fault_n,
-        output wire                  status_hall_fault_n
+        input  wire                         clk,
+        input  wire                         reset,
+        input  wire                         trigger,
+        input  wire                         fault,
+        input  wire signed [DATA_WIDTH-1:0] pwm_sink_data,
+        input  wire                         pwm_sink_valid,
+        input  wire [2:0]                   sensor_hall_uvw,
+        input  wire                         driver_otw_n,
+        input  wire                         driver_fault_n,
+        output reg  [2:0]                   driver_pwm,
+        output reg  [2:0]                   driver_reset_n,
+        output wire                         status_driver_otw_n,
+        output wire                         status_driver_fault_n,
+        output wire                         status_hall_fault_n
     );
     
-    localparam int PWM_COUNTER_WIDTH = $clog2(PWM_MAX_ON_CYCLES + 1);
+    localparam int PWM_COUNTER_WIDTH = $clog2(PWM_PERIOD_CYCLES);
     
     // Filter nFAULT, nOTW
     deglitch #(
@@ -39,7 +40,7 @@ module pwm_driver #(
     );
     
     // Commutation
-    wire comm_direction = pwm_sink_data[$bits(pwm_sink_data)-1];
+    logic comm_direction;
     wire [2:0] comm_input = sensor_hall_uvw ^ {3{comm_direction}};
     logic [2:0] comm_phase_enable;
     logic [2:0] comm_phase_polarity;
@@ -65,27 +66,28 @@ module pwm_driver #(
     end
     
     // Latch Next PWM Compare Value
-    logic trigger_delayed = 1'b0;
-    wire unsigned [DATA_WIDTH-1:0] pwm_sink_data_abs = (comm_direction == 1'b0) ? pwm_sink_data : -pwm_sink_data;
-    logic unsigned [PWM_COUNTER_WIDTH-1:0] next_pwm_compare = '0;
+    logic signed [DATA_WIDTH-1:0] next_pwm_compare = '0;
+    wire unsigned [DATA_WIDTH-1:0] next_pwm_compare_abs = (0 <= next_pwm_compare) ? DATA_WIDTH'(next_pwm_compare) : DATA_WIDTH'(-next_pwm_compare);
+    assign comm_direction = (next_pwm_compare < 0) ? 1'b1 : 1'b0;
     logic next_pwm_available = 1'b0;
-    always @(posedge clk) begin
-        trigger_delayed <= trigger;
-    end
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
             next_pwm_compare <= '0;
             next_pwm_available <= 1'b0;
         end
-        else if (fault | ~status_driver_otw_n | ~status_driver_fault_n) begin
-            next_pwm_available <= 1'b0;
-        end
-        else if (pwm_sink_valid == 1'b1) begin
-            next_pwm_compare <= (pwm_sink_data_abs < PWM_MAX_ON_CYCLES) ? PWM_COUNTER_WIDTH'(pwm_sink_data_abs) : PWM_COUNTER_WIDTH'(PWM_MAX_ON_CYCLES);
-            next_pwm_available <= 1'b1;
-        end
-        else if (trigger_delayed == 1'b1) begin
-            next_pwm_available <= 1'b0;
+        else begin
+            if (fault | ~status_driver_otw_n | ~status_driver_fault_n) begin
+                next_pwm_available <= 1'b0;
+            end
+            else if (pwm_sink_valid == 1'b1) begin
+                next_pwm_available <= 1'b1;
+            end
+            else if (trigger == 1'b1) begin
+                next_pwm_available <= 1'b0;
+            end
+            if (pwm_sink_valid == 1'b1) begin
+                next_pwm_compare <= pwm_sink_data;
+            end
         end
     end
     
@@ -109,15 +111,18 @@ module pwm_driver #(
             if (fault | ~status_driver_otw_n | ~status_driver_fault_n) begin
                 pwm_drive <= 1'b0;
             end
-            else if (trigger_delayed == 1'b1) begin
+            else if (trigger == 1'b1) begin
                 if (next_pwm_available == 1'b1) begin
                     pwm_drive <= 1'b1;
-                    pwm_compare <= next_pwm_compare;
+                    pwm_compare <= (next_pwm_compare_abs <= PWM_MAX_ON_CYCLES) ? PWM_COUNTER_WIDTH'(next_pwm_compare_abs) : PWM_COUNTER_WIDTH'(PWM_MAX_ON_CYCLES);
                 end
-                pwm_counter <= '0;
+                pwm_counter <= PWM_COUNTER_WIDTH'(PWM_PERIOD_CYCLES - 1);
             end
             else begin
-                pwm_counter <= (pwm_counter < '1) ? pwm_counter + 1'b1 : '1;
+                if (pwm_counter == 1'b0) begin
+                    pwm_drive <= 1'b0;
+                end
+                pwm_counter <= pwm_counter - 1'b1;
             end
             driver_pwm_ff[0] <= pwm_drive & comm_phase_polarity[0] & (pwm_counter < pwm_compare);
             driver_pwm_ff[1] <= pwm_drive & comm_phase_polarity[1] & (pwm_counter < pwm_compare);

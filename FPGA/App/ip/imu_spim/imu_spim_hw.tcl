@@ -51,6 +51,11 @@ add_fileset_file imu_spim.sv SYSTEM_VERILOG PATH imu_spim.sv
 # 
 # parameters
 # 
+add_parameter PRESCALER INTEGER 1
+set_parameter_property PRESCALER DISPLAY_NAME "Prescaler"
+set_parameter_property PRESCALER ALLOWED_RANGES 1:2147483647
+set_parameter_property PRESCALER HDL_PARAMETER true
+set_parameter_property PRESCALER AFFECTS_GENERATION true
 
 
 # 

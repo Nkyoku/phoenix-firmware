@@ -1,0 +1,15 @@
+C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module deglitch
+
+Top level modules:
+	deglitch
+
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/pwm_driver/pwm_driver_test.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/pwm_driver/pwm_driver_test.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module test
+
+Top level modules:
+	test
+
+} {} {}}

@@ -1,0 +1,71 @@
+#pragma once
+
+#include <stdint.h>
+#include <system.h>
+#include <altera_msgdma.h>
+#include <stream_data.hpp>
+
+/**
+ * mSGDMAで送信するメッセージを管理するベースクラス
+ */
+template <class T>
+class StreamDataDesciptor {
+public:
+    /**
+     * コンストラクタ
+     * mSGMDAのディスクリプタを初期化する
+     * @param data データへのポインタ
+     * @param length データの長さ
+     * @param channel チャンネル番号
+     */
+    constexpr StreamDataDesciptor(const T &data,int channel)
+    : Descriptor({0, 0, 0, 0})
+    {
+        /*Descriptor.read_address = const_cast<alt_u32*>(reinterpret_cast<const alt_u32*>(&data));
+        Descriptor.write_address = 0;
+        Descriptor.transfer_length = static_cast<alt_u32>(sizeof(T));
+        Descriptor.control = ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GO_MASK
+            | ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GENERATE_SOP_MASK
+            | ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GENERATE_EOP_MASK
+            | (channel << ALTERA_MSGDMA_DESCRIPTOR_CONTROL_TRANSMIT_CHANNEL_OFFSET);*/
+    }
+
+    /**
+     * 非同期的に転送を開始する
+     * @param device mSGDMAのハンドル
+     * @return　転送の開始に成功したらtrueを返す
+     */
+    bool TransmitAsync(alt_msgdma_dev *device) const {
+        return alt_msgdma_standard_descriptor_async_transfer(device, const_cast<alt_msgdma_standard_descriptor*>(&Descriptor)) == 0;
+    }
+
+    /**
+     * 同期的に転送を開始する
+     * @param device mSGDMAのハンドル
+     * @return　転送に成功したらtrueを返す
+     */
+    bool TransmitSync(alt_msgdma_dev *device) const {
+        return alt_msgdma_standard_descriptor_sync_transfer(device, const_cast<alt_msgdma_standard_descriptor*>(&Descriptor)) == 0;
+    }
+
+private:
+    /**
+     * mSGDMAのディスクリプタ
+     */
+    alt_msgdma_standard_descriptor Descriptor;
+};
+
+class StreamTransmitter {
+public:
+    static bool Initialize(void) {
+        alt_msgdma_dev *dev = alt_msgdma_open(MSGDMA_0_CSR_NAME);
+        _Device = dev;
+        return dev != nullptr;
+    }
+
+    static bool TransmitAdc2(void);
+
+private:
+    // mSGDMAのハンドル
+    static alt_msgdma_dev *_Device;
+};

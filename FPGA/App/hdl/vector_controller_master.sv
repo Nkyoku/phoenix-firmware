@@ -19,22 +19,24 @@
 |-------------|-------------|-------------|-------------|---------------|---------------|---------------|---------------|
 | DRV_OTW_4_N | DRV_OTW_3_N | DRV_OTW_2_N | DRV_OTW_1_N | DRV_FAULT_4_N | DRV_FAULT_3_N | DRV_FAULT_2_N | DRV_FAULT_1_N |
 
-|        7       |        6       |        5       |        4       |       3       |       2       |       1       |       0       |
-|----------------|----------------|----------------|----------------|---------------|---------------|---------------|---------------|
-| HALL_FAULT_4_N | HALL_FAULT_3_N | HALL_FAULT_2_N | HALL_FAULT_1_N | ENC_FAULT_4_N | ENC_FAULT_3_N | ENC_FAULT_2_N | ENC_FAULT_1_N |
+|        7       |        6       |        5       |        4       |          3 ~ 0           |
+|----------------|----------------|----------------|----------------|--------------------------|
+| HALL_FAULT_4_N | HALL_FAULT_3_N | HALL_FAULT_2_N | HALL_FAULT_1_N | reserved (Read as all 1) |
 
-平常時は1でSTATUSの各ビットが0になる瞬間があったら対応するビットが0にクリアされる。
-DRV_OTW_[n]_N, DRV_FAULT_[n]_N, HALL_FAULT_[n]_Nのいずれかのビットがクリアされているフォルト出力と割り込み出力がアサートになる。 (n=1...4)
-FAULT.FAULT_CLRに1を書き込むと全てのビットが1に戻る。
+平常時は全てのビットが1だがSTATUSの各ビットが0になる瞬間があったら対応するビットが0にクリアされる。
+DRV_OTW_[n]_N, DRV_FAULT_[n]_N, HALL_FAULT_[n]_N (n=1...4)のいずれかのビットがクリアされた瞬間にフォルト出力と割り込み出力がアサートされる。
+読むと全てのビットが1にセットされる。
 
 
-### FAULT (0x4) Write Only
+### FAULT (0x4) Read/Write
 |  15 ~ 2  |     1     |     0     |
 |----------|-----------|-----------|
-| reserved | FAULT_SET | FAULT_CLR |
+| reserved | FAULT_CLR | FAULT_SET |
 
-FAULT_CLRに1を書き込むとINTFLAGが1にセットされ、フォルト出力と割り込み出力がデアサートされる。
-FAULT_SETに1を書き込むとフォルト出力と割り込み出力がアサートされる。
+FAULT_CLRに1を書き込むとフォルト出力がデアサートされる。
+FAULT_SETに1を書き込むとフォルト出力がアサートされる。
+FAULT_CLRよりFAULT_SETのほうが優先される。
+現在のフォルト出力の状態がFAULT_SETの値として読める。
 
 
 ### POSITION (0x6) Read Only
@@ -140,70 +142,15 @@ module vector_controller_master (
 		output reg         current_reference_3_valid,
 		output wire [31:0] current_reference_4_data,
 		output reg         current_reference_4_valid,
-		input  wire [5:0]  slave_address,
+		input  wire [4:0]  slave_address,
 		input  wire        slave_read,
 		output reg  [15:0] slave_readdata,
 		input  wire        slave_write,
 		input  wire [15:0] slave_writedata,
-        output wire        irq
+        output reg         irq
 	);
 
-    // Fault output
-    assign irq = fault;
-    logic fault_set, fault_clear;
-    logic [3:0] status_driver_otw_n_latch = '1;
-    logic [3:0] status_driver_fault_n_latch = '1;
-    logic [3:0] status_hall_fault_n_latch = '1;
-    logic [3:0] status_encoder_fault_n_latch = '1;
-    always @(posedge clk, posedge reset) begin
-        if (reset == 1'b1) begin
-            fault <= 1'b0;
-            status_driver_otw_n_latch <= '1;
-            status_driver_fault_n_latch <= '1;
-            status_hall_fault_n_latch <= '1;
-            status_encoder_fault_n_latch <= '1;
-        end
-        else begin
-            if ((status_driver_otw_n_latch != '1) | (status_driver_fault_n_latch != '1) | (status_hall_fault_n_latch != '1)) begin
-                // エンコーダ以外の異常検知に対しフォルト出力をアサートする
-                fault <= 1'b1;
-            end
-            else if (fault_clear == 1'b1) begin
-                fault <= 1'b0;
-            end
-            else if (fault_set == 1'b1) begin
-                fault <= 1'b1;
-            end
-            status_driver_otw_n_latch    <= (fault_clear ? '1 : status_driver_otw_n_latch   ) & status_driver_otw_n;
-            status_driver_fault_n_latch  <= (fault_clear ? '1 : status_driver_fault_n_latch ) & status_driver_fault_n;
-            status_hall_fault_n_latch    <= (fault_clear ? '1 : status_hall_fault_n_latch   ) & status_hall_fault_n;
-            status_encoder_fault_n_latch <= (fault_clear ? '1 : status_encoder_fault_n_latch) & status_encoder_fault_n;
-        end
-    end
-    
-    // Current measurement
-    logic signed [15:0] motor_current_meas_d [1:4];
-    logic signed [15:0] motor_current_meas_q [1:4];
-    always @(posedge clk) begin
-        if (current_measurement_1_valid == 1'b1) begin
-            motor_current_meas_d[1] <= current_measurement_1_data[31:16];
-            motor_current_meas_q[1] <= current_measurement_1_data[15:0];
-        end
-        if (current_measurement_2_valid == 1'b1) begin
-            motor_current_meas_d[2] <= current_measurement_2_data[31:16];
-            motor_current_meas_q[2] <= current_measurement_2_data[15:0];
-        end
-        if (current_measurement_3_valid == 1'b1) begin
-            motor_current_meas_d[3] <= current_measurement_3_data[31:16];
-            motor_current_meas_q[3] <= current_measurement_3_data[15:0];
-        end
-        if (current_measurement_4_valid == 1'b1) begin
-            motor_current_meas_d[4] <= current_measurement_4_data[31:16];
-            motor_current_meas_q[4] <= current_measurement_4_data[15:0];
-        end
-    end
-    
-    // Avalon-MM
+    // Register Address Map
     typedef enum {
         REGISTER_STATUS   = 'h00,
         REGISTER_INTFLAG  = 'h01, 
@@ -232,6 +179,76 @@ module vector_controller_master (
         REGISTER_KP       = 'h18,
         REGISTER_KI       = 'h19
     } REGISTER_MAP;
+
+    // Fault
+    logic fault_set;
+    logic fault_clear;
+    always @(posedge clk, posedge reset) begin
+        if (reset == 1'b1) begin
+            fault <= 1'b0;
+        end
+        else begin
+            if ((status_driver_otw_n != '1) | (status_driver_fault_n != '1) | (status_hall_fault_n != '1)) begin
+                fault <= 1'b1;
+            end
+            else begin
+                fault <= (fault & ~fault_clear) | fault_set;
+            end
+        end
+    end
+    
+    // Interrupt Flag
+    logic [3:0] status_driver_otw_n_ff = '1;
+    logic [3:0] status_driver_fault_n_ff = '1;
+    logic [3:0] status_hall_fault_n_ff = '1;
+    logic [3:0] intflag_driver_otw_n = '1;
+    logic [3:0] intflag_driver_fault_n = '1;
+    logic [3:0] intflag_hall_fault_n = '1;
+    wire intflag_clear = slave_read & (slave_address == REGISTER_INTFLAG);
+    always @(posedge clk, posedge reset) begin
+        if (reset == 1'b1) begin
+            status_driver_otw_n_ff <= '1;
+            status_driver_fault_n_ff <= '1;
+            status_hall_fault_n_ff <= '1;
+            intflag_driver_otw_n <= '1;
+            intflag_driver_fault_n <= '1;
+            intflag_hall_fault_n <= '1;
+            irq <= 1'b0;
+        end
+        else begin
+            status_driver_otw_n_ff    <= {4{fault_clear}} | status_driver_otw_n;
+            status_driver_fault_n_ff  <= {4{fault_clear}} | status_driver_fault_n;
+            status_hall_fault_n_ff    <= {4{fault_clear}} | status_hall_fault_n;
+            intflag_driver_otw_n   <= ({4{intflag_clear}} | intflag_driver_otw_n  ) & (status_driver_otw_n   | ~status_driver_otw_n_ff  );
+            intflag_driver_fault_n <= ({4{intflag_clear}} | intflag_driver_fault_n) & (status_driver_fault_n | ~status_driver_fault_n_ff);
+            intflag_hall_fault_n   <= ({4{intflag_clear}} | intflag_hall_fault_n  ) & (status_hall_fault_n   | ~status_hall_fault_n_ff  );
+            irq <= (intflag_driver_otw_n != '1) | (intflag_driver_fault_n != '1) | (intflag_hall_fault_n != '1);
+        end
+    end
+
+    // Current measurement
+    logic signed [15:0] motor_current_meas_d [1:4];
+    logic signed [15:0] motor_current_meas_q [1:4];
+    always @(posedge clk) begin
+        if (current_measurement_1_valid == 1'b1) begin
+            motor_current_meas_d[1] <= current_measurement_1_data[31:16];
+            motor_current_meas_q[1] <= current_measurement_1_data[15:0];
+        end
+        if (current_measurement_2_valid == 1'b1) begin
+            motor_current_meas_d[2] <= current_measurement_2_data[31:16];
+            motor_current_meas_q[2] <= current_measurement_2_data[15:0];
+        end
+        if (current_measurement_3_valid == 1'b1) begin
+            motor_current_meas_d[3] <= current_measurement_3_data[31:16];
+            motor_current_meas_q[3] <= current_measurement_3_data[15:0];
+        end
+        if (current_measurement_4_valid == 1'b1) begin
+            motor_current_meas_d[4] <= current_measurement_4_data[31:16];
+            motor_current_meas_q[4] <= current_measurement_4_data[15:0];
+        end
+    end
+    
+    // Avalon-MM
     logic signed [15:0] motor_current_ref_d [1:4] = '{16'h0000, 16'h0000, 16'h0000, 16'h0000};
     logic signed [15:0] motor_current_ref_q [1:4] = '{16'h0000, 16'h0000, 16'h0000, 16'h0000};
     assign current_reference_1_data = {motor_current_ref_d[1], motor_current_ref_q[1]};
@@ -264,8 +281,8 @@ module vector_controller_master (
             if (slave_read == 1'b1) begin
                 case (slave_address)
                     REGISTER_STATUS   : slave_readdata <= {status_driver_otw_n, status_driver_fault_n, status_hall_fault_n, status_encoder_fault_n};
-                    REGISTER_INTFLAG  : slave_readdata <= {status_driver_otw_n_latch, status_driver_fault_n_latch, status_hall_fault_n_latch, status_encoder_fault_n_latch};
-                    REGISTER_FAULT    : slave_readdata <= 16'h0000;
+                    REGISTER_INTFLAG  : slave_readdata <= {intflag_driver_otw_n, intflag_driver_fault_n, intflag_hall_fault_n, 4'hF};
+                    REGISTER_FAULT    : slave_readdata <= {15'h0000, fault};
                     REGISTER_POSITION : slave_readdata <= {8'h00, status_pos_error, status_pos_uncertain};
                     REGISTER_ENCODER1 : slave_readdata <= encoder_1_data;
                     REGISTER_ENCODER2 : slave_readdata <= encoder_2_data;
@@ -294,8 +311,8 @@ module vector_controller_master (
             end
             if (slave_write == 1'b1) begin
                 if (slave_address == REGISTER_FAULT) begin
-                    fault_set <= slave_writedata[1];
-                    fault_clear <= slave_writedata[0];
+                    fault_set <= slave_writedata[0];
+                    fault_clear <= slave_writedata[1];
                 end
                 if (slave_address == REGISTER_IREFD1) begin
                     motor_current_ref_d[1] <= slave_writedata;

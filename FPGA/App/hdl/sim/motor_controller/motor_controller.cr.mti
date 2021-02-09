@@ -1,4 +1,11 @@
-C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv
+C:/work/Robocup/Firmware/Phoenix_FPGA/ip/avalon_st_clock_bridge/avalon_st_clock_bridge.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/ip/avalon_st_clock_bridge/avalon_st_clock_bridge.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module avalon_st_clock_bridge
+
+Top level modules:
+	avalon_st_clock_bridge
+
+} {} {}} C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/motor_controller.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
 -- Compiling module motor_controller
 
@@ -12,12 +19,12 @@ Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 
 Top level modules:
 	MyCIC
 
-} {} {}} C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv
+} {} {}} C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/ltc2320.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/ltc2320.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
--- Compiling module pwm_driver
+-- Compiling module ltc2320
 
 Top level modules:
-	pwm_driver
+	ltc2320
 
 } {} {}} C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/ip/motor_controller/sim/motor_controller_test.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
@@ -25,5 +32,12 @@ Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 
 
 Top level modules:
 	test
+
+} {} {}} C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/Firmware/Phoenix_FPGA/hdl/pwm_driver.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module pwm_driver
+
+Top level modules:
+	pwm_driver
 
 } {} {}}

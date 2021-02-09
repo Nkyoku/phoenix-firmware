@@ -1,0 +1,172 @@
+#include "centralized_monitor.hpp"
+#include <driver/load_switch.hpp>
+#include <peripheral/motor_controller.hpp>
+#include <peripheral/vector_controller.hpp>
+#include <sys/unistd.h>
+#include <system.h>
+#include <altera_avalon_pio_regs.h>
+#include <altera_avalon_timer_regs.h>
+#include <sys/alt_irq.h>
+
+void CentralizedMonitor::Initialized(void) {
+    // 各種モーターコントローラを停止する
+    VectorController::SetFault();
+    MotorController::SetFault();
+
+    // 割り込みハンドラを設定する
+    alt_ic_isr_register(TIMER_0_IRQ_INTERRUPT_CONTROLLER_ID, TIMER_0_IRQ, TimerHandler, nullptr, nullptr);
+    alt_ic_isr_register(PIO_1_IRQ_INTERRUPT_CONTROLLER_ID, PIO_1_IRQ, PioHandler, nullptr, nullptr);
+    alt_ic_isr_register(VECTOR_CONTROLLER_MASTER_0_IRQ_INTERRUPT_CONTROLLER_ID, VECTOR_CONTROLLER_MASTER_0_IRQ, VectorControllerHandler, nullptr, nullptr);
+    alt_ic_isr_register(MOTOR_CONTROLLER_5_IRQ_INTERRUPT_CONTROLLER_ID, MOTOR_CONTROLLER_5_IRQ, MotorControllerHandler, nullptr, nullptr);
+
+    // timer_0を停止し、TOフラグをクリアする
+    IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_0_BASE, ALTERA_AVALON_TIMER_CONTROL_STOP_MSK);
+    IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_0_BASE, 0);
+
+    // pio_1のエッジ検知フラグをクリア
+    IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PIO_1_BASE, 0);
+
+    // pio_1のフォルト関連の割り込みを有効にする
+    IOWR_ALTERA_AVALON_PIO_IRQ_MASK(PIO_1_BASE, Pio1Motor5SwitchFault | Pio1Motor4SwitchFault | Pio1Motor3SwitchFault | Pio1Motor2SwitchFault | Pio1Motor1SwitchFault | Pio1ModuleSleep | Pio1FpgaStop);
+
+    // モーター関連のセンサーの電源を投入する
+    LoadSwitch::SetAllOn();
+    usleep(1000);
+
+    // 各種モーターコントローラからのフォルトフラグをクリアする
+    VectorController::ClearFault();
+    MotorController::ClearFault();
+}
+
+void CentralizedMonitor::Adc2KeepAlive(int dc48v_voltage){
+    // ADC2のタイムアウトカウンタを初期化する
+    _Adc2Timeout = ADC2_TIMEOUT_THRESHOLD;
+
+    // 低電圧、過電圧を判定しエラーフラグに反映する
+    if (dc48v_voltage < DC48V_UNDER_VOLTAGE_THRESHOLD){
+        SetErrorFlags(ErrorCauseDc48vUnderVoltage);
+    }
+    else if (DC48V_OVER_VOLTAGE_THRESHOLD < dc48v_voltage){
+        SetErrorFlags(ErrorCauseDc48vOverVoltage);
+    }
+}
+
+void CentralizedMonitor::ImuKeepAlive(void){
+    // timer_0をリセットする　(固定周期タイマーのPERIOD_nへの書き込みはカウンタを初期値へリセットしカウントを停止させる)
+    IOWR_ALTERA_AVALON_TIMER_PERIOD_0(TIMER_0_BASE, 0);
+
+    // timer_0を再開する
+    IOWR_ALTERA_AVALON_TIMER_CONTROL(TIMER_0_BASE, ALTERA_AVALON_TIMER_CONTROL_ITO_MSK | ALTERA_AVALON_TIMER_CONTROL_START_MSK);
+}
+
+void CentralizedMonitor::Update(void) {
+
+
+
+
+
+}
+
+uint32_t CentralizedMonitor::ClearErrorFlags(void) {
+    auto context = alt_irq_disable_all();
+    uint32_t new_error_flags = _ErrorFlags;
+
+    // pio_1のフォルト関連の割り込みを再び有効化する
+    IOWR_ALTERA_AVALON_PIO_IRQ_MASK(PIO_1_BASE, Pio1Motor5SwitchFault | Pio1Motor4SwitchFault | Pio1Motor3SwitchFault | Pio1Motor2SwitchFault | Pio1Motor1SwitchFault | Pio1ModuleSleep | Pio1FpgaStop);
+
+    // pio_1に関するエラーフラグの解除を試みる
+    uint32_t pio_1_data = IORD_ALTERA_AVALON_PIO_DATA(PIO_1_BASE);
+    if (~pio_1_data & Pio1ModuleSleep){
+        new_error_flags &= ~ErrorCauseModuleSleep;
+    }
+    if (~pio_1_data & Pio1FpgaStop){
+        new_error_flags &= ~ErrorCauseFpgaStop;
+    }
+
+    // モーターコントローラ関連のエラーフラグを解除を試みる
+    auto vcm_status = VectorController::GetStatus();
+    auto mc5_status = MotorController::GetStatus();
+    uint32_t hall_sensor_fault_flags = vcm_status.HallSensorFault() | mc5_status.HallSensorFault();
+    new_error_flags &= ~(hall_sensor_fault_flags * ErrorCauseMotor1HallSensor);
+
+
+
+
+
+
+
+
+    alt_irq_enable_all(context);
+    return new_error_flags;
+}
+
+void CentralizedMonitor::TimerHandler(void *context) {
+    // TOフラグをクリアする
+    IOWR_ALTERA_AVALON_TIMER_STATUS(TIMER_0_BASE, 0);
+
+    // フォルトフラグを更新する
+    SetFaultFlags(FaultCauseImuTimeout);
+}
+
+void CentralizedMonitor::PioHandler(void *context) {
+    // pio_1から割り込み要因のI/Oビットを取得し以降のその要因の割り込みを禁止する
+    uint32_t irq_masks = IORD_ALTERA_AVALON_PIO_IRQ_MASK(PIO_1_BASE);
+    uint32_t irq_flags = IORD_ALTERA_AVALON_PIO_DATA(PIO_1_BASE) & irq_masks;
+    IOWR_ALTERA_AVALON_PIO_IRQ_MASK(PIO_1_BASE, irq_masks & ~irq_flags);
+
+    // エラーフラグを更新する
+    if (irq_flags & Pio1ModuleSleep) {
+        SetErrorFlags(ErrorCauseModuleSleep);
+    }
+    if (irq_flags & Pio1FpgaStop) {
+        SetErrorFlags(ErrorCauseFpgaStop);
+    }
+
+    // フォルトフラグを更新する
+    if (irq_flags & Pio1Motor1SwitchFault) {
+        SetFaultFlags(FaultCauseMotor1LoadSwitch);
+        LoadSwitch::SetMotor1Enabled(false);
+    }
+    if (irq_flags & Pio1Motor2SwitchFault) {
+        SetFaultFlags(FaultCauseMotor2LoadSwitch);
+        LoadSwitch::SetMotor2Enabled(false);
+    }
+    if (irq_flags & Pio1Motor3SwitchFault) {
+        SetFaultFlags(FaultCauseMotor3LoadSwitch);
+        LoadSwitch::SetMotor3Enabled(false);
+    }
+    if (irq_flags & Pio1Motor4SwitchFault) {
+        SetFaultFlags(FaultCauseMotor4LoadSwitch);
+        LoadSwitch::SetMotor4Enabled(false);
+    }
+    if (irq_flags & Pio1Motor5SwitchFault) {
+        SetFaultFlags(FaultCauseMotor5LoadSwitch);
+        LoadSwitch::SetMotor5Enabled(false);
+    }
+}
+
+void CentralizedMonitor::VectorControllerHandler(void *context){
+
+}
+
+void CentralizedMonitor::MotorControllerHandler(void *context){
+
+}
+
+void CentralizedMonitor::SetErrorFlags(uint32_t error_flags){
+    auto context = alt_irq_disable_all();
+     _ErrorFlags |= error_flags;
+    alt_irq_enable_all(context);
+
+    //VectorController::SetFault();
+}
+
+void CentralizedMonitor::SetFaultFlags(uint32_t fault_flags){
+    auto context = alt_irq_disable_all();
+    _FaultFlags |= fault_flags;
+    alt_irq_enable_all(context);
+}
+
+volatile uint32_t CentralizedMonitor::_ErrorFlags = 0;
+volatile uint32_t CentralizedMonitor::_FaultFlags = 0;
+int CentralizedMonitor::_Adc2Timeout = 0;

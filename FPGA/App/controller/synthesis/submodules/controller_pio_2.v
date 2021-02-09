@@ -1,4 +1,4 @@
-//Legal Notice: (C)2020 Altera Corporation. All rights reserved.  Your
+//Legal Notice: (C)2021 Altera Corporation. All rights reserved.  Your
 //use of Altera Corporation's design tools, logic functions and other
 //software and tools, and its AMPP partner logic functions, and any
 //output files any of the foregoing (including device programming or
@@ -33,7 +33,7 @@ module controller_pio_2 (
                         )
 ;
 
-  output  [ 10: 0] out_port;
+  output  [  9: 0] out_port;
   output  [ 31: 0] readdata;
   input   [  2: 0] address;
   input            chipselect;
@@ -44,14 +44,14 @@ module controller_pio_2 (
 
 
 wire             clk_en;
-reg     [ 10: 0] data_out;
-wire    [ 10: 0] out_port;
-wire    [ 10: 0] read_mux_out;
+reg     [  9: 0] data_out;
+wire    [  9: 0] out_port;
+wire    [  9: 0] read_mux_out;
 wire    [ 31: 0] readdata;
 wire             wr_strobe;
   assign clk_en = 1;
   //s1, which is an e_avalon_slave
-  assign read_mux_out = {11 {(address == 0)}} & data_out;
+  assign read_mux_out = {10 {(address == 0)}} & data_out;
   assign wr_strobe = chipselect && ~write_n;
   always @(posedge clk or negedge reset_n)
     begin
@@ -59,7 +59,7 @@ wire             wr_strobe;
           data_out <= 0;
       else if (clk_en)
           if (wr_strobe)
-              data_out <= (address == 5)? data_out & ~writedata[10 : 0]: (address == 4)? data_out | writedata[10 : 0]: (address == 0)? writedata[10 : 0]: data_out;
+              data_out <= (address == 5)? data_out & ~writedata[9 : 0]: (address == 4)? data_out | writedata[9 : 0]: (address == 0)? writedata[9 : 0]: data_out;
     end
 
 

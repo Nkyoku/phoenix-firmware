@@ -11,8 +11,8 @@ module test ();
     real F_PWM = 50000;
     real FILTER_GAIN = 6.591796875;
     
-    int param_kp = 10000;
-    int param_ki = 1000;
+    int param_kp = 4000;
+    int param_ki = 500;
     
     // Clock (10MHz)
     logic clk = 1'b0;
@@ -78,9 +78,9 @@ module test ();
     // Motor driver (実際には8回転で回転子は1回転する)
     logic driver_otw_n = 1'b1;
     logic driver_fault_n = 1'b1;
-    logic unsigned [15:0] driver_pwm_u_data;
-    logic unsigned [15:0] driver_pwm_v_data;
-    logic unsigned [15:0] driver_pwm_w_data;
+    logic unsigned [11:0] driver_pwm_u_data;
+    logic unsigned [11:0] driver_pwm_v_data;
+    logic unsigned [11:0] driver_pwm_w_data;
     logic driver_pwm_valid = 1'b0;
     
     // Current sensor
@@ -96,7 +96,7 @@ module test ();
     logic signed [15:0] current_d, current_q;
     
     // Motor model
-    real theta = 0.4; // rad
+    real theta = 0.0; // rad
     real omega = 0.0; // rad/s
     real V_u = 0.0, V_v = 0.0, V_w = 0.0;
     real V_d, V_q;
@@ -110,6 +110,11 @@ module test ();
             V_u = (2 * $itor(driver_pwm_u_data) - $itor(driver_pwm_v_data) - $itor(driver_pwm_w_data)) / 3000 * 48;
             V_v = (2 * $itor(driver_pwm_v_data) - $itor(driver_pwm_u_data) - $itor(driver_pwm_w_data)) / 3000 * 48;
             V_w = (2 * $itor(driver_pwm_w_data) - $itor(driver_pwm_u_data) - $itor(driver_pwm_v_data)) / 3000 * 48;
+        end
+        if (fault == 1'b1) begin
+            V_u = 0.0;
+            V_v = 0.0;
+            V_w = 0.0;
         end
         if (pulse_50khz == 1'b1) begin
             V_d = (V_u * $cos(theta * Motor_P) + V_v * $cos(theta * Motor_P - 2 * PI / 3) + V_w * $cos(theta * Motor_P + 2 * PI / 3)) * 0.816496581;
@@ -143,27 +148,50 @@ module test ();
     
     // Error test
     logic error_test = 1'b0;
-    initial begin
-        repeat(500000) @(posedge clk);
+    /*initial begin
+        repeat(100000) @(posedge clk);
         error_test <= 1'b1;
-        repeat(4567) @(posedge clk);
+        repeat(1000) @(posedge clk);
+        @(negedge clk);
+        theta <= 0.0;
+        omega <= 0.0;
+        V_u <= 0.0;
+        V_v <= 0.0;
+        V_w <= 0.0;
+        I_d <= 0.0;
+        I_q <= 0.0;
+        repeat(1000) @(posedge clk);
         error_test <= 1'b0;
-    end
+        repeat(200000) @(posedge clk);
+        error_test <= 1'b1;
+        repeat(1000) @(posedge clk);
+        @(negedge clk);
+        theta <= 0.0;
+        omega <= 0.0;
+        V_u <= 0.0;
+        V_v <= 0.0;
+        V_w <= 0.0;
+        I_d <= 0.0;
+        I_q <= 0.0;
+        repeat(765) @(posedge clk);
+        error_test <= 1'b0;
+    end*/
     
     // Hall sensors and encoder
     logic [2:0] hall_uvw = '0;
     logic [1:0] enc_ab = '0;
     real theta_deg;
     assign theta_deg = theta * Motor_P / PI * 180;
-    always @(theta_deg) begin
+    //always @(theta_deg) begin
+    always @(posedge clk) begin
         int t;
         t = $rtoi(8000 * theta_deg) % 2880000;
         if (t < 0) t = t + 2880000;
-        hall_uvw[2] <= ~error_test ? ((t < 720000) | (2160000 <= t)) : 1'b0;
-        hall_uvw[1] <= ~error_test ? ((240000 < t) & (t <= 1680000)) : 1'b0;
-        hall_uvw[0] <= ~error_test ? ((1200000 < t) & (t <= 2640000)) : 1'b0;
-        enc_ab[1] <= (t / 11250) % 2;
-        enc_ab[0] <= ((t + 5625) / 11250) % 2;
+        hall_uvw[2] <= ~error_test ? ((t < 240000) | (1680000 <= t)) : 1'b0;
+        hall_uvw[1] <= ~error_test ? ((t < 1200000) | (2640000 <= t)) : 1'b0;
+        hall_uvw[0] <= ~error_test ? ((720000 < t) & (t <= 2160000)) : 1'b0;
+        enc_ab[0] <= (t / 11250) % 2;
+        enc_ab[1] <= ((t + 5625) / 11250) % 2;
     end
     
     // Vector Controller
@@ -204,7 +232,7 @@ module test ();
     always begin
         repeat(10) @(posedge clk);
         current_ref_dq_valid <= 1'b1;
-        current_ref_d_data <= '0;
+        current_ref_d_data <= 0;
         current_ref_q_data <= 1000;
         @(posedge clk);
         current_ref_dq_valid <= 1'b0;

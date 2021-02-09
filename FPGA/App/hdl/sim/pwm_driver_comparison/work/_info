@@ -1,0 +1,236 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/pwm_driver
+vbipolar_sync_deglitch
+Z0 DXx6 sv_std 3 std 0 22 VYECXdT12H8WgbUP_5Y6:3
+Z1 !s110 1611496656
+!i10b 1
+!s100 lmaL10@GR4JCVDMh@LAS60
+Z2 !s11b Dg1SIo80bB@j0V0VzS_@n1
+I3mH=^z=bAe0?z^Xka4:M;1
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+S1
+Z4 dC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/pwm_driver_comparison
+Z5 w1611457274
+Z6 8C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv
+Z7 FC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv
+!i122 158
+L0 31 32
+Z8 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z9 !s108 1611496656.000000
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv|
+Z10 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv|
+!i113 1
+Z11 o-work work -sv
+Z12 tCvgOpt 0
+vdeglitch
+R0
+R1
+!i10b 1
+!s100 O7GTfb`:>9O@ozj<1n3=E2
+R2
+IdfAYcMHQVNg1m84Ne=@gL0
+R3
+S1
+R4
+R5
+R6
+R7
+!i122 158
+L0 2 27
+R8
+r1
+!s85 0
+31
+R9
+Z13 !s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv|
+R10
+!i113 1
+R11
+R12
+vds_pwm_driver
+R0
+R1
+!i10b 1
+!s100 X3K9f3kzKm9SN^4A8Z@@@2
+R2
+Igd6Xcj?d16^`Q^l2XjEO_3
+R3
+S1
+R4
+w1611382413
+8C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+!i122 152
+L0 1 94
+R8
+r1
+!s85 0
+31
+R9
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv|
+!i113 1
+R11
+R12
+vpark_transform
+R0
+R1
+!i10b 1
+!s100 XaFMI=CCR6Bc[HZ0fI9NM1
+R2
+IaZjB1A45LE=IV22@_kh[c1
+R3
+S1
+R4
+w1601714039
+8C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/park_transform.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/park_transform.sv
+!i122 153
+L0 1 184
+R8
+r1
+!s85 0
+31
+R9
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/park_transform.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/park_transform.sv|
+!i113 1
+R11
+R12
+vposition_estimator
+R0
+R1
+!i10b 1
+!s100 `V3:BC;W?>goF[i]YE2O12
+R2
+Ic;0HEhESRe0WzOf_?m_H@0
+R3
+S1
+R4
+w1611496190
+8C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv
+!i122 154
+L0 1 105
+R8
+r1
+!s85 0
+31
+R9
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv|
+!i113 1
+R11
+R12
+vpwm_driver
+R0
+R1
+!i10b 1
+!s100 S3;lLUFANb@a`z]IzLL]00
+R2
+I0Ikn2mb52fnzL7>i0cbEa1
+R3
+S1
+R4
+w1611329811
+8C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pwm_driver.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pwm_driver.sv
+!i122 155
+L0 1 137
+R8
+r1
+!s85 0
+31
+R9
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pwm_driver.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pwm_driver.sv|
+!i113 1
+R11
+R12
+vquadrature_decoder
+R0
+R1
+!i10b 1
+!s100 CX3igkEG74KSnhYSS5o0@2
+R2
+IWgCMbo[AYVIMTAXN=mN>B1
+R3
+S1
+R4
+w1600659996
+8C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/quadrature_decoder.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/quadrature_decoder.sv
+!i122 156
+L0 1 71
+R8
+r1
+!s85 0
+31
+R9
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/quadrature_decoder.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/quadrature_decoder.sv|
+!i113 1
+R11
+R12
+vspace_vector_modulator
+R0
+R1
+!i10b 1
+!s100 ?oVV=YWl3zY:GEP<^hOLY0
+R2
+Inz6mWELo4V0ZI_CG[BV0S0
+R3
+S1
+R4
+w1601560478
+8C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv
+!i122 157
+L0 1 101
+R8
+r1
+!s85 0
+31
+R9
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv|
+!i113 1
+R11
+R12
+vtest
+R0
+!s110 1611496655
+!i10b 1
+!s100 P3:R^VBoHPHA1eh@NQlh13
+R2
+IVLd1OPV^IJ^kjP`Keb@Rc3
+R3
+S1
+R4
+w1611496631
+8C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/pwm_driver_comparison/pwm_driver_comparison.sv
+FC:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/pwm_driver_comparison/pwm_driver_comparison.sv
+!i122 151
+L0 2 180
+R8
+r1
+!s85 0
+31
+!s108 1611496655.000000
+!s107 C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/pwm_driver_comparison/pwm_driver_comparison.sv|
+!s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/pwm_driver_comparison/pwm_driver_comparison.sv|
+!i113 1
+R11
+R12

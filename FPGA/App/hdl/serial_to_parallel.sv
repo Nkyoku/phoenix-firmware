@@ -18,36 +18,55 @@ module SerialToParallel #(
         output wire input_h
     );
     
-    reg [PRESCALER_WIDTH-1:0] prescaler = '0;
-    reg [3:0] counter = '0;
-    reg [8:0] sr_ff = '0;
-    reg [8:0] sr_input = '0;
-    assign input_ser = sr_input[0];
-    assign input_a = sr_input[1];
-    assign input_b = sr_input[2];
-    assign input_c = sr_input[3];
-    assign input_d = sr_input[4];
-    assign input_e = sr_input[5];
-    assign input_f = sr_input[6];
-    assign input_g = sr_input[7];
-    assign input_h = sr_input[8];
+    logic [PRESCALER_WIDTH-1:0] prescaler = '0;
+    logic [3:0] counter = '0;
+    logic [8:0] shift_reg = '0;
+    logic [8:0] input_filtered;
+    assign input_ser = input_filtered[0];
+    assign input_a = input_filtered[1];
+    assign input_b = input_filtered[2];
+    assign input_c = input_filtered[3];
+    assign input_d = input_filtered[4];
+    assign input_e = input_filtered[5];
+    assign input_f = input_filtered[6];
+    assign input_g = input_filtered[7];
+    assign input_h = input_filtered[8];
+
+    logic valid = 1'b0;
+
+    genvar i;
+    generate
+        for (i = 0; i <= 8; i = i + 1) begin : filters
+            bipolar_sync_deglitch #(
+                .DELAY(16),
+                .DEFAULT_OUTPUT(0)
+            ) filter (
+                .reset  (reset),
+                .clk    (clk),
+                .clk_en (valid),
+                .in     (shift_reg[i]),
+                .out    (input_filtered[i])
+            );
+        end
+    endgenerate
     
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
             prescaler <= '0;
-            sr_ff <= '0;
+            counter <= '0;
+            shift_reg <= '0;
             sr_clk <= 1'b0;
             sr_load_n <= 1'b1;
-            sr_input <= '0;
         end
         else begin
+            valid <= 1'b0;
             prescaler <= prescaler + 1'b1;
             sr_clk <= prescaler[PRESCALER_WIDTH-1];
             if (prescaler == 0) begin
                 sr_load_n <= (counter < 9);
-                sr_ff <= {sr_ff[7:1], sr_ff[0] ^ 1'(INVERSE), sr_dout};
-                if (9 <= counter) begin
-                    sr_input <= {sr_ff[7:1], sr_ff[0] ^ 1'(INVERSE)};
+                shift_reg <= {shift_reg[7:0], sr_dout ^ 1'(INVERSE)};
+                if (counter == 8) begin
+                    valid <= 1'b1;
                 end
             end
             if (prescaler == (1 << (PRESCALER_WIDTH - 1))) begin

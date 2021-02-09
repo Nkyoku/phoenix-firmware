@@ -17,12 +17,12 @@ module position_estimator #(
     logic [THETA_WIDTH-1:0] default_theta_table [0:7] = '{
                                     // U, V, W
         0,                          // 0, 0, 0 : error
-        2 * PULSE_PER_ROTATION / 3, // 0, 0, 1 : 240 deg
-        PULSE_PER_ROTATION / 3,     // 0, 1, 0 : 120 deg
-        PULSE_PER_ROTATION / 2,     // 0, 1, 1 : 180 deg
-        0,                          // 1, 0, 0 :   0 deg
-        5 * PULSE_PER_ROTATION / 6, // 1, 0, 1 : 300 deg
-        PULSE_PER_ROTATION / 6,     // 1, 1, 0 :  60 deg
+        PULSE_PER_ROTATION / 2,     // 0, 0, 1 : 180 deg
+        PULSE_PER_ROTATION / 6,     // 0, 1, 0 :  60 deg
+        PULSE_PER_ROTATION / 3,     // 0, 1, 1 : 120 deg
+        5 * PULSE_PER_ROTATION / 6, // 1, 0, 0 : 300 deg
+        2 * PULSE_PER_ROTATION / 3, // 1, 0, 1 : 240 deg
+        0,                          // 1, 1, 0 :   0 deg
         0                           // 1, 1, 1 : error
     };
     
@@ -48,38 +48,38 @@ module position_estimator #(
                 theta_uncertain <= 1'b1;
             end
             else if ((hall_uvw_transition == 3'b100) & hall_uvw[1] & ~hall_uvw[0] & ~theta_error) begin
-                // 90 deg
-                theta_data <= THETA_WIDTH'(PULSE_PER_ROTATION / 4);
-                theta_error <= 1'b0;
-                theta_uncertain <= 1'b0;
-            end
-            else if ((hall_uvw_transition == 3'b100) & ~hall_uvw[1] & hall_uvw[0] & ~theta_error) begin
-                // 270 deg
-                theta_data <= THETA_WIDTH'(3 * PULSE_PER_ROTATION / 4);
-                theta_error <= 1'b0;
-                theta_uncertain <= 1'b0;
-            end
-            else if ((hall_uvw_transition == 3'b010) & hall_uvw[2] & ~hall_uvw[0] & ~theta_error) begin
                 // 30 deg
                 theta_data <= THETA_WIDTH'(PULSE_PER_ROTATION / 12);
                 theta_error <= 1'b0;
                 theta_uncertain <= 1'b0;
             end
-            else if ((hall_uvw_transition == 3'b010) & ~hall_uvw[2] & hall_uvw[0] & ~theta_error) begin
+            else if ((hall_uvw_transition == 3'b100) & ~hall_uvw[1] & hall_uvw[0] & ~theta_error) begin
                 // 210 deg
                 theta_data <= THETA_WIDTH'(7 * PULSE_PER_ROTATION / 12);
                 theta_error <= 1'b0;
                 theta_uncertain <= 1'b0;
             end
-            else if ((hall_uvw_transition == 3'b001) & hall_uvw[2] & ~hall_uvw[1] & ~theta_error) begin
+            else if ((hall_uvw_transition == 3'b010) & hall_uvw[2] & ~hall_uvw[0] & ~theta_error) begin
                 // 330 deg
                 theta_data <= THETA_WIDTH'(11 * PULSE_PER_ROTATION / 12);
                 theta_error <= 1'b0;
                 theta_uncertain <= 1'b0;
             end
-            else if ((hall_uvw_transition == 3'b001) & ~hall_uvw[2] & hall_uvw[1] & ~theta_error) begin
+            else if ((hall_uvw_transition == 3'b010) & ~hall_uvw[2] & hall_uvw[0] & ~theta_error) begin
                 // 150 deg
                 theta_data <= THETA_WIDTH'(5 * PULSE_PER_ROTATION / 12);
+                theta_error <= 1'b0;
+                theta_uncertain <= 1'b0;
+            end
+            else if ((hall_uvw_transition == 3'b001) & hall_uvw[2] & ~hall_uvw[1] & ~theta_error) begin
+                // 270 deg
+                theta_data <= THETA_WIDTH'(3 * PULSE_PER_ROTATION / 4);
+                theta_error <= 1'b0;
+                theta_uncertain <= 1'b0;
+            end
+            else if ((hall_uvw_transition == 3'b001) & ~hall_uvw[2] & hall_uvw[1] & ~theta_error) begin
+                // 90 deg
+                theta_data <= THETA_WIDTH'(PULSE_PER_ROTATION / 4);
                 theta_error <= 1'b0;
                 theta_uncertain <= 1'b0;
             end

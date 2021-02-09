@@ -83,9 +83,9 @@ module ds_pwm_driver #(
             driver_reset_n <= '0;
         end
         else begin
-            driver_pwm_ff[0] <= drive & (counter < u_compare);
+            driver_pwm_ff[2] <= drive & (counter < u_compare);
             driver_pwm_ff[1] <= drive & (counter < v_compare);
-            driver_pwm_ff[2] <= drive & (counter < w_compare);
+            driver_pwm_ff[0] <= drive & (counter < w_compare);
             driver_reset_n_ff <= drive;
             driver_pwm <= driver_pwm_ff;
             driver_reset_n <= {3{driver_reset_n_ff}};

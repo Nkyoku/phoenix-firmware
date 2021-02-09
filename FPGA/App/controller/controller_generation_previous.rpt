@@ -1,15 +1,25 @@
 Info: Starting: Create HDL design files for synthesis
-Info: qsys-generate C:\work\Robocup\phoenix-firmware\FPGA\controller.qsys --synthesis=VERILOG --output-directory=C:\work\Robocup\phoenix-firmware\FPGA\controller\synthesis --family="Cyclone 10 LP" --part=10CL025YU256C8G
-Progress: Loading FPGA/controller.qsys
+Info: qsys-generate C:\work\Robocup\phoenix-firmware\FPGA\App\controller.qsys --synthesis=VERILOG --output-directory=C:\work\Robocup\phoenix-firmware\FPGA\App\controller\synthesis --family="Cyclone 10 LP" --part=10CL025YU256C8G
+Progress: Loading App/controller.qsys
 Progress: Reading input file
+Progress: Adding avalon_st_uart_tx_0 [avalon_st_uart_tx 1.0]
+Progress: Parameterizing module avalon_st_uart_tx_0
 Progress: Adding clk_0 [clock_source 20.1]
 Progress: Parameterizing module clk_0
+Progress: Adding clk_1 [clock_source 20.1]
+Progress: Parameterizing module clk_1
+Progress: Adding counter_0 [altera_avalon_performance_counter 20.1]
+Progress: Parameterizing module counter_0
 Progress: Adding data_ram_0 [altera_avalon_onchip_memory2 20.1]
 Progress: Parameterizing module data_ram_0
+Progress: Adding data_ram_1 [altera_avalon_onchip_memory2 20.1]
+Progress: Parameterizing module data_ram_1
+Progress: Adding dc_fifo_0 [altera_avalon_dc_fifo 20.1]
+Progress: Parameterizing module dc_fifo_0
 Progress: Adding fpu_0 [altera_nios_custom_instr_floating_point_2 20.1]
 Progress: Parameterizing module fpu_0
-Progress: Adding i2cm [altera_avalon_i2c 20.1]
-Progress: Parameterizing module i2cm
+Progress: Adding i2c_master_0 [i2c_master 1.0]
+Progress: Parameterizing module i2c_master_0
 Progress: Adding imu_spim [imu_spim 1.0]
 Progress: Parameterizing module imu_spim
 Progress: Adding instruction_rom_0 [altera_avalon_onchip_memory2 20.1]
@@ -20,8 +30,8 @@ Progress: Adding mm_bridge_0 [altera_avalon_mm_bridge 20.1]
 Progress: Parameterizing module mm_bridge_0
 Progress: Adding mm_bridge_1 [altera_avalon_mm_bridge 20.1]
 Progress: Parameterizing module mm_bridge_1
-Progress: Adding motor_controller_0 [motor_controller 1.0]
-Progress: Parameterizing module motor_controller_0
+Progress: Adding motor_controller_5 [motor_controller 1.0]
+Progress: Parameterizing module motor_controller_5
 Progress: Adding msgdma_0 [altera_msgdma 20.1]
 Progress: Parameterizing module msgdma_0
 Progress: Adding nios_0 [altera_nios2_gen2 20.1]
@@ -32,10 +42,20 @@ Progress: Adding pio_1 [altera_avalon_pio 20.1]
 Progress: Parameterizing module pio_1
 Progress: Adding pio_2 [altera_avalon_pio 20.1]
 Progress: Parameterizing module pio_2
-Progress: Adding spim [altera_avalon_spi 20.1]
-Progress: Parameterizing module spim
+Progress: Adding pio_3 [altera_avalon_pio 20.1]
+Progress: Parameterizing module pio_3
+Progress: Adding pio_4 [altera_avalon_pio 20.1]
+Progress: Parameterizing module pio_4
+Progress: Adding spi_slave_to_avalon_mm_master_bridge_0 [spi_slave_to_avalon_mm_master_bridge 20.1]
+Progress: Parameterizing module spi_slave_to_avalon_mm_master_bridge_0
+Progress: Adding spim_0 [altera_avalon_spi 20.1]
+Progress: Parameterizing module spim_0
+Progress: Adding st_packets_to_bytes_0 [altera_avalon_st_packets_to_bytes 20.1]
+Progress: Parameterizing module st_packets_to_bytes_0
 Progress: Adding sysid_qsys_0 [altera_avalon_sysid_qsys 20.1]
 Progress: Parameterizing module sysid_qsys_0
+Progress: Adding timer_0 [altera_avalon_timer 20.1]
+Progress: Parameterizing module timer_0
 Progress: Adding vector_controller_master_0 [vector_controller_master 1.0]
 Progress: Parameterizing module vector_controller_master_0
 Progress: Adding vic_0 [altera_vic 20.1]
@@ -44,50 +64,97 @@ Progress: Building connections
 Progress: Parameterizing connections
 Progress: Validating
 Progress: Done reading input file
-Info: controller.msgdma_0: Address alignment of the descriptors: The descriptors must be aligned on Avalon-MM Descriptor read/write master's data width boundary. In this case, it is 32-bit boundary.
-Info: controller.msgdma_0.dispatcher_internal: Interrupts must be handled by the component connected to the response source port (such as a descriptor pre-fetching block)
+Info: controller.jtag_uart_0: JTAG UART IP input clock need to be at least double (2x) the operating frequency of JTAG TCK on board
+Info: controller.pio_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: controller.pio_4: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: controller.sysid_qsys_0: System ID is not assigned automatically. Edit the System ID parameter to provide a unique ID
 Info: controller.sysid_qsys_0: Time stamp will be automatically updated when this component is generated.
-Warning: controller.i2cm: Interrupt sender i2cm.interrupt_sender is not connected to an interrupt receiver
-Warning: controller.motor_controller_0: Interrupt sender motor_controller_0.irq is not connected to an interrupt receiver
-Warning: controller.msgdma_0: Interrupt sender msgdma_0.csr_irq is not connected to an interrupt receiver
-Warning: controller.pio_0: Interrupt sender pio_0.irq is not connected to an interrupt receiver
-Warning: controller.pio_1: Interrupt sender pio_1.irq is not connected to an interrupt receiver
-Warning: controller.spim: Interrupt sender spim.irq is not connected to an interrupt receiver
-Warning: controller.vector_controller_master_0: Interrupt sender vector_controller_master_0.irq is not connected to an interrupt receiver
 Info: controller: Generating controller "controller" for QUARTUS_SYNTH
+Info: Interconnect is inserted between master spi_slave_to_avalon_mm_master_bridge_0.avalon_master and slave data_ram_1.s2 because the master has address signal 32 bit wide, but the slave is 8 bit wide.
+Info: Interconnect is inserted between master spi_slave_to_avalon_mm_master_bridge_0.avalon_master and slave data_ram_1.s2 because the master has read signal 1 bit wide, but the slave is 0 bit wide.
+Info: Interconnect is inserted between master spi_slave_to_avalon_mm_master_bridge_0.avalon_master and slave data_ram_1.s2 because the master has readdatavalid signal 1 bit wide, but the slave is 0 bit wide.
+Info: Interconnect is inserted between master spi_slave_to_avalon_mm_master_bridge_0.avalon_master and slave data_ram_1.s2 because the master has waitrequest signal 1 bit wide, but the slave is 0 bit wide.
+Warning: controller: "No matching role found for nios_0_custom_instruction_master_multi_xconnect:ci_slave:ci_slave_ipending (ipending)"
+Warning: controller: "No matching role found for nios_0_custom_instruction_master_multi_xconnect:ci_slave:ci_slave_estatus (estatus)"
+Info: avalon_st_uart_tx_0: "controller" instantiated avalon_st_uart_tx "avalon_st_uart_tx_0"
+Info: counter_0: Starting RTL generation for module 'controller_counter_0'
+Info: counter_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_performance_counter -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_performance_counter/generate_rtl.pl --name=controller_counter_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0007_counter_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0007_counter_0_gen//controller_counter_0_component_configuration.pl  --do_build_sim=0  ]
+Info: counter_0: Done RTL generation for module 'controller_counter_0'
+Info: counter_0: "controller" instantiated altera_avalon_performance_counter "counter_0"
 Info: data_ram_0: Starting RTL generation for module 'controller_data_ram_0'
-Info: data_ram_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_data_ram_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0002_data_ram_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0002_data_ram_0_gen//controller_data_ram_0_component_configuration.pl  --do_build_sim=0  ]
+Info: data_ram_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_data_ram_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0008_data_ram_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0008_data_ram_0_gen//controller_data_ram_0_component_configuration.pl  --do_build_sim=0  ]
 Info: data_ram_0: Done RTL generation for module 'controller_data_ram_0'
 Info: data_ram_0: "controller" instantiated altera_avalon_onchip_memory2 "data_ram_0"
-Info: i2cm: "controller" instantiated altera_avalon_i2c "i2cm"
+Info: data_ram_1: Starting RTL generation for module 'controller_data_ram_1'
+Info: data_ram_1:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_data_ram_1 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0009_data_ram_1_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0009_data_ram_1_gen//controller_data_ram_1_component_configuration.pl  --do_build_sim=0  ]
+Info: data_ram_1: Done RTL generation for module 'controller_data_ram_1'
+Info: data_ram_1: "controller" instantiated altera_avalon_onchip_memory2 "data_ram_1"
+Info: dc_fifo_0: "controller" instantiated altera_avalon_dc_fifo "dc_fifo_0"
+Info: fpu_0: "controller" instantiated altera_nios_custom_instr_floating_point_2 "fpu_0"
+Info: i2c_master_0: "controller" instantiated i2c_master "i2c_master_0"
 Info: imu_spim: "controller" instantiated imu_spim "imu_spim"
 Info: instruction_rom_0: Starting RTL generation for module 'controller_instruction_rom_0'
-Info: instruction_rom_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_instruction_rom_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0005_instruction_rom_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0005_instruction_rom_0_gen//controller_instruction_rom_0_component_configuration.pl  --do_build_sim=0  ]
+Info: instruction_rom_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_instruction_rom_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0013_instruction_rom_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0013_instruction_rom_0_gen//controller_instruction_rom_0_component_configuration.pl  --do_build_sim=0  ]
 Info: instruction_rom_0: Done RTL generation for module 'controller_instruction_rom_0'
 Info: instruction_rom_0: "controller" instantiated altera_avalon_onchip_memory2 "instruction_rom_0"
+Info: jtag_uart_0: Starting RTL generation for module 'controller_jtag_uart_0'
+Info: jtag_uart_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_jtag_uart -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_jtag_uart/generate_rtl.pl --name=controller_jtag_uart_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0014_jtag_uart_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0014_jtag_uart_0_gen//controller_jtag_uart_0_component_configuration.pl  --do_build_sim=0  ]
+Info: jtag_uart_0: Done RTL generation for module 'controller_jtag_uart_0'
+Info: jtag_uart_0: "controller" instantiated altera_avalon_jtag_uart "jtag_uart_0"
 Info: mm_bridge_0: "controller" instantiated altera_avalon_mm_bridge "mm_bridge_0"
-Info: motor_controller_0: "controller" instantiated motor_controller "motor_controller_0"
+Info: motor_controller_5: "controller" instantiated motor_controller "motor_controller_5"
 Info: msgdma_0: "controller" instantiated altera_msgdma "msgdma_0"
 Info: nios_0: "controller" instantiated altera_nios2_gen2 "nios_0"
 Info: pio_0: Starting RTL generation for module 'controller_pio_0'
-Info: pio_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0008_pio_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0008_pio_0_gen//controller_pio_0_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0017_pio_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0017_pio_0_gen//controller_pio_0_component_configuration.pl  --do_build_sim=0  ]
 Info: pio_0: Done RTL generation for module 'controller_pio_0'
 Info: pio_0: "controller" instantiated altera_avalon_pio "pio_0"
 Info: pio_1: Starting RTL generation for module 'controller_pio_1'
-Info: pio_1:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_1 --dir=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0009_pio_1_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0009_pio_1_gen//controller_pio_1_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_1:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_1 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0018_pio_1_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0018_pio_1_gen//controller_pio_1_component_configuration.pl  --do_build_sim=0  ]
 Info: pio_1: Done RTL generation for module 'controller_pio_1'
 Info: pio_1: "controller" instantiated altera_avalon_pio "pio_1"
 Info: pio_2: Starting RTL generation for module 'controller_pio_2'
-Info: pio_2:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_2 --dir=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0010_pio_2_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0010_pio_2_gen//controller_pio_2_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_2:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_2 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0019_pio_2_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0019_pio_2_gen//controller_pio_2_component_configuration.pl  --do_build_sim=0  ]
 Info: pio_2: Done RTL generation for module 'controller_pio_2'
 Info: pio_2: "controller" instantiated altera_avalon_pio "pio_2"
-Info: spim: Starting RTL generation for module 'controller_spim'
-Info: spim:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_spi -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_spi/generate_rtl.pl --name=controller_spim --dir=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0011_spim_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0011_spim_gen//controller_spim_component_configuration.pl  --do_build_sim=0  ]
-Info: spim: Done RTL generation for module 'controller_spim'
-Info: spim: "controller" instantiated altera_avalon_spi "spim"
+Info: pio_3: Starting RTL generation for module 'controller_pio_3'
+Info: pio_3:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_3 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0020_pio_3_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0020_pio_3_gen//controller_pio_3_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_3: Done RTL generation for module 'controller_pio_3'
+Info: pio_3: "controller" instantiated altera_avalon_pio "pio_3"
+Info: spi_slave_to_avalon_mm_master_bridge_0: "controller" instantiated spi_slave_to_avalon_mm_master_bridge "spi_slave_to_avalon_mm_master_bridge_0"
+Info: spim_0: Starting RTL generation for module 'controller_spim_0'
+Info: spim_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_spi -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_spi/generate_rtl.pl --name=controller_spim_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0022_spim_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0022_spim_0_gen//controller_spim_0_component_configuration.pl  --do_build_sim=0  ]
+Info: spim_0: Done RTL generation for module 'controller_spim_0'
+Info: spim_0: "controller" instantiated altera_avalon_spi "spim_0"
+Info: st_packets_to_bytes_0: "controller" instantiated altera_avalon_st_packets_to_bytes "st_packets_to_bytes_0"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_avalon_st_packets_to_bytes.v
 Info: sysid_qsys_0: "controller" instantiated altera_avalon_sysid_qsys "sysid_qsys_0"
+Info: timer_0: Starting RTL generation for module 'controller_timer_0'
+Info: timer_0:   Generation command is [exec C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/bin/perl.exe -I C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_timer -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_timer/generate_rtl.pl --name=controller_timer_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0025_timer_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0025_timer_0_gen//controller_timer_0_component_configuration.pl  --do_build_sim=0  ]
+Info: timer_0: Done RTL generation for module 'controller_timer_0'
+Info: timer_0: "controller" instantiated altera_avalon_timer "timer_0"
 Info: vector_controller_master_0: "controller" instantiated vector_controller_master "vector_controller_master_0"
+Info: vic_0: "controller" instantiated altera_vic "vic_0"
+Info: nios_0_custom_instruction_master_translator: "controller" instantiated altera_customins_master_translator "nios_0_custom_instruction_master_translator"
+Info: nios_0_custom_instruction_master_comb_xconnect: "controller" instantiated altera_customins_xconnect "nios_0_custom_instruction_master_comb_xconnect"
+Info: nios_0_custom_instruction_master_comb_slave_translator0: "controller" instantiated altera_customins_slave_translator "nios_0_custom_instruction_master_comb_slave_translator0"
+Info: nios_0_custom_instruction_master_multi_xconnect: "controller" instantiated altera_customins_xconnect "nios_0_custom_instruction_master_multi_xconnect"
+Info: mm_interconnect_0: "controller" instantiated altera_mm_interconnect "mm_interconnect_0"
+Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_003: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_004: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_005: Inserting error_adapter: error_adapter_0
+Info: mm_interconnect_1: "controller" instantiated altera_mm_interconnect "mm_interconnect_1"
+Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_003: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_004: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_005: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_006: Inserting error_adapter: error_adapter_0
+Info: mm_interconnect_2: "controller" instantiated altera_mm_interconnect "mm_interconnect_2"
 Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
@@ -97,98 +164,96 @@ Info: avalon_st_adapter_005: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_006: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_007: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_008: Inserting error_adapter: error_adapter_0
-Info: mm_interconnect_0: "controller" instantiated altera_mm_interconnect "mm_interconnect_0"
+Info: avalon_st_adapter_009: Inserting error_adapter: error_adapter_0
+Info: mm_interconnect_3: "controller" instantiated altera_mm_interconnect "mm_interconnect_3"
 Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
-Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
-Info: avalon_st_adapter_003: Inserting error_adapter: error_adapter_0
-Info: avalon_st_adapter_004: Inserting error_adapter: error_adapter_0
-Info: avalon_st_adapter_005: Inserting error_adapter: error_adapter_0
-Info: avalon_st_adapter_006: Inserting error_adapter: error_adapter_0
-Info: mm_interconnect_1: "controller" instantiated altera_mm_interconnect "mm_interconnect_1"
-Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
-Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
-Info: mm_interconnect_2: "controller" instantiated altera_mm_interconnect "mm_interconnect_2"
+Info: mm_interconnect_4: "controller" instantiated altera_mm_interconnect "mm_interconnect_4"
 Info: irq_mapper: "controller" instantiated altera_irq_mapper "irq_mapper"
 Info: rst_controller: "controller" instantiated altera_reset_controller "rst_controller"
+Info: fpci_combi: "fpu_0" instantiated altera_nios_custom_instr_floating_point_2_combi "fpci_combi"
+Info: fpci_multi: "fpu_0" instantiated altera_nios_custom_instr_floating_point_2_multi "fpci_multi"
 Info: dispatcher_internal: "msgdma_0" instantiated modular_sgdma_dispatcher "dispatcher_internal"
-Info: prefetcher_internal: "msgdma_0" instantiated altera_msgdma_prefetcher "prefetcher_internal"
 Info: read_mstr_internal: "msgdma_0" instantiated dma_read_master "read_mstr_internal"
 Info: cpu: Starting RTL generation for module 'controller_nios_0_cpu'
-Info: cpu:   Generation command is [exec C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/bin/perl.exe -I C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/cpu_lib -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/nios_lib -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/generate_rtl.pl --name=controller_nios_0_cpu --dir=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0019_cpu_gen/ --quartus_bindir=C:/opt/intelFPGA_lite/20.1/quartus/bin64/ --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8538_8057038517888009991.dir/0019_cpu_gen//controller_nios_0_cpu_processor_configuration.pl  --do_build_sim=0  ]
-Info: cpu: # 2020.10.03 14:34:45 (*) Starting Nios II generation
-Info: cpu: # 2020.10.03 14:34:45 (*)   Elaborating CPU configuration settings
-Info: cpu: # 2020.10.03 14:34:45 (*)   Creating all objects for CPU
-Info: cpu: # 2020.10.03 14:34:46 (*)   Generating RTL from CPU objects
-Info: cpu: # 2020.10.03 14:34:46 (*)   Creating plain-text RTL
-Info: cpu: # 2020.10.03 14:34:46 (*) Done Nios II generation
+Info: cpu:   Generation command is [exec C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/bin/perl.exe -I C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/cpu_lib -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/nios_lib -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/generate_rtl.pl --name=controller_nios_0_cpu --dir=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0037_cpu_gen/ --quartus_bindir=C:/opt/intelFPGA_lite/20.1/quartus/bin64/ --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8664_2205296478683064934.dir/0037_cpu_gen//controller_nios_0_cpu_processor_configuration.pl  --do_build_sim=0  ]
+Info: cpu: # 2021.02.06 17:42:11 (*) Starting Nios II generation
+Info: cpu: # 2021.02.06 17:42:11 (*)   Elaborating CPU configuration settings
+Info: cpu: # 2021.02.06 17:42:11 (*)   Creating all objects for CPU
+Info: cpu: # 2021.02.06 17:42:11 (*)     Testbench
+Info: cpu: # 2021.02.06 17:42:11 (*)     Instruction decoding
+Info: cpu: # 2021.02.06 17:42:11 (*)       Instruction fields
+Info: cpu: # 2021.02.06 17:42:11 (*)       Instruction decodes
+Info: cpu: # 2021.02.06 17:42:11 (*)       Signals for RTL simulation waveforms
+Info: cpu: # 2021.02.06 17:42:11 (*)       Instruction controls
+Info: cpu: # 2021.02.06 17:42:11 (*)     Pipeline frontend
+Info: cpu: # 2021.02.06 17:42:11 (*)     Pipeline backend
+Info: cpu: # 2021.02.06 17:42:12 (*)   Generating RTL from CPU objects
+Info: cpu: # 2021.02.06 17:42:12 (*)   Creating plain-text RTL
+Info: cpu: # 2021.02.06 17:42:12 (*) Done Nios II generation
 Info: cpu: Done RTL generation for module 'controller_nios_0_cpu'
 Info: cpu: "nios_0" instantiated altera_nios2_gen2_unit "cpu"
-Info: nios_0_data_master_translator: "mm_interconnect_0" instantiated altera_merlin_master_translator "nios_0_data_master_translator"
-Info: msgdma_0_csr_translator: "mm_interconnect_0" instantiated altera_merlin_slave_translator "msgdma_0_csr_translator"
-Info: nios_0_data_master_agent: "mm_interconnect_0" instantiated altera_merlin_master_agent "nios_0_data_master_agent"
-Info: msgdma_0_csr_agent: "mm_interconnect_0" instantiated altera_merlin_slave_agent "msgdma_0_csr_agent"
-Info: msgdma_0_csr_agent_rsp_fifo: "mm_interconnect_0" instantiated altera_avalon_sc_fifo "msgdma_0_csr_agent_rsp_fifo"
-Info: router: "mm_interconnect_0" instantiated altera_merlin_router "router"
-Info: router_001: "mm_interconnect_0" instantiated altera_merlin_router "router_001"
-Info: router_002: "mm_interconnect_0" instantiated altera_merlin_router "router_002"
-Info: router_003: "mm_interconnect_0" instantiated altera_merlin_router "router_003"
-Info: router_004: "mm_interconnect_0" instantiated altera_merlin_router "router_004"
-Info: router_005: "mm_interconnect_0" instantiated altera_merlin_router "router_005"
-Info: router_006: "mm_interconnect_0" instantiated altera_merlin_router "router_006"
-Info: router_009: "mm_interconnect_0" instantiated altera_merlin_router "router_009"
-Info: router_012: "mm_interconnect_0" instantiated altera_merlin_router "router_012"
-Info: router_013: "mm_interconnect_0" instantiated altera_merlin_router "router_013"
-Info: msgdma_0_mm_read_limiter: "mm_interconnect_0" instantiated altera_merlin_traffic_limiter "msgdma_0_mm_read_limiter"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_avalon_sc_fifo.v
-Info: mm_bridge_1_s0_burst_adapter: "mm_interconnect_0" instantiated altera_merlin_burst_adapter "mm_bridge_1_s0_burst_adapter"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_avalon_st_pipeline_base.v
-Info: cmd_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux"
-Info: cmd_demux_001: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux_001"
-Info: cmd_demux_002: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux_002"
-Info: cmd_demux_003: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux_003"
-Info: cmd_demux_004: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux_004"
-Info: cmd_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux"
-Info: cmd_mux_001: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux_001"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: cmd_mux_004: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux_004"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: cmd_mux_007: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux_007"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: rsp_demux_004: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux_004"
-Info: rsp_demux_007: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux_007"
-Info: rsp_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: rsp_mux_001: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux_001"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: rsp_mux_002: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux_002"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: rsp_mux_004: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux_004"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: nios_0_data_master_to_mm_bridge_1_s0_cmd_width_adapter: "mm_interconnect_0" instantiated altera_merlin_width_adapter "nios_0_data_master_to_mm_bridge_1_s0_cmd_width_adapter"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_address_alignment.sv
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_burst_uncompressor.sv
-Info: avalon_st_adapter: "mm_interconnect_0" instantiated altera_avalon_st_adapter "avalon_st_adapter"
-Info: avalon_st_adapter_004: "mm_interconnect_0" instantiated altera_avalon_st_adapter "avalon_st_adapter_004"
+Info: vic_csr: "vic_0" instantiated altera_vic_csr "vic_csr"
+Info: vic_priority: "vic_0" instantiated altera_vic_priority "vic_priority"
+Info: vic_vector: "vic_0" instantiated altera_vic_vector "vic_vector"
+Info: spi_slave_to_avalon_mm_master_bridge_0_avalon_master_translator: "mm_interconnect_0" instantiated altera_merlin_master_translator "spi_slave_to_avalon_mm_master_bridge_0_avalon_master_translator"
+Info: data_ram_1_s2_translator: "mm_interconnect_0" instantiated altera_merlin_slave_translator "data_ram_1_s2_translator"
+Info: nios_0_data_master_agent: "mm_interconnect_1" instantiated altera_merlin_master_agent "nios_0_data_master_agent"
+Info: nios_0_debug_mem_slave_agent: "mm_interconnect_1" instantiated altera_merlin_slave_agent "nios_0_debug_mem_slave_agent"
+Info: nios_0_debug_mem_slave_agent_rsp_fifo: "mm_interconnect_1" instantiated altera_avalon_sc_fifo "nios_0_debug_mem_slave_agent_rsp_fifo"
 Info: router: "mm_interconnect_1" instantiated altera_merlin_router "router"
 Info: router_001: "mm_interconnect_1" instantiated altera_merlin_router "router_001"
-Info: router_006: "mm_interconnect_1" instantiated altera_merlin_router "router_006"
+Info: router_002: "mm_interconnect_1" instantiated altera_merlin_router "router_002"
+Info: router_003: "mm_interconnect_1" instantiated altera_merlin_router "router_003"
 Info: cmd_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_demux_001: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "cmd_demux_001"
 Info: cmd_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "cmd_mux"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: rsp_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info: cmd_mux_001: "mm_interconnect_1" instantiated altera_merlin_multiplexer "cmd_mux_001"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_demux_001: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "rsp_demux_001"
 Info: rsp_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "rsp_mux"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_mux_001: "mm_interconnect_1" instantiated altera_merlin_multiplexer "rsp_mux_001"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: avalon_st_adapter: "mm_interconnect_1" instantiated altera_avalon_st_adapter "avalon_st_adapter"
 Info: router: "mm_interconnect_2" instantiated altera_merlin_router "router"
 Info: router_001: "mm_interconnect_2" instantiated altera_merlin_router "router_001"
+Info: router_006: "mm_interconnect_2" instantiated altera_merlin_router "router_006"
+Info: mm_bridge_0_m0_limiter: "mm_interconnect_2" instantiated altera_merlin_traffic_limiter "mm_bridge_0_m0_limiter"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_avalon_sc_fifo.v
 Info: cmd_demux: "mm_interconnect_2" instantiated altera_merlin_demultiplexer "cmd_demux"
 Info: cmd_mux: "mm_interconnect_2" instantiated altera_merlin_multiplexer "cmd_mux"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: rsp_demux: "mm_interconnect_2" instantiated altera_merlin_demultiplexer "rsp_demux"
 Info: rsp_mux: "mm_interconnect_2" instantiated altera_merlin_multiplexer "rsp_mux"
-Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: msgdma_0_descriptor_slave_cmd_width_adapter: "mm_interconnect_2" instantiated altera_merlin_width_adapter "msgdma_0_descriptor_slave_cmd_width_adapter"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_burst_uncompressor.sv
+Info: avalon_st_adapter_005: "mm_interconnect_2" instantiated altera_avalon_st_adapter "avalon_st_adapter_005"
+Info: router: "mm_interconnect_3" instantiated altera_merlin_router "router"
+Info: router_001: "mm_interconnect_3" instantiated altera_merlin_router "router_001"
+Info: router_006: "mm_interconnect_3" instantiated altera_merlin_router "router_006"
+Info: motor_controller_5_slave_burst_adapter: "mm_interconnect_3" instantiated altera_merlin_burst_adapter "motor_controller_5_slave_burst_adapter"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_avalon_st_pipeline_base.v
+Info: cmd_demux: "mm_interconnect_3" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_mux: "mm_interconnect_3" instantiated altera_merlin_multiplexer "cmd_mux"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_demux: "mm_interconnect_3" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info: rsp_mux: "mm_interconnect_3" instantiated altera_merlin_multiplexer "rsp_mux"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: avalon_st_adapter_005: "mm_interconnect_3" instantiated altera_avalon_st_adapter "avalon_st_adapter_005"
+Info: router: "mm_interconnect_4" instantiated altera_merlin_router "router"
+Info: router_001: "mm_interconnect_4" instantiated altera_merlin_router "router_001"
+Info: cmd_demux: "mm_interconnect_4" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_mux: "mm_interconnect_4" instantiated altera_merlin_multiplexer "cmd_mux"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_demux: "mm_interconnect_4" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info: rsp_mux: "mm_interconnect_4" instantiated altera_merlin_multiplexer "rsp_mux"
+Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: error_adapter_0: "avalon_st_adapter" instantiated error_adapter "error_adapter_0"
-Info: error_adapter_0: "avalon_st_adapter_004" instantiated error_adapter "error_adapter_0"
-Info: controller: Done "controller" with 74 modules, 121 files
+Info: error_adapter_0: "avalon_st_adapter_005" instantiated error_adapter "error_adapter_0"
+Info: error_adapter_0: "avalon_st_adapter_005" instantiated error_adapter "error_adapter_0"
+Info: controller: Done "controller" with 90 modules, 158 files
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis

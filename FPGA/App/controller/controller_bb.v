@@ -1,30 +1,35 @@
 
 module controller (
-	adc2_i2c_sda_in,
 	adc2_i2c_scl_in,
-	adc2_i2c_sda_oe,
+	adc2_i2c_sda_in,
 	adc2_i2c_scl_oe,
-	clk_clk,
+	adc2_i2c_sda_oe,
+	clk_100mhz_clk,
+	clk_sys_clk,
+	host_spi_mosi_to_the_spislave_inst_for_spichain,
+	host_spi_nss_to_the_spislave_inst_for_spichain,
+	host_spi_miso_to_and_from_the_spislave_inst_for_spichain,
+	host_spi_sclk_to_the_spislave_inst_for_spichain,
 	imu_spi_mosi,
 	imu_spi_miso,
 	imu_spi_sclk,
 	imu_spi_cs_n,
 	imu_spi_int_n,
-	mc_fault_fault,
-	mc_pwm_data,
-	mc_pwm_valid,
-	mc_pwm_ready,
-	mc_status_driver_otw_n,
-	mc_status_driver_fault_n,
-	mc_status_hall_fault_n,
-	msgdma_source_data,
-	msgdma_source_valid,
-	msgdma_source_ready,
-	msgdma_source_channel,
+	mc5_fault_fault,
+	mc5_pwm_data,
+	mc5_pwm_valid,
+	mc5_pwm_ready,
+	mc5_status_driver_otw_n,
+	mc5_status_driver_fault_n,
+	mc5_status_hall_fault_n,
+	pio3_export,
+	pio4_export,
 	pio_0_export,
 	pio_1_export,
 	pio_2_export,
-	reset_reset_n,
+	reset_100mhz_reset_n,
+	reset_sys_reset_n,
+	uart_txd,
 	vc_encoder_encoder_1_data,
 	vc_encoder_encoder_2_data,
 	vc_encoder_encoder_3_data,
@@ -53,35 +58,38 @@ module controller (
 	vc_status_hall_fault_n,
 	vc_status_encoder_fault_n,
 	vc_status_pos_error,
-	vc_status_pos_uncertain,
-	uart_rxd,
-	uart_txd);	
+	vc_status_pos_uncertain);	
 
-	input		adc2_i2c_sda_in;
 	input		adc2_i2c_scl_in;
-	output		adc2_i2c_sda_oe;
+	input		adc2_i2c_sda_in;
 	output		adc2_i2c_scl_oe;
-	input		clk_clk;
+	output		adc2_i2c_sda_oe;
+	input		clk_100mhz_clk;
+	input		clk_sys_clk;
+	input		host_spi_mosi_to_the_spislave_inst_for_spichain;
+	input		host_spi_nss_to_the_spislave_inst_for_spichain;
+	inout		host_spi_miso_to_and_from_the_spislave_inst_for_spichain;
+	input		host_spi_sclk_to_the_spislave_inst_for_spichain;
 	output		imu_spi_mosi;
 	input		imu_spi_miso;
 	output		imu_spi_sclk;
 	output		imu_spi_cs_n;
 	input		imu_spi_int_n;
-	output		mc_fault_fault;
-	output	[15:0]	mc_pwm_data;
-	output		mc_pwm_valid;
-	input		mc_pwm_ready;
-	input		mc_status_driver_otw_n;
-	input		mc_status_driver_fault_n;
-	input		mc_status_hall_fault_n;
-	output	[15:0]	msgdma_source_data;
-	output		msgdma_source_valid;
-	input		msgdma_source_ready;
-	output	[7:0]	msgdma_source_channel;
+	output		mc5_fault_fault;
+	output	[15:0]	mc5_pwm_data;
+	output		mc5_pwm_valid;
+	input		mc5_pwm_ready;
+	input		mc5_status_driver_otw_n;
+	input		mc5_status_driver_fault_n;
+	input		mc5_status_hall_fault_n;
+	input	[31:0]	pio3_export;
+	input	[31:0]	pio4_export;
 	input		pio_0_export;
 	input	[31:0]	pio_1_export;
-	output	[10:0]	pio_2_export;
-	input		reset_reset_n;
+	output	[9:0]	pio_2_export;
+	input		reset_100mhz_reset_n;
+	input		reset_sys_reset_n;
+	output		uart_txd;
 	input	[15:0]	vc_encoder_encoder_1_data;
 	input	[15:0]	vc_encoder_encoder_2_data;
 	input	[15:0]	vc_encoder_encoder_3_data;
@@ -111,6 +119,4 @@ module controller (
 	input	[3:0]	vc_status_encoder_fault_n;
 	input	[3:0]	vc_status_pos_error;
 	input	[3:0]	vc_status_pos_uncertain;
-	input		uart_rxd;
-	output		uart_txd;
 endmodule

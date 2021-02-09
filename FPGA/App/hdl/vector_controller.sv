@@ -67,8 +67,8 @@ module vector_controller #(
         .clk(clk),
         .reset(reset),
         .latch(pulse_1khz),
-        .enc_a(sensor_encoder_ab[0]),
-        .enc_b(sensor_encoder_ab[1]),
+        .enc_a(sensor_encoder_ab[1]),
+        .enc_b(sensor_encoder_ab[0]),
         .inc(qdec_inc),
         .dec(qdec_dec),
         .counter(encoder_data)
@@ -186,6 +186,11 @@ module vector_controller #(
                 pwm_d_data <= pi_d_data;
                 pwm_q_data <= pi_q_data;
             end
+            /*if (current_reference_valid == 1'b1) begin
+                pwm_dq_available <= 1'b1;
+                pwm_d_data <= current_reference_data[CURRENT_WIDTH +: CURRENT_WIDTH];
+                pwm_q_data <= current_reference_data[0 +: CURRENT_WIDTH];
+            end*/
             if (pwm_dq_available & current_measurement_valid) begin
                 pwm_dq_valid <= 1'b1;
             end

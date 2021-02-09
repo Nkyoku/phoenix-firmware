@@ -1,0 +1,11 @@
+#pragma
+
+enum StreamId_t {
+    StreamIdStatusFlags = 1,
+    StreamIdAdc2 = 2,
+
+
+
+};
+
+#include "stream_data_adc2.hpp"
