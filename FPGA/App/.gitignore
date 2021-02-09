@@ -6,3 +6,4 @@
 !/output_files/convert.cof
 *.tcl~
 *.log
+/software/*/obj
