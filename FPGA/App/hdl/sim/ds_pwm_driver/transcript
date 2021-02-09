@@ -1,0 +1,225 @@
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ds_pwm_driver
+# 
+# Top level modules:
+# 	ds_pwm_driver
+# 
+# 
+# 2 compiles, 0 failed with no errors.
+vsim -gui work.test
+# vsim -gui work.test 
+# Start time: 22:49:45 on Feb 09,2021
+# Loading sv_std.std
+# Loading work.test
+# Loading work.ds_pwm_driver
+do C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/wave.do
+add wave -position insertpoint  \
+sim:/test/driver/v_compare
+add wave -position insertpoint  \
+sim:/test/driver/w_compare
+write format wave -window .main_pane.wave.interior.cs.body.pw.wf C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/wave.do
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ds_pwm_driver
+# 
+# Top level modules:
+# 	ds_pwm_driver
+# 
+# 
+# 2 compiles, 0 failed with no errors.
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# Loading work.test
+# Loading work.ds_pwm_driver
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ds_pwm_driver
+# 
+# Top level modules:
+# 	ds_pwm_driver
+# 
+# 
+# 2 compiles, 0 failed with no errors.
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# Loading work.test
+# Loading work.ds_pwm_driver
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ds_pwm_driver
+# 
+# Top level modules:
+# 	ds_pwm_driver
+# 
+# 
+# 2 compiles, 0 failed with no errors.
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# Loading work.test
+# Loading work.ds_pwm_driver
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+add wave -position insertpoint  \
+sim:/test/driver/u_compare_add_dir
+add wave -position insertpoint  \
+sim:/test/driver/v_compare_add_dir
+add wave -position insertpoint  \
+sim:/test/driver/w_compare_add_dir
+write format wave -window .main_pane.wave.interior.cs.body.pw.wf C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/wave.do
+restart
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ds_pwm_driver
+# 
+# Top level modules:
+# 	ds_pwm_driver
+# 
+# 
+# 2 compiles, 0 failed with no errors.
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# Loading work.test
+# Loading work.ds_pwm_driver
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ds_pwm_driver
+# 
+# Top level modules:
+# 	ds_pwm_driver
+# 
+# 
+# 2 compiles, 0 failed with no errors.
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# Loading work.test
+# Loading work.ds_pwm_driver
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ds_pwm_driver
+# 
+# Top level modules:
+# 	ds_pwm_driver
+# 
+# 
+# 2 compiles, 0 failed with no errors.
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# Loading work.test
+# Loading work.ds_pwm_driver
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module test
+# 
+# Top level modules:
+# 	test
+# 
+# 
+# vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/ds_pwm_driver.sv
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# -- Compiling module ds_pwm_driver
+# 
+# Top level modules:
+# 	ds_pwm_driver
+# 
+# 
+# 2 compiles, 0 failed with no errors.
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+# Loading work.test
+# Loading work.ds_pwm_driver
+run -all
+# ** Note: $stop    : C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv(75)
+#    Time: 38085 ns  Iteration: 1  Instance: /test
+# Break in Module test at C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver_test.sv line 75
+# End time: 23:18:32 on Feb 09,2021, Elapsed time: 0:28:47
+# Errors: 0, Warnings: 1
+# Closing project C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/sim/ds_pwm_driver/ds_pwm_driver.mpf

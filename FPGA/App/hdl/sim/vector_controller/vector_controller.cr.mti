@@ -1,38 +1,23 @@
-C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/vector_controller.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/vector_controller.sv
-Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
--- Compiling module vector_controller
--- Compiling module muxed_park_transform
-
-Top level modules:
-	vector_controller
-
-} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/current_cic_filter.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/current_cic_filter.sv
+C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/current_cic_filter.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/current_cic_filter.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
 -- Compiling module current_cic_filter
 
 Top level modules:
 	current_cic_filter
 
-} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/quadrature_decoder.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/quadrature_decoder.sv
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
--- Compiling module quadrature_decoder
+-- Compiling module space_vector_modulator
 
 Top level modules:
-	quadrature_decoder
+	space_vector_modulator
 
-} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pi_controller.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pi_controller.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
--- Compiling module position_estimator
+-- Compiling module pi_controller
 
 Top level modules:
-	position_estimator
-
-} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/current_fir_filter.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/current_fir_filter.sv
-Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
--- Compiling module current_fir_filter
-
-Top level modules:
-	current_fir_filter
+	pi_controller
 
 } {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/deglitch.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
@@ -43,26 +28,19 @@ Top level modules:
 	deglitch
 	bipolar_sync_deglitch
 
-} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pi_controller.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/pi_controller.sv
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/current_fir_filter.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/current_fir_filter.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
--- Compiling module pi_controller
+-- Compiling module current_fir_filter
 
 Top level modules:
-	pi_controller
+	current_fir_filter
 
-} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/space_vector_modulator.sv
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/position_estimator.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
--- Compiling module space_vector_modulator
+-- Compiling module position_estimator
 
 Top level modules:
-	space_vector_modulator
-
-} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/clarke_transform.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/clarke_transform.sv
-Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
--- Compiling module clarke_transform
-
-Top level modules:
-	clarke_transform
+	position_estimator
 
 } {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/park_transform.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/park_transform.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
@@ -70,5 +48,12 @@ Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 
 
 Top level modules:
 	park_transform
+
+} {} {}} C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/clarke_transform.sv {1 {vlog -work work -sv -stats=none C:/work/Robocup/phoenix-firmware/FPGA/App/hdl/clarke_transform.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module clarke_transform
+
+Top level modules:
+	clarke_transform
 
 } {} {}}

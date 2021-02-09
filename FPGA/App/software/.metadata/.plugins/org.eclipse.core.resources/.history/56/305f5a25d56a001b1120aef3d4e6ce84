@@ -25,6 +25,10 @@
 #include <sys/alt_stdio.h>
 
 void CentralizedMonitor::Initialize(void) {
+    // パフォーマンスカウンタをリセットし再開する
+    PERF_RESET(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
+    PERF_START_MEASURING(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
+
     // 割り込みハンドラを設定する
     alt_ic_isr_register(TIMER_0_IRQ_INTERRUPT_CONTROLLER_ID, TIMER_0_IRQ, TimerHandler, nullptr, nullptr);
     alt_ic_isr_register(PIO_0_IRQ_INTERRUPT_CONTROLLER_ID, PIO_0_IRQ, Pio0Handler, nullptr, nullptr);
@@ -158,9 +162,7 @@ void CentralizedMonitor::SetFaultFlags(uint32_t fault_flags) {
 }
 
 void CentralizedMonitor::DoPeriodicCommonWork(void) {
-    // パフォーマンスカウンタの測定を開始する
-    PERF_RESET(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
-    PERF_START_MEASURING(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
+    // パフォーマンスカウンタのセクション1の測定を開始する
     PERF_BEGIN(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
 
     // Lチカ
@@ -206,7 +208,7 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
         // Jetsonからエラーフラグのクリアが指示されていればクリアを試みる
         if (SharedMemory::IsRequestedClearingErrorFlags() == true) {
 #if DEBUG_PRINTF
-            alt_putstr("Flag cleared\n");
+        alt_putstr("Flag cleared\n");
 #endif
             ClearErrorFlags();
         }
@@ -214,7 +216,6 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
 
     // パフォーマンスカウンタのセクション1の測定を終了する
     PERF_END(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
-    PERF_STOP_MEASURING(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
     uint64_t counter_64 = perf_get_section_time(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
     int counter = (counter_64 & 0xFFFFFFFFFFFF0000ULL) ? 65535 : static_cast<int>(counter_64);
 
