@@ -1,5 +1,0 @@
-#pragma once
-
-#include <altera_msgdma.h>
-
-int my_msgdma_standard_descriptor_async_transfer(alt_msgdma_dev *dev, alt_msgdma_standard_descriptor *desc);
