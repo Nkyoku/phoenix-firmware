@@ -14,15 +14,15 @@
 #include <status_flags.hpp>
 #include "wheel_controller.hpp"
 #include "dribble_controller.hpp"
-#include "shared_memory.hpp"
+#include "shared_memory_manager.hpp"
 #include "stream_transmitter.hpp"
+#include "data_holder.hpp"
 
 #define DEBUG_PRINTF 0
 #if DEBUG_PRINTF
 #include <stdio.h>
 #include <sys/alt_stdio.h>
 #endif
-#include <sys/alt_stdio.h>
 
 void CentralizedMonitor::Initialize(void) {
     // 割り込みハンドラを設定する
@@ -54,18 +54,24 @@ void CentralizedMonitor::Start(void) {
     IOWR_ALTERA_AVALON_TIMER_PERIOD_0(TIMER_0_BASE, 0);
 }
 
-void CentralizedMonitor::Adc2KeepAlive(int dc48v_voltage) {
+void CentralizedMonitor::Adc2Callback(void) {
     // ADC2のタイムアウトカウンタを初期化する
     _Adc2Timeout = ADC2_TIMEOUT_THRESHOLD;
 
     // 低電圧、過電圧を判定しエラーフラグに反映する
-    if (dc48v_voltage < DC48V_UNDER_VOLTAGE_THRESHOLD) {
+    DataHolder::FetchAdc2Result();
+    auto &adc2_data = DataHolder::GetAdc2Data();
+    if (adc2_data.Dc48vVoltage < DC48V_UNDER_VOLTAGE_THRESHOLD) {
         SetErrorFlags(ErrorCauseDc48vUnderVoltage);
     }
-    else if (DC48V_OVER_VOLTAGE_THRESHOLD < dc48v_voltage) {
+    else if (DC48V_OVER_VOLTAGE_THRESHOLD < adc2_data.Dc48vVoltage) {
         SetErrorFlags(ErrorCauseDc48vOverVoltage);
     }
 
+    // 測定値を送信する
+    StreamTransmitter::TransmitAdc2(adc2_data);
+
+    // Lチカ
     static int cnt = 0;
     ++cnt;
     if (cnt == 5) {
@@ -113,12 +119,15 @@ void CentralizedMonitor::ClearErrorFlags(void) {
     // 軽度の過電流エラーを解除する
     new_error_flags &= ~(ErrorCauseMotor5OverCurrent | ErrorCauseMotor4OverCurrent | ErrorCauseMotor3OverCurrent | ErrorCauseMotor2OverCurrent | ErrorCauseMotor1OverCurrent);
 
+    // 新しいエラーフラグを格納する
     _ErrorFlags = new_error_flags;
     SharedMemory::WriteErrorFlags(new_error_flags);
 }
 
 void CentralizedMonitor::SetErrorFlags(uint32_t error_flags) {
+#if DEBUG_PRINTF
     uint32_t previous = _ErrorFlags;
+#endif
     uint32_t new_error_flags;
     {
         CriticalSection cs;
@@ -138,7 +147,9 @@ void CentralizedMonitor::SetErrorFlags(uint32_t error_flags) {
 }
 
 void CentralizedMonitor::SetFaultFlags(uint32_t fault_flags) {
+#if DEBUG_PRINTF
     uint32_t previous = _FaultFlags;
+#endif
     uint32_t new_fault_flags;
     {
         CriticalSection cs;
@@ -159,20 +170,14 @@ void CentralizedMonitor::SetFaultFlags(uint32_t fault_flags) {
 
 void CentralizedMonitor::DoPeriodicCommonWork(void) {
     // パフォーマンスカウンタの測定を開始する
+    static int performance_counter = 0;
     PERF_RESET(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
     PERF_START_MEASURING(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
     PERF_BEGIN(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
 
-    // Lチカ
-    static int cnt = 0;
-    ++cnt;
-    if (cnt == 50) {
-        Led::SetMotor5Enabled(true);
-    }
-    else if (100 <= cnt) {
-        cnt = 0;
-        Led::SetMotor5Enabled(false);
-    }
+    // IMU、モータードライバ等のデータを読み、Jetsonへ送信する
+    DataHolder::FetchRegistersOnPreControlLoop();
+    StreamTransmitter::TransmitMotion(DataHolder::GetMotionData(), performance_counter);
 
     // ADC2のタイムアウトカウンタを減算しすでに0だったらフォルトを発生する
     int adc2_timeout = _Adc2Timeout;
@@ -213,14 +218,25 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
     }
 
     // パフォーマンスカウンタのセクション1の測定を終了する
+    // 測定値は次の処理の始めに送信される
     PERF_END(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
     PERF_STOP_MEASURING(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
     uint64_t counter_64 = perf_get_section_time(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
-    int counter = (counter_64 & 0xFFFFFFFFFFFF0000ULL) ? 65535 : static_cast<int>(counter_64);
+    performance_counter = (counter_64 & 0xFFFFFFFFFFFF0000ULL) ? 65535 : static_cast<int>(counter_64);
+
+    // Lチカ
+    static int cnt = 0;
+    ++cnt;
+    if (cnt == 50) {
+        Led::SetMotor5Enabled(true);
+    }
+    else if (100 <= cnt) {
+        cnt = 0;
+        Led::SetMotor5Enabled(false);
+    }
 
     // ステータスフラグを送信する
     StreamTransmitter::TransmitStatus();
-    StreamTransmitter::TransmitMotion(counter);
 }
 
 void CentralizedMonitor::TimerHandler(void *context) {

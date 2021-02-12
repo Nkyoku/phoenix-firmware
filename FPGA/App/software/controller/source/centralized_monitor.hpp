@@ -42,11 +42,9 @@ public:
     }
 
     /**
-     * ADC2の生存報告をする
-     * ADC2がDC48Vの測定を完了した際にAdc2::Handler()から呼ばれる
-     * @param dc48v_voltage Adc2::GetDc48v()で取得できる値と同じ
+     * ADC2の測定完了時にAdc2::Handler()から呼ばれるコールバック
      */
-    static void Adc2KeepAlive(int dc48v_voltage);
+    static void Adc2Callback(void);
 
     /**
      * エラーフラグのクリアを試みる
@@ -123,8 +121,8 @@ private:
     static constexpr int ADC2_TIMEOUT_THRESHOLD = 50;
 
     /// DC48Vの下限電圧[mV]
-    static constexpr int DC48V_UNDER_VOLTAGE_THRESHOLD = 30000; // T.B.D.
+    static constexpr float DC48V_UNDER_VOLTAGE_THRESHOLD = 30.0f; // T.B.D.
 
     /// DC48Vの上限電圧[mV]
-    static constexpr int DC48V_OVER_VOLTAGE_THRESHOLD = 52500;
+    static constexpr float DC48V_OVER_VOLTAGE_THRESHOLD = 52.5f;
 };

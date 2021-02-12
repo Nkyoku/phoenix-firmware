@@ -5,11 +5,12 @@
 #include <mutex>
 #include <chrono>
 #include <thread>
+#include <cmath>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/qos.hpp>
 #include <phoenix_msgs/srv/clear_error.hpp>
 #include <phoenix_msgs/srv/set_speed.hpp>
-#include "../include/phoenix/shared_memory_struct.hpp"
+#include "../include/phoenix/shared_memory.hpp"
 
 namespace phoenix {
 
@@ -21,6 +22,12 @@ static constexpr int SpiFrequency = 20000000;
 
 /// SPIのモード
 static constexpr int SpiMode = 1;
+
+/// 速度制御の比例ゲインのパラメータ名
+static const std::string PARAM_SPEED_KP("speed_kp");
+
+/// 速度制御の積分ゲインのパラメータ名
+static const std::string PARAM_SPEED_KI("speed_ki");
 
 /**
  * SPIで制御コマンドを送るノード
@@ -34,6 +41,9 @@ public:
         using namespace std::placeholders;
         (void)options;
 
+        // 共有メモリーを初期化する
+        memset(&_SharedMemory, 0, sizeof(_SharedMemory));
+
         // SPIデバイスを開く
         auto spi = std::shared_ptr<Spi>(new Spi);
         if (spi->Open(phoenix::SpiDeviceName, phoenix::SpiFrequency) == false) {
@@ -44,8 +54,12 @@ public:
 
         // サービスを登録する
         rclcpp::QoS qos(rclcpp::QoSInitialization(RMW_QOS_POLICY_HISTORY_KEEP_LAST, QOS_DEPTH));
-        _ClearErrorService = this->create_service<phoenix_msgs::srv::ClearError>("clear_error", std::bind(&CommandServerNode::ClearErrorCallback, this, _1, _2, _3));
-        _SetSpeedService = this->create_service<phoenix_msgs::srv::SetSpeed>("set_speed", std::bind(&CommandServerNode::SetSpeedCallback, this, _1, _2, _3));
+        _ClearErrorService = create_service<phoenix_msgs::srv::ClearError>("clear_error", std::bind(&CommandServerNode::ClearErrorCallback, this, _1, _2, _3));
+        _SetSpeedService = create_service<phoenix_msgs::srv::SetSpeed>("set_speed", std::bind(&CommandServerNode::SetSpeedCallback, this, _1, _2, _3));
+
+        // パラメータを宣言する
+        declare_parameter<double>(PARAM_SPEED_KP, 0.0);
+        declare_parameter<double>(PARAM_SPEED_KI, 0.0);
     }
 
 private:
@@ -97,30 +111,28 @@ private:
         (void)request_header;
 
         // パラメータをコピーする
-        SharedMemory_t shared_memory;
-        shared_memory.Parameters.FrameNumber = ++_FrameNumber;
+        _SharedMemory.Parameters.FrameNumber++;
         for (int index = 0; index < 4; index++) {
-            shared_memory.Parameters.wheel_speed[index] = request->wheel_speed[index];
+            _SharedMemory.Parameters.wheel_speed[index] = request->wheel_speed[index];
         }
-        shared_memory.Parameters.dribble_power = request->dribble_power;
+        _SharedMemory.Parameters.dribble_power = request->dribble_power;
+        _SharedMemory.Parameters.speed_gain_p = std::fmaxf(0.0f, static_cast<float>(get_parameter(PARAM_SPEED_KP).as_double()));
+        _SharedMemory.Parameters.speed_gain_i = std::fmaxf(0.0f, static_cast<float>(get_parameter(PARAM_SPEED_KI).as_double()));
 
         // チェックサムを計算して格納する
-        uint32_t checksum = shared_memory.Parameters.CalculateChecksum();
-        shared_memory.HeadChecksum = checksum;
-        shared_memory.TailChecksum = checksum;
+        uint32_t checksum = _SharedMemory.Parameters.CalculateChecksum();
+        _SharedMemory.HeadChecksum = checksum;
+        _SharedMemory.TailChecksum = checksum;
 
         // パラメータと前後のチェックサムを書き込む
         response->succeeded = _AvalonMm->Write(
             static_cast<uint32_t>(offsetof(SharedMemory_t, HeadChecksum)),
-            &shared_memory.HeadChecksum,
+            &_SharedMemory.HeadChecksum,
             sizeof(SharedMemory_t::Parameters_t) + sizeof(uint32_t) * 2);
     }
 
     /// Avalon-MMマスター
     std::shared_ptr<AvalonMm> _AvalonMm;
-
-    /// 受信処理を行うトリガーとなるタイマー
-    //rclcpp::TimerBase::SharedPtr _Timer;
 
     /// ClearErrorサービス
     rclcpp::Service<phoenix_msgs::srv::ClearError>::SharedPtr _ClearErrorService;
@@ -128,9 +140,9 @@ private:
     /// SetSpeedサービス
     rclcpp::Service<phoenix_msgs::srv::SetSpeed>::SharedPtr _SetSpeedService;
 
-    /// Parametersを書き込むときのフレーム番号
-    uint32_t _FrameNumber = 0;
-
+    /// 共有メモリー
+    SharedMemory_t _SharedMemory;
+    
     /// QoSのパラメータ
     static constexpr int QOS_DEPTH = 10;
 };

@@ -1,8 +1,7 @@
 uint16 performance_counter
-int16[3] accelerometer
-int16[3] gyroscope
-int16[4] encoder_pulse_count
-int16[4] motor_current_d
-int16[4] motor_current_q
-int16[4] motor_current_ref_q
-int16 motor_power_5
+float32[3] accelerometer
+float32[3] gyroscope
+float32[4] wheel_velocity
+float32[4] wheel_current_meas_d
+float32[4] wheel_current_meas_q
+float32[4] wheel_current_ref_q

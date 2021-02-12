@@ -1,6 +1,8 @@
 content_assist_disabled_computers=org.eclipse.cdt.ui.textProposalCategory\u0000org.eclipse.cdt.ui.parserProposalCategory\u0000
 content_assist_proposals_timeout=5000
 eclipse.preferences.version=1
+editor_folding_default_headers=false
+editor_folding_enabled=false
 formatter_profile=_My Format
 formatter_settings_version=1
 globalBuildConsole/keepLog=false

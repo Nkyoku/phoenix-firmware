@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>2021/02/08 22:03:29</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1612789409145</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>2021/02/11 15:54:07</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1613026447534</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>C:\work\Robocup\phoenix-firmware\FPGA\App\software\controller_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\controller.sopcinfo</SopcDesignFile>

@@ -55,6 +55,12 @@ private:
     };
 
 public:
+    /// デューティ比が1となるときのPOWERレジスタの値
+    static constexpr int FULL_SCALE_OF_POWER = 3000;
+
+    /// POWERレジスタに設定可能な最大値の絶対値
+    static constexpr int MAXIMUM_POWER = 2985;
+
     static MotorControllerStatus GetStatus(void) {
         return MotorControllerStatus(__builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->STATUS));
     }

@@ -1,8 +1,6 @@
 #include "adc2.hpp"
 #include <sys/alt_irq.h>
 #include <centralized_monitor.hpp>
-#include <dribble_controller.hpp>
-#include <stream_transmitter.hpp>
 
 bool Adc2::Initialize(void) {
     // ダミークロックを送ってI2Cバスをリセットする
@@ -93,17 +91,15 @@ void Adc2::Handler(void *context) {
     }
     case STATE_ReadResult: {
         uint16_t rxdata = I2CM_GetReadResult2Byte(I2C_BASE);
-        uint16_t result = (rxdata << 8) | (rxdata >> 8);
+        int16_t result = (rxdata << 8) | (rxdata >> 8);
         if (_Sequence == 0) {
-            float value = static_cast<int>(result) * (1.0f / 32768.0f * 4.096f * 21.0f * 1000.0f); // 分解能 42mV;
-            _Result[0] = static_cast<int>(fmaxf(0.0f, fminf(value, 65535.0f)));
-            CentralizedMonitor::Adc2KeepAlive(_Result[0]);
-            StreamTransmitter::TransmitAdc2();
+            float value = static_cast<int>(result) * (1.0f / 32768.0f * 4.096f * 21.0f); // 分解能 42mV;
+            _Result[0] = fmaxf(0.0f, fminf(value, 65.535f));
         }
         else {
-            float value = static_cast<int>(result) * (1.0f / 32768.0f * 0.256f / 0.01f * 1000.0f); // 分解能 12.5mA
-            _Result[1] = static_cast<int>(fmaxf(0.0f, fminf(value, 65535.0f)));
-            DribbleController::Adc2UpdateCurrent(_Result[1]);
+            float value = static_cast<int>(result) * (1.0f / 32768.0f * 0.256f / 0.01f); // 分解能 12.5mA
+            _Result[1] = fmaxf(0.0f, fminf(value, 65.535f));
+            CentralizedMonitor::Adc2Callback();
         }
         _Valid = true;
 
@@ -130,5 +126,5 @@ void Adc2::Handler(void *context) {
 
 Adc2::STATE_t Adc2::_State = Adc2::STATE_WriteConfig;
 int Adc2::_Sequence = 0;
-uint16_t Adc2::_Result[Adc2::NUMBER_OF_SEQUENCE];
+float Adc2::_Result[Adc2::NUMBER_OF_SEQUENCE];
 bool Adc2::_Valid = false;

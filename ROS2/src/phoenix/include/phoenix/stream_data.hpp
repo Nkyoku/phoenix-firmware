@@ -14,17 +14,17 @@ struct StreamDataStatus_t {
 };
 
 struct StreamDataAdc2_t {
-    uint16_t dc48v_voltage;
-    uint16_t dribble_current;
+    __fp16 dc48v_voltage;
+    __fp16 dribble_voltage;
+    __fp16 dribble_current;
 };
 
 struct StreamDataMotion_t {
     uint16_t performance_counter;
-    int16_t accelerometer[3];
-    int16_t gyroscope[3];
-    int16_t encoder_pulse_count[4];
-    int16_t motor_current_d[4];
-    int16_t motor_current_q[4];
-    int16_t motor_current_ref_q[4];
-    int16_t motor_power_5;
+    __fp16 accelerometer[3];
+    __fp16 gyroscope[3];
+    __fp16 wheel_velocity[4];
+    __fp16 wheel_current_meas_d[4];
+    __fp16 wheel_current_meas_q[4];
+    __fp16 wheel_current_ref_q[4];
 };

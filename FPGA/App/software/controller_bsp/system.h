@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_0' in SOPC Builder design 'controller'
  * SOPC Builder design path: ../../controller.sopcinfo
  *
- * Generated: Mon Feb 08 22:03:30 JST 2021
+ * Generated: Thu Feb 11 15:54:08 JST 2021
  */
 
 /*
@@ -141,6 +141,8 @@
  *
  */
 
+#define ALT_CI_FLOAT32TO16_0(A) __builtin_custom_ini(ALT_CI_FLOAT32TO16_0_N,(A))
+#define ALT_CI_FLOAT32TO16_0_N 0x0
 #define ALT_CI_NIOS_CUSTOM_INSTR_FLOATING_POINT_2_0(n,A,B) __builtin_custom_inii(ALT_CI_NIOS_CUSTOM_INSTR_FLOATING_POINT_2_0_N+(n&ALT_CI_NIOS_CUSTOM_INSTR_FLOATING_POINT_2_0_N_MASK),(A),(B))
 #define ALT_CI_NIOS_CUSTOM_INSTR_FLOATING_POINT_2_0_1(n,A,B) __builtin_custom_inii(ALT_CI_NIOS_CUSTOM_INSTR_FLOATING_POINT_2_0_1_N+(n&ALT_CI_NIOS_CUSTOM_INSTR_FLOATING_POINT_2_0_1_N_MASK),(A),(B))
 #define ALT_CI_NIOS_CUSTOM_INSTR_FLOATING_POINT_2_0_1_FADDS_N ALT_CI_NIOS_CUSTOM_INSTR_FLOATING_POINT_2_0_1_N+5
@@ -187,6 +189,7 @@
 #define __ALTERA_NIOS2_GEN2
 #define __ALTERA_NIOS_CUSTOM_INSTR_FLOATING_POINT_2
 #define __ALTERA_VIC
+#define __FLOAT32TO16
 #define __I2C_MASTER
 #define __IMU_SPIM
 #define __MOTOR_CONTROLLER
@@ -768,7 +771,7 @@
 #define SYSID_QSYS_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_0_NAME "/dev/sysid_qsys_0"
 #define SYSID_QSYS_0_SPAN 8
-#define SYSID_QSYS_0_TIMESTAMP 1612789344
+#define SYSID_QSYS_0_TIMESTAMP 1613025884
 #define SYSID_QSYS_0_TYPE "altera_avalon_sysid_qsys"
 
 

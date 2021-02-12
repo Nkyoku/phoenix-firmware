@@ -3582,6 +3582,66 @@
 						<entry kind="macro" name="__hal__" value=""/>
 						<entry kind="macro" name="exit(a)" value="_exit(a)"/>
 					</resource>
+					<resource project-relative-path="source/data_holder.cpp">
+						<entry kind="includePath" name="/controller_bsp/newlib/nios2-elf/include">
+							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>
+						</entry>
+						<entry kind="includePath" name="/controller_bsp/HAL/inc">
+							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>
+						</entry>
+						<entry kind="includePath" name="/controller_bsp">
+							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>
+						</entry>
+						<entry kind="includePath" name="/controller_bsp/drivers/inc">
+							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/source">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/include">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="macro" name="ALTERA_AVALON_JTAG_UART_IGNORE_FIFO_FULL_ERROR" value=""/>
+						<entry kind="macro" name="ALT_NO_CLEAN_EXIT" value=""/>
+						<entry kind="macro" name="ALT_NO_EXIT" value=""/>
+						<entry kind="macro" name="ALT_NO_INSTRUCTION_EMULATION" value=""/>
+						<entry kind="macro" name="ALT_SINGLE_THREADED" value=""/>
+						<entry kind="macro" name="ALT_USE_DIRECT_DRIVERS" value=""/>
+						<entry kind="macro" name="ALT_USE_SMALL_DRIVERS" value=""/>
+						<entry kind="macro" name="SMALL_C_LIB" value=""/>
+						<entry kind="macro" name="__hal__" value=""/>
+						<entry kind="macro" name="exit(a)" value="_exit(a)"/>
+					</resource>
+					<resource project-relative-path="source/shared_memory_manager.cpp">
+						<entry kind="includePath" name="/controller_bsp/newlib/nios2-elf/include">
+							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>
+						</entry>
+						<entry kind="includePath" name="/controller_bsp/HAL/inc">
+							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>
+						</entry>
+						<entry kind="includePath" name="/controller_bsp">
+							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>
+						</entry>
+						<entry kind="includePath" name="/controller_bsp/drivers/inc">
+							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/source">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/include">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="macro" name="ALTERA_AVALON_JTAG_UART_IGNORE_FIFO_FULL_ERROR" value=""/>
+						<entry kind="macro" name="ALT_NO_CLEAN_EXIT" value=""/>
+						<entry kind="macro" name="ALT_NO_EXIT" value=""/>
+						<entry kind="macro" name="ALT_NO_INSTRUCTION_EMULATION" value=""/>
+						<entry kind="macro" name="ALT_SINGLE_THREADED" value=""/>
+						<entry kind="macro" name="ALT_USE_DIRECT_DRIVERS" value=""/>
+						<entry kind="macro" name="ALT_USE_SMALL_DRIVERS" value=""/>
+						<entry kind="macro" name="SMALL_C_LIB" value=""/>
+						<entry kind="macro" name="__hal__" value=""/>
+						<entry kind="macro" name="exit(a)" value="_exit(a)"/>
+					</resource>
 					<resource project-relative-path="source/driver/adc2.cpp">
 						<entry kind="includePath" name="/controller_bsp/newlib/nios2-elf/include">
 							<flag value="VALUE_WORKSPACE_PATH|RESOLVED"/>

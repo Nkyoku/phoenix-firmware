@@ -32,12 +32,12 @@ ament_target_dependencies(adc3 rclcpp std_msgs sensor_msgs)
 
 # stream (standalone)
 add_executable(stream src/stream_main.cpp src/uart.cpp src/avalon_st.cpp)
-ament_target_dependencies(stream rclcpp std_msgs phoenix_msgs)
+ament_target_dependencies(stream rclcpp sensor_msgs phoenix_msgs)
 
 # stream (library)
 #add_library(stream SHARED src/stream_main.cpp src/uart.cpp src/avalon_st.cpp)
 #target_compile_definitions(stream PUBLIC PHOENIX_BUILD_AS_LIBRARY)
-#ament_target_dependencies(stream rclcpp rclcpp_components phoenix_msgs)
+#ament_target_dependencies(stream rclcpp rclcpp_components sensor_msgs phoenix_msgs)
 #rclcpp_components_register_nodes(stream "phoenix::StreamPublisherNode")
 
 # command (standalone)

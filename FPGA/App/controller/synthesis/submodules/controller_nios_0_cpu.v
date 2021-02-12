@@ -3481,6 +3481,7 @@ wire             A_op_custom;
 wire             A_op_div;
 wire             A_op_divu;
 wire             A_op_eret;
+wire             A_op_float32to16_0;
 wire             A_op_flushd;
 wire             A_op_flushda;
 wire             A_op_flushi;
@@ -3781,6 +3782,7 @@ wire             D_op_custom;
 wire             D_op_div;
 wire             D_op_divu;
 wire             D_op_eret;
+wire             D_op_float32to16_0;
 wire             D_op_flushd;
 wire             D_op_flushda;
 wire             D_op_flushi;
@@ -4154,6 +4156,7 @@ wire             E_op_custom;
 wire             E_op_div;
 wire             E_op_divu;
 wire             E_op_eret;
+wire             E_op_float32to16_0;
 wire             E_op_flushd;
 wire             E_op_flushda;
 wire             E_op_flushi;
@@ -4371,6 +4374,7 @@ wire             F_op_custom;
 wire             F_op_div;
 wire             F_op_divu;
 wire             F_op_eret;
+wire             F_op_float32to16_0;
 wire             F_op_flushd;
 wire             F_op_flushda;
 wire             F_op_flushi;
@@ -4751,6 +4755,7 @@ wire             M_op_custom;
 wire             M_op_div;
 wire             M_op_divu;
 wire             M_op_eret;
+wire             M_op_float32to16_0;
 wire             M_op_flushd;
 wire             M_op_flushda;
 wire             M_op_flushi;
@@ -5209,6 +5214,7 @@ wire             W_op_custom;
 wire             W_op_div;
 wire             W_op_divu;
 wire             W_op_eret;
+wire             W_op_float32to16_0;
 wire             W_op_flushd;
 wire             W_op_flushda;
 wire             W_op_flushi;
@@ -5705,6 +5711,7 @@ reg              wait_for_one_post_bret_inst;
   assign F_op_intr = (F_iw_opx == 61) & F_is_opx_inst;
   assign F_op_crst = (F_iw_opx == 62) & F_is_opx_inst;
   assign F_op_opx_rsv63 = (F_iw_opx == 63) & F_is_opx_inst;
+  assign F_op_float32to16_0 = F_op_custom & ({F_iw_custom_n[7 : 0]} == 8'h0);
   assign F_op_nios_custom_instr_floating_point_2_0 = F_op_custom & ({F_iw_custom_n[7 : 4] , 4'b0} == 8'he0);
   assign F_op_nios_custom_instr_floating_point_2_0_1 = F_op_custom & ({F_iw_custom_n[7 : 3] , 3'b0} == 8'hf8);
   assign F_is_opx_inst = F_iw_op == 58;
@@ -5835,6 +5842,7 @@ reg              wait_for_one_post_bret_inst;
   assign D_op_intr = (D_iw_opx == 61) & D_is_opx_inst;
   assign D_op_crst = (D_iw_opx == 62) & D_is_opx_inst;
   assign D_op_opx_rsv63 = (D_iw_opx == 63) & D_is_opx_inst;
+  assign D_op_float32to16_0 = D_op_custom & ({D_iw_custom_n[7 : 0]} == 8'h0);
   assign D_op_nios_custom_instr_floating_point_2_0 = D_op_custom & ({D_iw_custom_n[7 : 4] , 4'b0} == 8'he0);
   assign D_op_nios_custom_instr_floating_point_2_0_1 = D_op_custom & ({D_iw_custom_n[7 : 3] , 3'b0} == 8'hf8);
   assign D_is_opx_inst = D_iw_op == 58;
@@ -5965,6 +5973,7 @@ reg              wait_for_one_post_bret_inst;
   assign E_op_intr = (E_iw_opx == 61) & E_is_opx_inst;
   assign E_op_crst = (E_iw_opx == 62) & E_is_opx_inst;
   assign E_op_opx_rsv63 = (E_iw_opx == 63) & E_is_opx_inst;
+  assign E_op_float32to16_0 = E_op_custom & ({E_iw_custom_n[7 : 0]} == 8'h0);
   assign E_op_nios_custom_instr_floating_point_2_0 = E_op_custom & ({E_iw_custom_n[7 : 4] , 4'b0} == 8'he0);
   assign E_op_nios_custom_instr_floating_point_2_0_1 = E_op_custom & ({E_iw_custom_n[7 : 3] , 3'b0} == 8'hf8);
   assign E_is_opx_inst = E_iw_op == 58;
@@ -6095,6 +6104,7 @@ reg              wait_for_one_post_bret_inst;
   assign M_op_intr = (M_iw_opx == 61) & M_is_opx_inst;
   assign M_op_crst = (M_iw_opx == 62) & M_is_opx_inst;
   assign M_op_opx_rsv63 = (M_iw_opx == 63) & M_is_opx_inst;
+  assign M_op_float32to16_0 = M_op_custom & ({M_iw_custom_n[7 : 0]} == 8'h0);
   assign M_op_nios_custom_instr_floating_point_2_0 = M_op_custom & ({M_iw_custom_n[7 : 4] , 4'b0} == 8'he0);
   assign M_op_nios_custom_instr_floating_point_2_0_1 = M_op_custom & ({M_iw_custom_n[7 : 3] , 3'b0} == 8'hf8);
   assign M_is_opx_inst = M_iw_op == 58;
@@ -6225,6 +6235,7 @@ reg              wait_for_one_post_bret_inst;
   assign A_op_intr = (A_iw_opx == 61) & A_is_opx_inst;
   assign A_op_crst = (A_iw_opx == 62) & A_is_opx_inst;
   assign A_op_opx_rsv63 = (A_iw_opx == 63) & A_is_opx_inst;
+  assign A_op_float32to16_0 = A_op_custom & ({A_iw_custom_n[7 : 0]} == 8'h0);
   assign A_op_nios_custom_instr_floating_point_2_0 = A_op_custom & ({A_iw_custom_n[7 : 4] , 4'b0} == 8'he0);
   assign A_op_nios_custom_instr_floating_point_2_0_1 = A_op_custom & ({A_iw_custom_n[7 : 3] , 3'b0} == 8'hf8);
   assign A_is_opx_inst = A_iw_op == 58;
@@ -6355,6 +6366,7 @@ reg              wait_for_one_post_bret_inst;
   assign W_op_intr = (W_iw_opx == 61) & W_is_opx_inst;
   assign W_op_crst = (W_iw_opx == 62) & W_is_opx_inst;
   assign W_op_opx_rsv63 = (W_iw_opx == 63) & W_is_opx_inst;
+  assign W_op_float32to16_0 = W_op_custom & ({W_iw_custom_n[7 : 0]} == 8'h0);
   assign W_op_nios_custom_instr_floating_point_2_0 = W_op_custom & ({W_iw_custom_n[7 : 4] , 4'b0} == 8'he0);
   assign W_op_nios_custom_instr_floating_point_2_0_1 = W_op_custom & ({W_iw_custom_n[7 : 3] , 3'b0} == 8'hf8);
   assign W_is_opx_inst = W_iw_op == 58;
@@ -9222,7 +9234,7 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     end
 
 
-  assign D_ctrl_custom_multi = D_op_nios_custom_instr_floating_point_2_0_1;
+  assign D_ctrl_custom_multi = D_op_float32to16_0|D_op_nios_custom_instr_floating_point_2_0_1;
   assign E_ctrl_custom_multi_nxt = D_ctrl_custom_multi;
   always @(posedge clk or negedge reset_n)
     begin
@@ -12792,6 +12804,7 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     D_op_opx_rsv42|
     D_op_opx_rsv43|
     D_op_rdctl|
+    D_op_float32to16_0|
     D_op_nios_custom_instr_floating_point_2_0_1|
     D_op_muli|
     D_op_mul|
@@ -13154,6 +13167,7 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     (F_op_sub)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737562 :
     (F_op_srai)? 304'h2020202020202020202020202020202020202020202020202020202020202020202073726169 :
     (F_op_sra)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737261 :
+    (F_op_float32to16_0)? 304'h20202020202020202020202020202020202020202020202020666c6f61743332746f31365f30 :
     (F_op_nios_custom_instr_floating_point_2_0)? 304'h20206e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f30 :
     (F_op_nios_custom_instr_floating_point_2_0_1)? 304'h6e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f305f31 :
     304'h2020202020202020202020202020202020202020202020202020202020202020202020424144;
@@ -13245,6 +13259,7 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     (D_op_sub)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737562 :
     (D_op_srai)? 304'h2020202020202020202020202020202020202020202020202020202020202020202073726169 :
     (D_op_sra)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737261 :
+    (D_op_float32to16_0)? 304'h20202020202020202020202020202020202020202020202020666c6f61743332746f31365f30 :
     (D_op_nios_custom_instr_floating_point_2_0)? 304'h20206e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f30 :
     (D_op_nios_custom_instr_floating_point_2_0_1)? 304'h6e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f305f31 :
     304'h2020202020202020202020202020202020202020202020202020202020202020202020424144;
@@ -13336,6 +13351,7 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     (E_op_sub)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737562 :
     (E_op_srai)? 304'h2020202020202020202020202020202020202020202020202020202020202020202073726169 :
     (E_op_sra)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737261 :
+    (E_op_float32to16_0)? 304'h20202020202020202020202020202020202020202020202020666c6f61743332746f31365f30 :
     (E_op_nios_custom_instr_floating_point_2_0)? 304'h20206e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f30 :
     (E_op_nios_custom_instr_floating_point_2_0_1)? 304'h6e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f305f31 :
     304'h2020202020202020202020202020202020202020202020202020202020202020202020424144;
@@ -13427,6 +13443,7 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     (M_op_sub)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737562 :
     (M_op_srai)? 304'h2020202020202020202020202020202020202020202020202020202020202020202073726169 :
     (M_op_sra)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737261 :
+    (M_op_float32to16_0)? 304'h20202020202020202020202020202020202020202020202020666c6f61743332746f31365f30 :
     (M_op_nios_custom_instr_floating_point_2_0)? 304'h20206e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f30 :
     (M_op_nios_custom_instr_floating_point_2_0_1)? 304'h6e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f305f31 :
     304'h2020202020202020202020202020202020202020202020202020202020202020202020424144;
@@ -13518,6 +13535,7 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     (A_op_sub)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737562 :
     (A_op_srai)? 304'h2020202020202020202020202020202020202020202020202020202020202020202073726169 :
     (A_op_sra)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737261 :
+    (A_op_float32to16_0)? 304'h20202020202020202020202020202020202020202020202020666c6f61743332746f31365f30 :
     (A_op_nios_custom_instr_floating_point_2_0)? 304'h20206e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f30 :
     (A_op_nios_custom_instr_floating_point_2_0_1)? 304'h6e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f305f31 :
     304'h2020202020202020202020202020202020202020202020202020202020202020202020424144;
@@ -13609,6 +13627,7 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     (W_op_sub)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737562 :
     (W_op_srai)? 304'h2020202020202020202020202020202020202020202020202020202020202020202073726169 :
     (W_op_sra)? 304'h2020202020202020202020202020202020202020202020202020202020202020202020737261 :
+    (W_op_float32to16_0)? 304'h20202020202020202020202020202020202020202020202020666c6f61743332746f31365f30 :
     (W_op_nios_custom_instr_floating_point_2_0)? 304'h20206e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f30 :
     (W_op_nios_custom_instr_floating_point_2_0_1)? 304'h6e696f735f637573746f6d5f696e7374725f666c6f6174696e675f706f696e745f325f305f31 :
     304'h2020202020202020202020202020202020202020202020202020202020202020202020424144;

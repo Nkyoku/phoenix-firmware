@@ -1,13 +1,13 @@
+#include <math.h> // math.h内のfmaxf,fminfを後でカスタム命令版に置き換えるため最初にincludeする
 #include "wheel_controller.hpp"
-#include <driver/imu.hpp>
+#include <board.hpp>
 #include <peripheral/vector_controller.hpp>
-#include "centralized_monitor.hpp"
-#include "shared_memory.hpp"
-#include <math.h>
+#include "shared_memory_manager.hpp"
+#include "data_holder.hpp"
 
 void WheelController::StartControl(void) {
-    VectorController::SetGainP(3500);
-    VectorController::SetGainI(500);
+    VectorController::SetGainP(CURRENT_CONTROL_GAIN_P);
+    VectorController::SetGainI(CURRENT_CONTROL_GAIN_I);
     VectorController::ClearFault();
     VectorController::SetCurrentReferenceQ(1, 0);
     VectorController::SetCurrentReferenceQ(2, 0);
@@ -29,22 +29,21 @@ void WheelController::StopControl(void) {
 
 void WheelController::Update(bool new_parameters) {
     if (VectorController::IsFault() == false) {
-        int speed_meas_i[4];
-        speed_meas_i[0] = VectorController::GetEncoderValue(1);
-        speed_meas_i[1] = VectorController::GetEncoderValue(2);
-        speed_meas_i[2] = VectorController::GetEncoderValue(3);
-        speed_meas_i[3] = VectorController::GetEncoderValue(4);
+        auto &motion_data = DataHolder::GetMotionData();
+        auto &parameters = SharedMemory::GetParameters();
+        float speed_gain_p = fmaxf(0.0f, parameters.speed_gain_p);
+        float speed_gain_i = fmaxf(0.0f, parameters.speed_gain_i);
         for (int index = 0; index < 4; index++) {
-            float speed_ref = SharedMemory::GetParameters().wheel_speed[index];
+            float speed_ref = parameters.wheel_speed[index];
             if (fabsf(speed_ref) <= MaxSpeedReference) {
-                float speed_meas = speed_meas_i[index];
+                float speed_meas = motion_data.Wheels[index].Velocity;
                 float error = speed_ref - speed_meas;
-                float value_i = _SpeedGainI * error;
-                float value_p = _SpeedGainP * (error - _LastSpeedError[index]);
+                float value_i = speed_gain_i * error;
+                float value_p = speed_gain_p * (error - _LastSpeedError[index]);
                 _LastSpeedError[index] = error;
 
                 float current_ref = _LastCurrentReference[index];
-                current_ref += (value_p + value_i) * 0.0000152587890625f;
+                current_ref += value_p + value_i;
                 current_ref = fmaxf(-MaxCurrentReference, fminf(current_ref, MaxCurrentReference));
                 _LastCurrentReference[index] = current_ref;
             }
@@ -53,41 +52,16 @@ void WheelController::Update(bool new_parameters) {
                 _LastSpeedError[index] = 0.0f;
             }
         }
-        VectorController::SetCurrentReferenceQ(1, static_cast<int>(_LastCurrentReference[0] * 1977.0f));
-        VectorController::SetCurrentReferenceQ(2, static_cast<int>(_LastCurrentReference[1] * 1977.0f));
-        VectorController::SetCurrentReferenceQ(3, static_cast<int>(_LastCurrentReference[2] * 1977.0f));
-        VectorController::SetCurrentReferenceQ(4, static_cast<int>(_LastCurrentReference[3] * 1977.0f));
+        static constexpr float RECIPROCAL_CURRENT_SCALE = 1.0f / ADC1_CURRENT_SCALE;
+        VectorController::SetCurrentReferenceQ(1, static_cast<int>(_LastCurrentReference[0] * RECIPROCAL_CURRENT_SCALE));
+        VectorController::SetCurrentReferenceQ(2, static_cast<int>(_LastCurrentReference[1] * RECIPROCAL_CURRENT_SCALE));
+        VectorController::SetCurrentReferenceQ(3, static_cast<int>(_LastCurrentReference[2] * RECIPROCAL_CURRENT_SCALE));
+        VectorController::SetCurrentReferenceQ(4, static_cast<int>(_LastCurrentReference[3] * RECIPROCAL_CURRENT_SCALE));
     }
     else if (new_parameters == true) {
         StartControl();
     }
 }
 
-void WheelController::SetGains(float kp, float ki) {
-    /*auto clamp = [](float value) -> int {
-     value = (0.0f <= value) ? value : 0.0f;
-     value = (value * (1u << VectorController::GainScale)) + 0.5f;
-     value = (value <= 65535.0f) ? value : 65535.0f;
-     return static_cast<int>(value);
-     };
-     VectorController::SetGainP(clamp(kp));
-     VectorController::SetGainI(clamp(ki));*/
-    _SpeedGainP = fmaxf(0.0f, fminf(kp, 10000.0f));
-    _SpeedGainI = fmaxf(0.0f, fminf(ki, 10000.0f));
-}
-
-void WheelController::GetGains(float *kp, float *ki) {
-    //*kp = static_cast<float>(VectorController::GetGainP()) * (1.0f / (1u << VectorController::GainScale));
-    //*ki = static_cast<float>(VectorController::GetGainI()) * (1.0f / (1u << VectorController::GainScale));
-    if (kp != nullptr) {
-        *kp = _SpeedGainP;
-    }
-    if (ki != nullptr) {
-        *ki = _SpeedGainI;
-    }
-}
-
-float WheelController::_SpeedGainP;
-float WheelController::_SpeedGainI;
 float WheelController::_LastSpeedError[4];
 float WheelController::_LastCurrentReference[4];

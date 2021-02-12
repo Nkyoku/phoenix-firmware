@@ -14,7 +14,7 @@
 #include <driver/led.hpp>
 #include <driver/load_switch.hpp>
 #include <driver/critical_section.hpp>
-#include "shared_memory.hpp"
+#include "shared_memory_manager.hpp"
 #include "centralized_monitor.hpp"
 #include "wheel_controller.hpp"
 #include "dribble_controller.hpp"
@@ -115,7 +115,7 @@ static MSCMD_USER_RESULT command_adc2(MSOPT *msopt, MSCMD_USER_OBJECT usrobj) {
     return 0;
 }
 
-static MSCMD_USER_RESULT command_kp(MSOPT *msopt, MSCMD_USER_OBJECT usrobj) {
+/*static MSCMD_USER_RESULT command_kp(MSOPT *msopt, MSCMD_USER_OBJECT usrobj) {
     int argc;
     msopt_get_argc(msopt, &argc);
     if (argc == 2) {
@@ -143,7 +143,7 @@ static MSCMD_USER_RESULT command_ki(MSOPT *msopt, MSCMD_USER_OBJECT usrobj) {
         printf("Ki = %d\n", value);
     }
     return 0;
-}
+}*/
 
 /*static MSCMD_USER_RESULT command_speed(MSOPT *msopt, MSCMD_USER_OBJECT usrobj) {
  int argc;
@@ -276,8 +276,8 @@ int main(void) {
     static constexpr MSCMD_COMMAND_TABLE command_table[] = {
         {"imu", command_imu},
         {"adc", command_adc2},
-        {"kp", command_kp},
-        {"ki", command_ki},
+        //{"kp", command_kp},
+        //{"ki", command_ki},
         //{"speed", command_speed},
         //{"power", command_power},
         {"switch", command_switch},

@@ -97,12 +97,13 @@ C_SRCS += source/microshell/util/ntlibc.c
 CXX_SRCS += source/driver/adc2.cpp
 CXX_SRCS += source/driver/imu.cpp
 CXX_SRCS += source/main.cpp
-CXX_SRCS += source/shared_memory.cpp
 CXX_SRCS += source/centralized_monitor.cpp
 CXX_SRCS += source/dribble_controller.cpp
 CXX_SRCS += source/wheel_controller.cpp
 CXX_SRCS += source/stream_transmitter.cpp
 CXX_SRCS += source/peripheral/msgdma.cpp
+CXX_SRCS += source/data_holder.cpp
+CXX_SRCS += source/shared_memory_manager.cpp
 ASM_SRCS :=
 
 

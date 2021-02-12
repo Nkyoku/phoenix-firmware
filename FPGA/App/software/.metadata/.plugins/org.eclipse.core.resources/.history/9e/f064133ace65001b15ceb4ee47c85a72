@@ -1,8 +1,0 @@
-#pragma
-
-#include <stdint.h>
-
-struct StreamDataAdc2_t {
-    uint16_t Dc48v;
-    uint16_t DribbleCurrent;
-};

@@ -89,6 +89,7 @@ private:
 	};
 
 public:
+	// 固定小数点数で表されるKP, KIの小数点の位置
     static constexpr int GainScale = 14;
     
 	static VectorControllerStatus GetStatus(void) {

@@ -9,6 +9,8 @@
 
 // Command Template
 // ros2 service call /set_speed phoenix_msgs/srv/SetSpeed "{wheel_speed: [0.0, 0.0, 0.0, 0.0], dribble_power: 0.0}"
+// ros2 param set /command_server speed_kp 0.4
+// ros2 param set /command_server speed_ki 0.008
 
 class StatusTestNode : public rclcpp::Node {
 public:
@@ -125,18 +127,20 @@ private:
     }
 
     void InitializeAdc2Window(void) {
-        _Adc2Window = newwin(5, 32, 19, 2);
+        _Adc2Window = newwin(6, 32, 19, 2);
         wborder(_Adc2Window, 0, 0, 0, 0, 0, 0, 0, 0);
         mvwaddstr(_Adc2Window, 0, 3, "  [Adc2]");
         mvwaddstr(_Adc2Window, 2, 3, "DC48V   [       ] mV");
-        mvwaddstr(_Adc2Window, 3, 3, "Dribble [       ] mA");
+        mvwaddstr(_Adc2Window, 3, 3, "Dribble [       ] mV");
+        mvwaddstr(_Adc2Window, 4, 3, "Dribble [       ] mA");
         wrefresh(_Adc2Window);
     }
 
     void UpdateAdc2(void) {
         if (_LastAdc2) {
-            mvwprintw(_Adc2Window, 2, 13, "%5d", _LastAdc2->dc48v_voltage);
-            mvwprintw(_Adc2Window, 3, 13, "%5d", _LastAdc2->dribble_current);
+            mvwprintw(_Adc2Window, 2, 13, "%5d", (int)(_LastAdc2->dc48v_voltage * 1000));
+            mvwprintw(_Adc2Window, 3, 13, "%5d", (int)(_LastAdc2->dribble_voltage * 1000));
+            mvwprintw(_Adc2Window, 4, 13, "%5d", (int)(_LastAdc2->dribble_current * 1000));
             wrefresh(_Adc2Window);
             _LastAdc2 = nullptr;
         } else {
@@ -147,7 +151,7 @@ private:
     }
 
     void InitializeMotionWindow(void) {
-        _MotionWindow = newwin(31, 32, 1, 35);
+        _MotionWindow = newwin(32, 34, 1, 35);
         wborder(_MotionWindow, 0, 0, 0, 0, 0, 0, 0, 0);
         mvwaddstr(_MotionWindow, 0, 7, " [Motion]");
         mvwaddstr(_MotionWindow, 2, 3, "         Accel X [        ]");
@@ -172,36 +176,34 @@ private:
         mvwaddstr(_MotionWindow, 21, 3, "   Motor 2 Ref Q [        ]");
         mvwaddstr(_MotionWindow, 22, 3, "   Motor 3 Ref Q [        ]");
         mvwaddstr(_MotionWindow, 23, 3, "   Motor 4 Ref Q [        ]");
-        mvwaddstr(_MotionWindow, 24, 3, "   Motor 5 Power [        ]");
         mvwaddstr(_MotionWindow, 26, 3, "    Perf Counter [        ]");
         wrefresh(_MotionWindow);
     }
 
     void UpdateMotion(void) {
         if (_MotionMessage) {
-            mvwprintw(_MotionWindow, 2, 22, "%6d", _MotionMessage->accelerometer[0]);
-            mvwprintw(_MotionWindow, 3, 22, "%6d", _MotionMessage->accelerometer[1]);
-            mvwprintw(_MotionWindow, 4, 22, "%6d", _MotionMessage->accelerometer[2]);
-            mvwprintw(_MotionWindow, 5, 22, "%6d", _MotionMessage->gyroscope[0]);
-            mvwprintw(_MotionWindow, 6, 22, "%6d", _MotionMessage->gyroscope[1]);
-            mvwprintw(_MotionWindow, 7, 22, "%6d", _MotionMessage->gyroscope[2]);
-            mvwprintw(_MotionWindow, 8, 22, "%6d", _MotionMessage->encoder_pulse_count[0]);
-            mvwprintw(_MotionWindow, 9, 22, "%6d", _MotionMessage->encoder_pulse_count[1]);
-            mvwprintw(_MotionWindow, 10, 22, "%6d", _MotionMessage->encoder_pulse_count[2]);
-            mvwprintw(_MotionWindow, 11, 22, "%6d", _MotionMessage->encoder_pulse_count[3]);
-            mvwprintw(_MotionWindow, 12, 22, "%6d", _MotionMessage->motor_current_d[0]);
-            mvwprintw(_MotionWindow, 13, 22, "%6d", _MotionMessage->motor_current_q[0]);
-            mvwprintw(_MotionWindow, 14, 22, "%6d", _MotionMessage->motor_current_d[1]);
-            mvwprintw(_MotionWindow, 15, 22, "%6d", _MotionMessage->motor_current_q[1]);
-            mvwprintw(_MotionWindow, 16, 22, "%6d", _MotionMessage->motor_current_d[2]);
-            mvwprintw(_MotionWindow, 17, 22, "%6d", _MotionMessage->motor_current_q[2]);
-            mvwprintw(_MotionWindow, 18, 22, "%6d", _MotionMessage->motor_current_d[3]);
-            mvwprintw(_MotionWindow, 19, 22, "%6d", _MotionMessage->motor_current_q[3]);
-            mvwprintw(_MotionWindow, 20, 22, "%6d", _MotionMessage->motor_current_ref_q[0]);
-            mvwprintw(_MotionWindow, 21, 22, "%6d", _MotionMessage->motor_current_ref_q[1]);
-            mvwprintw(_MotionWindow, 22, 22, "%6d", _MotionMessage->motor_current_ref_q[2]);
-            mvwprintw(_MotionWindow, 23, 22, "%6d", _MotionMessage->motor_current_ref_q[3]);
-            mvwprintw(_MotionWindow, 24, 22, "%6d", _MotionMessage->motor_power_5);
+            mvwprintw(_MotionWindow, 2, 22, "%6f", _MotionMessage->accelerometer[0]);
+            mvwprintw(_MotionWindow, 3, 22, "%6f", _MotionMessage->accelerometer[1]);
+            mvwprintw(_MotionWindow, 4, 22, "%6f", _MotionMessage->accelerometer[2]);
+            mvwprintw(_MotionWindow, 5, 22, "%6f", _MotionMessage->gyroscope[0]);
+            mvwprintw(_MotionWindow, 6, 22, "%6f", _MotionMessage->gyroscope[1]);
+            mvwprintw(_MotionWindow, 7, 22, "%6f", _MotionMessage->gyroscope[2]);
+            mvwprintw(_MotionWindow, 8, 22, "%6f", _MotionMessage->wheel_velocity[0]);
+            mvwprintw(_MotionWindow, 9, 22, "%6f", _MotionMessage->wheel_velocity[1]);
+            mvwprintw(_MotionWindow, 10, 22, "%6f", _MotionMessage->wheel_velocity[2]);
+            mvwprintw(_MotionWindow, 11, 22, "%6f", _MotionMessage->wheel_velocity[3]);
+            mvwprintw(_MotionWindow, 12, 22, "%6f", _MotionMessage->wheel_current_meas_d[0]);
+            mvwprintw(_MotionWindow, 13, 22, "%6f", _MotionMessage->wheel_current_meas_q[0]);
+            mvwprintw(_MotionWindow, 14, 22, "%6f", _MotionMessage->wheel_current_meas_d[1]);
+            mvwprintw(_MotionWindow, 15, 22, "%6f", _MotionMessage->wheel_current_meas_q[1]);
+            mvwprintw(_MotionWindow, 16, 22, "%6f", _MotionMessage->wheel_current_meas_d[2]);
+            mvwprintw(_MotionWindow, 17, 22, "%6f", _MotionMessage->wheel_current_meas_q[2]);
+            mvwprintw(_MotionWindow, 18, 22, "%6f", _MotionMessage->wheel_current_meas_d[3]);
+            mvwprintw(_MotionWindow, 19, 22, "%6f", _MotionMessage->wheel_current_meas_q[3]);
+            mvwprintw(_MotionWindow, 20, 22, "%6f", _MotionMessage->wheel_current_ref_q[0]);
+            mvwprintw(_MotionWindow, 21, 22, "%6f", _MotionMessage->wheel_current_ref_q[1]);
+            mvwprintw(_MotionWindow, 22, 22, "%6f", _MotionMessage->wheel_current_ref_q[2]);
+            mvwprintw(_MotionWindow, 23, 22, "%6f", _MotionMessage->wheel_current_ref_q[3]);
             mvwprintw(_MotionWindow, 26, 23, "%5d", _MotionMessage->performance_counter);
             wrefresh(_MotionWindow);
             _MotionMessage = nullptr;
@@ -210,7 +212,7 @@ private:
     }
 
     void InitializeBatteryWindow(void) {
-        _BatteryWindow = newwin(7, 32, 25, 2);
+        _BatteryWindow = newwin(7, 32, 26, 2);
         wborder(_BatteryWindow, 0, 0, 0, 0, 0, 0, 0, 0);
         mvwaddstr(_BatteryWindow, 0, 3, "  [Adc3]");
         mvwaddstr(_BatteryWindow, 2, 3, "    Present [ ]");

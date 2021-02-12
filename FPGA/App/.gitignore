@@ -7,3 +7,4 @@
 *.tcl~
 *.log
 /software/*/obj
+/software/.metadata

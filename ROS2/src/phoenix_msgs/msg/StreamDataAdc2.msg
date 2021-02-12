@@ -1,5 +1,8 @@
-# Voltage of 48V DC/DC in mV
-uint16 dc48v_voltage
+# Voltage of 48V DC/DC
+float32 dc48v_voltage
 
-# Current Consumption of the Dribble Motor Driver in mA
-uint16 dribble_current
+# Output Voltage of the Dribble Motor Driver
+float32 dribble_voltage
+
+# Current Consumption of the Dribble Motor Driver
+float32 dribble_current

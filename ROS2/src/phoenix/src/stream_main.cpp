@@ -5,6 +5,8 @@
 #include <exception>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/qos.hpp>
+#include <arm_fp16.h>
+#include <sensor_msgs/msg/imu.hpp>
 #include <phoenix_msgs/msg/stream_data_adc2.hpp>
 #include <phoenix_msgs/msg/stream_data_status.hpp>
 #include <phoenix_msgs/msg/stream_data_motion.hpp>
@@ -47,6 +49,7 @@ public:
         _StatusPublisher = this->create_publisher<phoenix_msgs::msg::StreamDataStatus>("stream_data_status", qos);
         _Adc2Publisher = this->create_publisher<phoenix_msgs::msg::StreamDataAdc2>("stream_data_adc2", qos);
         _MotionPublisher = this->create_publisher<phoenix_msgs::msg::StreamDataMotion>("stream_data_motion", qos);
+        _ImuPublisher = this->create_publisher<sensor_msgs::msg::Imu>("stream_data_motion_imu", qos);
 
         // ペイロード受信バッファを確保しておく
         _Payload.reserve(MAXIMUM_PAYLOAD_LENGTH);
@@ -60,13 +63,6 @@ private:
             //throw std::runtime_error("Failed to read from UART device.");
             return;
         }
-        /*if (0 < read_length) {
-            for (size_t i = 0; i < read_length; i++)
-            {
-                printf((i == 0) ? "[%02X" : " %02X", buffer[i]);
-            }
-            printf("]\n");
-        }*/
         _Converter.Parse(buffer.data(), read_length, [this](uint8_t data, int channel, bool sof, bool eof) {
             if ((_ChannelNumber != channel) || sof) {
                 if (!_Payload.empty() && !_PayloadOverRun)
@@ -119,28 +115,6 @@ private:
         default:
             break;
         }
-
-        /*struct payload_t {
-            uint16_t frame_number;
-            uint16_t pos_theta;
-            int32_t error;
-            float current;
-            int16_t adc1_u_data_1;
-            int16_t adc1_v_data_1;
-            int16_t current_d;
-            int16_t current_q;
-            int16_t speed;
-        };
-        static int cnt = 0;
-        static int index = 0;
-        if ((channel == 0x72) && (payload.size() == sizeof(payload_t))) {
-            const payload_t *payload_data = reinterpret_cast<const payload_t *>(payload.data());
-            fprintf(fp, "%d,%d,%f,%d,%d,%d,%d,%d,%d\n", index++, payload_data->error, payload_data->current, payload_data->adc1_u_data_1, payload_data->adc1_v_data_1, payload_data->pos_theta, payload_data->current_d, payload_data->current_q, payload_data->speed);
-            if (100 <= ++cnt) {
-                cnt = 0;
-                printf("f=%d, u=%d, v=%d, p=%d, d=%d, q=%d, s=%d\n", payload_data->frame_number, payload_data->adc1_u_data_1, payload_data->adc1_v_data_1, payload_data->pos_theta, payload_data->current_d, payload_data->current_q, payload_data->speed);
-            }
-        }*/
     }
 
     /**
@@ -202,6 +176,7 @@ private:
      * StreamDataMotionを配信する
      */
     void PublishMotion(const StreamDataMotion_t *data) {
+        // StreamDataMotionを配信する
         phoenix_msgs::msg::StreamDataMotion msg;
         msg.performance_counter = data->performance_counter;
         for (int axis = 0; axis < 3; axis++) {
@@ -209,13 +184,23 @@ private:
             msg.gyroscope[axis] = data->gyroscope[axis];
         }
         for (int index = 0; index < 4; index++) {
-            msg.encoder_pulse_count[index] = data->encoder_pulse_count[index];
-            msg.motor_current_d[index] = data->motor_current_d[index];
-            msg.motor_current_q[index] = data->motor_current_q[index];
-            msg.motor_current_ref_q[index] = data->motor_current_ref_q[index];
+            msg.wheel_velocity[index] = data->wheel_velocity[index];
+            msg.wheel_current_meas_d[index] = data->wheel_current_meas_d[index];
+            msg.wheel_current_meas_q[index] = data->wheel_current_meas_q[index];
+            msg.wheel_current_ref_q[index] = data->wheel_current_ref_q[index];
         }
-        msg.motor_power_5 = data->motor_power_5;
         _MotionPublisher->publish(msg);
+
+        // IMUの測定値をROS2標準のImuメッセージとして配信する
+        sensor_msgs::msg::Imu imu_msg;
+        imu_msg.orientation_covariance[0] = -1.0;
+        imu_msg.linear_acceleration.x = msg.accelerometer[0];
+        imu_msg.linear_acceleration.y = msg.accelerometer[1];
+        imu_msg.linear_acceleration.z = msg.accelerometer[2];
+        imu_msg.angular_velocity.x = msg.gyroscope[0];
+        imu_msg.angular_velocity.y = msg.gyroscope[1];
+        imu_msg.angular_velocity.z = msg.gyroscope[2];
+        _ImuPublisher->publish(imu_msg);
     }
 
     /// UARTデバイス
@@ -244,6 +229,9 @@ private:
 
     /// StreamDataMotion(IMUやモーター制御の情報)を配信するpublisher
     rclcpp::Publisher<phoenix_msgs::msg::StreamDataMotion>::SharedPtr _MotionPublisher;
+
+    /// IMUの測定値を配信するpublisher
+    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr _ImuPublisher;
 
     /// QoSのパラメータ
     static constexpr int QOS_DEPTH = 10;

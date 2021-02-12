@@ -45,15 +45,13 @@ public:
     // 割り込みが開始される
     static void Start(void);
 
-    // 48V電源の出力電圧を取得する[mV]
-    // 結果はuint16_tの範囲にクランプされる
-    static uint16_t GetDc48v(void) {
+    // 48V電源の出力電圧を取得する[V]
+    static float GetDc48v(void) {
         return _Result[0];
     }
 
-    // ドリブルモーターの電流を取得する[mA]
-    // 結果はuint16_tの範囲にクランプされる
-    static uint16_t GetDribbleCurrent(void) {
+    // ドリブルモーターの電流を取得する[A]
+    static float GetDribbleCurrent(void) {
         return _Result[1];
     }
 
@@ -113,6 +111,6 @@ private:
     };
     static STATE_t _State;
     static int _Sequence;
-    static uint16_t _Result[NUMBER_OF_SEQUENCE];
+    static float _Result[NUMBER_OF_SEQUENCE];
     static bool _Valid;
 };
