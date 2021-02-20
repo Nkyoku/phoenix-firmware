@@ -442,38 +442,6 @@
          type = "String";
       }
    }
-   element pio_3
-   {
-      datum _sortIndex
-      {
-         value = "28";
-         type = "int";
-      }
-   }
-   element pio_3.s1
-   {
-      datum baseAddress
-      {
-         value = "2048";
-         type = "String";
-      }
-   }
-   element pio_4
-   {
-      datum _sortIndex
-      {
-         value = "29";
-         type = "int";
-      }
-   }
-   element pio_4.s1
-   {
-      datum baseAddress
-      {
-         value = "2304";
-         type = "String";
-      }
-   }
    element spi_slave_to_avalon_mm_master_bridge_0
    {
       datum _sortIndex
@@ -641,16 +609,6 @@
  <interface
    name="mc5_status"
    internal="motor_controller_5.status"
-   type="conduit"
-   dir="end" />
- <interface
-   name="pio3"
-   internal="pio_3.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="pio4"
-   internal="pio_4.external_connection"
    type="conduit"
    dir="end" />
  <interface
@@ -1016,7 +974,7 @@
   <parameter name="dataAddrWidth" value="16" />
   <parameter name="dataMasterHighPerformanceAddrWidth" value="1" />
   <parameter name="dataMasterHighPerformanceMapParam" value="" />
-  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='instruction_rom_0.s1' start='0x0' end='0x8000' type='altera_avalon_onchip_memory2.s1' /><slave name='data_ram_0.s1' start='0x8000' end='0x9000' type='altera_avalon_onchip_memory2.s1' /><slave name='data_ram_1.s1' start='0xB000' end='0xB400' type='altera_avalon_onchip_memory2.s1' /><slave name='nios_0.debug_mem_slave' start='0xB800' end='0xC000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='vic_0.csr_access' start='0xC000' end='0xC400' type='altera_vic.csr_access' /><slave name='msgdma_0.csr' start='0xC400' end='0xC420' type='altera_msgdma.csr' /><slave name='msgdma_0.descriptor_slave' start='0xC500' end='0xC510' type='altera_msgdma.descriptor_slave' /><slave name='sysid_qsys_0.control_slave' start='0xC600' end='0xC608' type='altera_avalon_sysid_qsys.control_slave' /><slave name='performance_counter_0.control_slave' start='0xC700' end='0xC720' type='altera_avalon_performance_counter.control_slave' /><slave name='timer_0.s1' start='0xC800' end='0xC820' type='altera_avalon_timer.s1' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0xC900' end='0xC908' type='altera_avalon_jtag_uart.avalon_jtag_slave' /><slave name='pio_0.s1' start='0xE000' end='0xE010' type='altera_avalon_pio.s1' /><slave name='pio_1.s1' start='0xE100' end='0xE110' type='altera_avalon_pio.s1' /><slave name='pio_2.s1' start='0xE200' end='0xE220' type='altera_avalon_pio.s1' /><slave name='i2c_master_0.slave' start='0xE400' end='0xE410' type='i2c_master.slave' /><slave name='spim_0.spi_control_port' start='0xE500' end='0xE520' type='altera_avalon_spi.spi_control_port' /><slave name='imu_spim.slave' start='0xE600' end='0xE610' type='imu_spim.slave' /><slave name='pio_3.s1' start='0xE800' end='0xE810' type='altera_avalon_pio.s1' /><slave name='pio_4.s1' start='0xE900' end='0xE910' type='altera_avalon_pio.s1' /><slave name='vector_controller_master_0.slave' start='0xF000' end='0xF040' type='vector_controller_master.slave' /><slave name='motor_controller_5.slave' start='0xF100' end='0xF108' type='motor_controller.slave' /></address-map>]]></parameter>
+  <parameter name="dataSlaveMapParam"><![CDATA[<address-map><slave name='instruction_rom_0.s1' start='0x0' end='0x8000' type='altera_avalon_onchip_memory2.s1' /><slave name='data_ram_0.s1' start='0x8000' end='0x9000' type='altera_avalon_onchip_memory2.s1' /><slave name='data_ram_1.s1' start='0xB000' end='0xB400' type='altera_avalon_onchip_memory2.s1' /><slave name='nios_0.debug_mem_slave' start='0xB800' end='0xC000' type='altera_nios2_gen2.debug_mem_slave' /><slave name='vic_0.csr_access' start='0xC000' end='0xC400' type='altera_vic.csr_access' /><slave name='msgdma_0.csr' start='0xC400' end='0xC420' type='altera_msgdma.csr' /><slave name='msgdma_0.descriptor_slave' start='0xC500' end='0xC510' type='altera_msgdma.descriptor_slave' /><slave name='sysid_qsys_0.control_slave' start='0xC600' end='0xC608' type='altera_avalon_sysid_qsys.control_slave' /><slave name='performance_counter_0.control_slave' start='0xC700' end='0xC720' type='altera_avalon_performance_counter.control_slave' /><slave name='timer_0.s1' start='0xC800' end='0xC820' type='altera_avalon_timer.s1' /><slave name='jtag_uart_0.avalon_jtag_slave' start='0xC900' end='0xC908' type='altera_avalon_jtag_uart.avalon_jtag_slave' /><slave name='pio_0.s1' start='0xE000' end='0xE010' type='altera_avalon_pio.s1' /><slave name='pio_1.s1' start='0xE100' end='0xE110' type='altera_avalon_pio.s1' /><slave name='pio_2.s1' start='0xE200' end='0xE220' type='altera_avalon_pio.s1' /><slave name='i2c_master_0.slave' start='0xE400' end='0xE410' type='i2c_master.slave' /><slave name='spim_0.spi_control_port' start='0xE500' end='0xE520' type='altera_avalon_spi.spi_control_port' /><slave name='imu_spim.slave' start='0xE600' end='0xE610' type='imu_spim.slave' /><slave name='vector_controller_master_0.slave' start='0xF000' end='0xF040' type='vector_controller_master.slave' /><slave name='motor_controller_5.slave' start='0xF100' end='0xF108' type='motor_controller.slave' /></address-map>]]></parameter>
   <parameter name="data_master_high_performance_paddr_base" value="0" />
   <parameter name="data_master_high_performance_paddr_size" value="0" />
   <parameter name="data_master_paddr_base" value="0" />
@@ -1222,34 +1180,6 @@
   <parameter name="simDoTestBenchWiring" value="false" />
   <parameter name="simDrivenValue" value="0" />
   <parameter name="width" value="10" />
- </module>
- <module name="pio_3" kind="altera_avalon_pio" version="20.1" enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="75000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="32" />
- </module>
- <module name="pio_4" kind="altera_avalon_pio" version="20.1" enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="75000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="32" />
  </module>
  <module
    name="spi_slave_to_avalon_mm_master_bridge_0"
@@ -1473,16 +1403,6 @@
   <parameter name="baseAddress" value="0x0200" />
   <parameter name="defaultConnection" value="false" />
  </connection>
- <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="pio_3.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0800" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection kind="avalon" version="20.1" start="mm_bridge_1.m0" end="pio_4.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0900" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
  <connection
    kind="avalon"
    version="20.1"
@@ -1599,13 +1519,11 @@
    version="20.1"
    start="clk_1.clk"
    end="avalon_st_uart_tx_0.clk" />
- <connection kind="clock" version="20.1" start="clk_0.clk" end="pio_3.clk" />
  <connection
    kind="clock"
    version="20.1"
    start="clk_0.clk"
    end="vector_controller_master_0.clk" />
- <connection kind="clock" version="20.1" start="clk_0.clk" end="pio_4.clk" />
  <connection
    kind="clock"
    version="20.1"
@@ -1807,13 +1725,11 @@
    version="20.1"
    start="clk_1.clk_reset"
    end="avalon_st_uart_tx_0.reset" />
- <connection kind="reset" version="20.1" start="clk_0.clk_reset" end="pio_3.reset" />
  <connection
    kind="reset"
    version="20.1"
    start="clk_0.clk_reset"
    end="vector_controller_master_0.reset" />
- <connection kind="reset" version="20.1" start="clk_0.clk_reset" end="pio_4.reset" />
  <connection
    kind="reset"
    version="20.1"
@@ -1893,17 +1809,7 @@
    kind="reset"
    version="20.1"
    start="nios_0.debug_reset_request"
-   end="pio_3.reset" />
- <connection
-   kind="reset"
-   version="20.1"
-   start="nios_0.debug_reset_request"
    end="vector_controller_master_0.reset" />
- <connection
-   kind="reset"
-   version="20.1"
-   start="nios_0.debug_reset_request"
-   end="pio_4.reset" />
  <connection
    kind="reset"
    version="20.1"

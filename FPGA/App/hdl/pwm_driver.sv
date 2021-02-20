@@ -7,6 +7,7 @@ module pwm_driver #(
         input  wire                         reset,
         input  wire                         trigger,
         input  wire                         fault,
+        input  wire                         brake,
         input  wire signed [DATA_WIDTH-1:0] pwm_sink_data,
         input  wire                         pwm_sink_valid,
         input  wire [2:0]                   sensor_hall_uvw,
@@ -52,15 +53,21 @@ module pwm_driver #(
         end
         else begin
             if (trigger == 1'b1) begin
-                case (comm_input)
-                    3'b100  : begin comm_phase_enable <= 3'b101; comm_phase_polarity <= 3'b100; end
-                    3'b110  : begin comm_phase_enable <= 3'b011; comm_phase_polarity <= 3'b010; end
-                    3'b010  : begin comm_phase_enable <= 3'b110; comm_phase_polarity <= 3'b010; end
-                    3'b011  : begin comm_phase_enable <= 3'b101; comm_phase_polarity <= 3'b001; end
-                    3'b001  : begin comm_phase_enable <= 3'b011; comm_phase_polarity <= 3'b001; end
-                    3'b101  : begin comm_phase_enable <= 3'b110; comm_phase_polarity <= 3'b100; end
-                    default : begin comm_phase_enable <= 3'b000; comm_phase_polarity <= 3'b000; end
-                endcase
+                if (brake == 1'b1) begin
+                    comm_phase_enable <= 3'b111;
+                    comm_phase_polarity <= 3'b000;
+                end
+                else begin
+                    case (comm_input)
+                        3'b100  : begin comm_phase_enable <= 3'b101; comm_phase_polarity <= 3'b100; end
+                        3'b110  : begin comm_phase_enable <= 3'b011; comm_phase_polarity <= 3'b010; end
+                        3'b010  : begin comm_phase_enable <= 3'b110; comm_phase_polarity <= 3'b010; end
+                        3'b011  : begin comm_phase_enable <= 3'b101; comm_phase_polarity <= 3'b001; end
+                        3'b001  : begin comm_phase_enable <= 3'b011; comm_phase_polarity <= 3'b001; end
+                        3'b101  : begin comm_phase_enable <= 3'b110; comm_phase_polarity <= 3'b100; end
+                        default : begin comm_phase_enable <= 3'b000; comm_phase_polarity <= 3'b000; end
+                    endcase
+                end
             end
         end
     end

@@ -15,14 +15,13 @@
 		.imu_spi_cs_n                                             (<connected-to-imu_spi_cs_n>),                                             //             .cs_n
 		.imu_spi_int_n                                            (<connected-to-imu_spi_int_n>),                                            //             .int_n
 		.mc5_fault_fault                                          (<connected-to-mc5_fault_fault>),                                          //    mc5_fault.fault
+		.mc5_fault_brake                                          (<connected-to-mc5_fault_brake>),                                          //             .brake
 		.mc5_pwm_data                                             (<connected-to-mc5_pwm_data>),                                             //      mc5_pwm.data
 		.mc5_pwm_valid                                            (<connected-to-mc5_pwm_valid>),                                            //             .valid
 		.mc5_pwm_ready                                            (<connected-to-mc5_pwm_ready>),                                            //             .ready
 		.mc5_status_driver_otw_n                                  (<connected-to-mc5_status_driver_otw_n>),                                  //   mc5_status.driver_otw_n
 		.mc5_status_driver_fault_n                                (<connected-to-mc5_status_driver_fault_n>),                                //             .driver_fault_n
 		.mc5_status_hall_fault_n                                  (<connected-to-mc5_status_hall_fault_n>),                                  //             .hall_fault_n
-		.pio3_export                                              (<connected-to-pio3_export>),                                              //         pio3.export
-		.pio4_export                                              (<connected-to-pio4_export>),                                              //         pio4.export
 		.pio_0_export                                             (<connected-to-pio_0_export>),                                             //        pio_0.export
 		.pio_1_export                                             (<connected-to-pio_1_export>),                                             //        pio_1.export
 		.pio_2_export                                             (<connected-to-pio_2_export>),                                             //        pio_2.export

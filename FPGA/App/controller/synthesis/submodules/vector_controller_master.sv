@@ -29,14 +29,19 @@ DRV_OTW_[n]_N, DRV_FAULT_[n]_N, HALL_FAULT_[n]_N (n=1...4)のいずれかのビ�
 
 
 ### FAULT (0x4) Read/Write
-|  15 ~ 2  |     1     |     0     |
-|----------|-----------|-----------|
-| reserved | FAULT_CLR | FAULT_SET |
+|  15 ~ 10 |      9      |      8      |      7      |      6      |      5      |      4      |      3      |      2      |     1     |     0     |
+|----------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|-----------|-----------|
+| reserved | BRAKE_4_CLR | BRAKE_4_SET | BRAKE_3_CLR | BRAKE_3_SET | BRAKE_2_CLR | BRAKE_2_SET | BRAKE_1_CLR | BRAKE_1_SET | FAULT_CLR | FAULT_SET |
 
 FAULT_CLRに1を書き込むとフォルト出力がデアサートされる。
 FAULT_SETに1を書き込むとフォルト出力がアサートされる。
 FAULT_CLRよりFAULT_SETのほうが優先される。
 現在のフォルト出力の状態がFAULT_SETの値として読める。
+
+BRAKE_[n]_CLRに1を書き込むとショートブレーキが解除される。
+BRAKE_[n]_SETに1を書き込むとショートブレーキになる。
+BRAKE_[n]_CLRよりBRAKE_[n]_SETのほうが優先される。
+現在のショートブレーキの状態はBRAKE_[n]_SETの値として読める。
 
 
 ### POSITION (0x6) Read Only
@@ -114,6 +119,7 @@ module vector_controller_master (
 		input  wire        clk,
 		input  wire        reset,
 		output reg         fault,
+		output reg [3:0]   brake,
 		input  wire [3:0]  status_driver_otw_n,
 		input  wire [3:0]  status_driver_fault_n,
 		input  wire [3:0]  status_hall_fault_n,
@@ -197,6 +203,18 @@ module vector_controller_master (
         end
     end
     
+    // Brake
+    logic [3:0] brake_set;
+    logic [3:0] brake_clear;
+    always @(posedge clk, posedge reset) begin
+        if (reset == 1'b1) begin
+            brake <= '0;
+        end
+        else begin
+            brake <= (brake & ~brake_clear) | brake_set;
+        end
+    end
+
     // Interrupt Flag
     logic [3:0] status_driver_otw_n_ff = '1;
     logic [3:0] status_driver_fault_n_ff = '1;
@@ -260,6 +278,8 @@ module vector_controller_master (
         if (reset == 1'b1) begin
             fault_set <= 1'b0;
             fault_clear <= 1'b0;
+            brake_set <= '0;
+            brake_clear <= '0;
             param_kp <= '0;
             param_ki <= '0;
             current_reference_1_valid <= 1'b0;
@@ -274,6 +294,8 @@ module vector_controller_master (
         else begin
             fault_set <= 1'b0;
             fault_clear <= 1'b0;
+            brake_set <= '0;
+            brake_clear <= '0;
             current_reference_1_valid <= 1'b0;
             current_reference_2_valid <= 1'b0;
             current_reference_3_valid <= 1'b0;
@@ -282,7 +304,7 @@ module vector_controller_master (
                 case (slave_address)
                     REGISTER_STATUS   : slave_readdata <= {status_driver_otw_n, status_driver_fault_n, status_hall_fault_n, status_encoder_fault_n};
                     REGISTER_INTFLAG  : slave_readdata <= {intflag_driver_otw_n, intflag_driver_fault_n, intflag_hall_fault_n, 4'hF};
-                    REGISTER_FAULT    : slave_readdata <= {15'h0000, fault};
+                    REGISTER_FAULT    : slave_readdata <= {7'h00, brake[3], 1'b0, brake[2], 1'b0, brake[1], 1'b0, brake[0], 1'b0, fault};
                     REGISTER_POSITION : slave_readdata <= {8'h00, status_pos_error, status_pos_uncertain};
                     REGISTER_ENCODER1 : slave_readdata <= encoder_1_data;
                     REGISTER_ENCODER2 : slave_readdata <= encoder_2_data;
@@ -313,6 +335,14 @@ module vector_controller_master (
                 if (slave_address == REGISTER_FAULT) begin
                     fault_set <= slave_writedata[0];
                     fault_clear <= slave_writedata[1];
+                    brake_set[0] <= slave_writedata[2];
+                    brake_clear[0] <= slave_writedata[3];
+                    brake_set[1] <= slave_writedata[4];
+                    brake_clear[1] <= slave_writedata[5];
+                    brake_set[2] <= slave_writedata[6];
+                    brake_clear[2] <= slave_writedata[7];
+                    brake_set[3] <= slave_writedata[8];
+                    brake_clear[3] <= slave_writedata[9];
                 end
                 if (slave_address == REGISTER_IREFD1) begin
                     motor_current_ref_d[1] <= slave_writedata;

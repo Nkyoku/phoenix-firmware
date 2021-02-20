@@ -19,7 +19,7 @@ static constexpr uint8_t Ads1015Address = 0x48;
 
 class AdcPublisherNode : public rclcpp::Node {
 public:
-    AdcPublisherNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) : Node("adc3_publisher"), _Adc3() {
+    AdcPublisherNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) : Node("phoenix_battery"), _Adc3() {
         using namespace std::chrono_literals;
         (void)options;
 

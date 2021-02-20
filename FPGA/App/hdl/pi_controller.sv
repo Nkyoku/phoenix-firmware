@@ -8,6 +8,7 @@ module pi_controller #(
         input  wire                             clk,
         input  wire                             reset,
         input  wire                             trigger,
+        input  wire                             brake,
         input  wire unsigned [GAIN_WIDTH-1:0]   param_kp, // 比例ゲイン
         input  wire unsigned [GAIN_WIDTH-1:0]   param_ki, // 積分ゲイン
         input  wire [DATA_COUNT*DATA_WIDTH-1:0] in_ref_data, // 目標量 {r0, r1, ...}
@@ -28,6 +29,7 @@ module pi_controller #(
     
     logic [$clog2(INDEX_MAX+1)-1:0] index = '0;
     logic [2:0] state = '0;
+    logic brake_enabled = 1'b0;
     logic r_valid = 1'b0;
     logic y_valid = 1'b0;
     logic signed [DATA_WIDTH-1:0] r [0:DATA_COUNT-1];
@@ -109,12 +111,12 @@ module pi_controller #(
             integ <= 'X;
             for (i = 0; i < DATA_COUNT; i = i + 1) begin
                 if (index == (3 + 3 * i)) begin
-                    integ <= (GAIN_WIDTH+DATA_WIDTH+3)'(u_z[i]);
+                    integ <= brake_enabled ? '0 : (GAIN_WIDTH+DATA_WIDTH+3)'(u_z[i]);
                 end
             end
         end
         else if ((3 < index) & (state[0] | state[1]) & (index <= (3 * DATA_COUNT + 2))) begin
-            integ <= integ + (GAIN_WIDTH+DATA_WIDTH+3)'(gain_out);
+            integ <= brake_enabled ? '0 : (integ + (GAIN_WIDTH+DATA_WIDTH+3)'(gain_out));
         end
         else begin
             integ <= 'X;
@@ -143,6 +145,7 @@ module pi_controller #(
             out_valid <= 1'b0;
             index <= '0;
             state <= '0;
+            brake_enabled <= 1'b0;
             r_valid <= 1'b0;
             y_valid <= 1'b0;
             for (i = 0; i < DATA_COUNT; i = i + 1) begin
@@ -166,6 +169,7 @@ module pi_controller #(
             if (trigger & (index == 0)) begin
                 index <= 1'b1;
                 state <= 3'b001;
+                brake_enabled <= brake;
             end
             else begin
                 index <= ((0 < index) & (index < INDEX_MAX)) ? (index + 1'b1) : '0;

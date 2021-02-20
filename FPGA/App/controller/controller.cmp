@@ -16,14 +16,13 @@
 			imu_spi_cs_n                                             : out   std_logic;                                        -- cs_n
 			imu_spi_int_n                                            : in    std_logic                     := 'X';             -- int_n
 			mc5_fault_fault                                          : out   std_logic;                                        -- fault
+			mc5_fault_brake                                          : out   std_logic;                                        -- brake
 			mc5_pwm_data                                             : out   std_logic_vector(15 downto 0);                    -- data
 			mc5_pwm_valid                                            : out   std_logic;                                        -- valid
 			mc5_pwm_ready                                            : in    std_logic                     := 'X';             -- ready
 			mc5_status_driver_otw_n                                  : in    std_logic                     := 'X';             -- driver_otw_n
 			mc5_status_driver_fault_n                                : in    std_logic                     := 'X';             -- driver_fault_n
 			mc5_status_hall_fault_n                                  : in    std_logic                     := 'X';             -- hall_fault_n
-			pio3_export                                              : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
-			pio4_export                                              : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			pio_0_export                                             : in    std_logic                     := 'X';             -- export
 			pio_1_export                                             : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			pio_2_export                                             : out   std_logic_vector(9 downto 0);                     -- export
@@ -35,6 +34,7 @@
 			vc_encoder_encoder_3_data                                : in    std_logic_vector(15 downto 0) := (others => 'X'); -- encoder_3_data
 			vc_encoder_encoder_4_data                                : in    std_logic_vector(15 downto 0) := (others => 'X'); -- encoder_4_data
 			vc_fault_fault                                           : out   std_logic;                                        -- fault
+			vc_fault_brake                                           : out   std_logic_vector(3 downto 0);                     -- brake
 			vc_imeas1_data                                           : in    std_logic_vector(31 downto 0) := (others => 'X'); -- data
 			vc_imeas1_valid                                          : in    std_logic                     := 'X';             -- valid
 			vc_imeas2_data                                           : in    std_logic_vector(31 downto 0) := (others => 'X'); -- data

@@ -21,14 +21,19 @@ DRV_OTW_N, DRV_FAULT_N, HALL_FAULT_Nのいずれかがクリアされた瞬間�
 
 
 ### FAULT (0x4) Read/Write
-|  15 ~ 2  |     1     |     0     |
-|----------|-----------|-----------|
-| reserved | FAULT_CLR | FAULT_SET |
+|  15 ~ 4  |     3     |     2     |     1     |     0     |
+|----------|-----------|-----------|-----------|-----------|
+| reserved | BRAKE_CLR | BRAKE_SET | FAULT_CLR | FAULT_SET |
 
 FAULT_CLRに1を書き込むとフォルト出力がデアサートされる。
 FAULT_SETに1を書き込むとフォルト出力がアサートされる。
 FAULT_CLRよりFAULT_SETのほうが優先される。
 現在のフォルト出力の状態がFAULT_SETの値として読める。
+
+BRAKE_CLRに1を書き込むとショートブレーキが解除される。
+BRAKE_SETに1を書き込むとショートブレーキになる。
+BRAKE_CLRよりBRAKE_SETのほうが優先される。
+現在のショートブレーキの状態はBRAKE_SETの値として読める。
 
 
 ### POWER (0x6) Read/Write
@@ -47,6 +52,7 @@ module motor_controller (
         input  wire        clk,
         input  wire        reset,
 		output reg         fault,
+        output reg         brake,
         input  wire        status_driver_otw_n,
 		input  wire        status_driver_fault_n,
 		input  wire        status_hall_fault_n,
@@ -86,6 +92,18 @@ module motor_controller (
         end
     end
     
+    // Brake
+    logic brake_set;
+    logic brake_clear;
+    always @(posedge clk, posedge reset) begin
+        if (reset == 1'b1) begin
+            brake <= 1'b0;
+        end
+        else begin
+            brake <= (brake & ~brake_clear) | brake_set;
+        end
+    end
+
     // Interrupt Flag
     logic status_driver_otw_n_ff = 1'b1;
     logic status_driver_fault_n_ff = 1'b1;
@@ -118,12 +136,18 @@ module motor_controller (
     // Avalon-MM
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
+            fault_set <= 1'b0;
+            fault_clear <= 1'b0;
+            brake_set <= 1'b0;
+            brake_clear <= 1'b0;
             pwm_source_data <= '0;
             pwm_source_valid <= 1'b0;
         end
         else begin
             fault_set <= 1'b0;
             fault_clear <= 1'b0;
+            brake_set <= 1'b0;
+            brake_clear <= 1'b0;
             if (pwm_source_valid & pwm_source_ready) begin
                 pwm_source_valid <= 1'b0;
             end
@@ -131,7 +155,7 @@ module motor_controller (
                 case (slave_address)
                     REGISTER_STATUS  : slave_readdata <= {13'h0000, status_driver_otw_n, status_driver_fault_n, status_hall_fault_n};
                     REGISTER_INTFLAG : slave_readdata <= {13'h0000, intflag_driver_otw_n, intflag_driver_fault_n, intflag_hall_fault_n};
-                    REGISTER_FAULT   : slave_readdata <= {15'h0000, fault};
+                    REGISTER_FAULT   : slave_readdata <= {13'h0000, brake, 1'b0, fault};
                     REGISTER_POWER   : slave_readdata <= pwm_source_data;
                     default          : slave_readdata <= 16'h0000;
                 endcase
@@ -140,6 +164,8 @@ module motor_controller (
                 if (slave_address == REGISTER_FAULT) begin
                     fault_set <= slave_writedata[0];
                     fault_clear <= slave_writedata[1];
+                    brake_set <= slave_writedata[2];
+                    brake_clear <= slave_writedata[3];
                 end
                 if (slave_address == REGISTER_POWER) begin
                     pwm_source_data <= slave_writedata[15:0];

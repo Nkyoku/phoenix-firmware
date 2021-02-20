@@ -25,13 +25,21 @@ public:
 
     /**
      * ADC2の測定値を送信する
+     * @param adc2_data 送るデータ
      */
     static void TransmitAdc2(const Adc2Data_t &adc2_data);
 
     /**
      * モーションデータを送信する
+     * @param motion_data 送るデータ
      */
-    static void TransmitMotion(const MotionData_t &motion_data, int performance_counter);
+    static void TransmitMotion(const MotionData_t &motion_data);
+
+    /**
+     * 制御データを送信する
+     * @param performance_counter パフォーマンスカウンタの値
+     */
+    static void TransmitControl(const ControlData_t &control_data, int performance_counter);
 
 private:
     /// mSGDMAのハンドル

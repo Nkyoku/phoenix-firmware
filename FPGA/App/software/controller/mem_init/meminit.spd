@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+<file path="hdl_sim/controller_data_ram_0.dat" type="DAT" initParamName="INIT_FILE" memoryPath="data_ram_0" />
+<file path="hdl_sim/controller_data_ram_1.dat" type="DAT" initParamName="INIT_FILE" memoryPath="data_ram_1" />
+<file path="hdl_sim/controller_instruction_rom_0.dat" type="DAT" initParamName="INIT_FILE" memoryPath="instruction_rom_0" />
+<file path="controller_data_ram_0.hex" type="HEX" initParamName="INIT_FILE" memoryPath="data_ram_0" />
+<file path="controller_data_ram_1.hex" type="HEX" initParamName="INIT_FILE" memoryPath="data_ram_1" />
+<file path="controller_instruction_rom_0.hex" type="HEX" initParamName="INIT_FILE" memoryPath="instruction_rom_0" />
+</simPackage>

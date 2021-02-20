@@ -82,7 +82,19 @@ public:
     }
 
     static bool IsFault(void) {
-        return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->FAULT) != 0;
+        return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->FAULT) & 0x1;
+    }
+
+    static void SetBrakeEnabled(void) {
+        __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x4);
+    }
+
+    static void ClearBrakeEnabled(void) {
+        __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x8);
+    }
+
+    static bool IsBrakeEnabled(void) {
+        return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->FAULT) & 0x4;
     }
 
     static int GetPower(void) {

@@ -20,14 +20,13 @@ module controller (
 		output wire        imu_spi_cs_n,                                             //             .cs_n
 		input  wire        imu_spi_int_n,                                            //             .int_n
 		output wire        mc5_fault_fault,                                          //    mc5_fault.fault
+		output wire        mc5_fault_brake,                                          //             .brake
 		output wire [15:0] mc5_pwm_data,                                             //      mc5_pwm.data
 		output wire        mc5_pwm_valid,                                            //             .valid
 		input  wire        mc5_pwm_ready,                                            //             .ready
 		input  wire        mc5_status_driver_otw_n,                                  //   mc5_status.driver_otw_n
 		input  wire        mc5_status_driver_fault_n,                                //             .driver_fault_n
 		input  wire        mc5_status_hall_fault_n,                                  //             .hall_fault_n
-		input  wire [31:0] pio3_export,                                              //         pio3.export
-		input  wire [31:0] pio4_export,                                              //         pio4.export
 		input  wire        pio_0_export,                                             //        pio_0.export
 		input  wire [31:0] pio_1_export,                                             //        pio_1.export
 		output wire [9:0]  pio_2_export,                                             //        pio_2.export
@@ -39,6 +38,7 @@ module controller (
 		input  wire [15:0] vc_encoder_encoder_3_data,                                //             .encoder_3_data
 		input  wire [15:0] vc_encoder_encoder_4_data,                                //             .encoder_4_data
 		output wire        vc_fault_fault,                                           //     vc_fault.fault
+		output wire [3:0]  vc_fault_brake,                                           //             .brake
 		input  wire [31:0] vc_imeas1_data,                                           //    vc_imeas1.data
 		input  wire        vc_imeas1_valid,                                          //             .valid
 		input  wire [31:0] vc_imeas2_data,                                           //    vc_imeas2.data
@@ -353,10 +353,6 @@ module controller (
 	wire    [2:0] mm_interconnect_3_pio_2_s1_address;                                           // mm_interconnect_3:pio_2_s1_address -> pio_2:address
 	wire          mm_interconnect_3_pio_2_s1_write;                                             // mm_interconnect_3:pio_2_s1_write -> pio_2:write_n
 	wire   [31:0] mm_interconnect_3_pio_2_s1_writedata;                                         // mm_interconnect_3:pio_2_s1_writedata -> pio_2:writedata
-	wire   [31:0] mm_interconnect_3_pio_3_s1_readdata;                                          // pio_3:readdata -> mm_interconnect_3:pio_3_s1_readdata
-	wire    [1:0] mm_interconnect_3_pio_3_s1_address;                                           // mm_interconnect_3:pio_3_s1_address -> pio_3:address
-	wire   [31:0] mm_interconnect_3_pio_4_s1_readdata;                                          // pio_4:readdata -> mm_interconnect_3:pio_4_s1_readdata
-	wire    [1:0] mm_interconnect_3_pio_4_s1_address;                                           // mm_interconnect_3:pio_4_s1_address -> pio_4:address
 	wire   [15:0] mm_interconnect_3_motor_controller_5_slave_readdata;                          // motor_controller_5:slave_readdata -> mm_interconnect_3:motor_controller_5_slave_readdata
 	wire    [1:0] mm_interconnect_3_motor_controller_5_slave_address;                           // mm_interconnect_3:motor_controller_5_slave_address -> motor_controller_5:slave_address
 	wire          mm_interconnect_3_motor_controller_5_slave_read;                              // mm_interconnect_3:motor_controller_5_slave_read -> motor_controller_5:slave_read
@@ -416,7 +412,7 @@ module controller (
 	wire          rst_controller_reset_out_reset_req;                                           // rst_controller:reset_req -> [data_ram_0:reset_req, data_ram_1:reset_req, instruction_rom_0:reset_req, nios_0:reset_req, rst_translator:reset_req_in]
 	wire          rst_controller_001_reset_out_reset;                                           // rst_controller_001:reset_out -> [data_ram_1:reset2, dc_fifo_0:out_reset_n, mm_interconnect_0:spi_slave_to_avalon_mm_master_bridge_0_clk_reset_reset_bridge_in_reset_reset, rst_translator_001:in_reset, spi_slave_to_avalon_mm_master_bridge_0:reset_n]
 	wire          rst_controller_001_reset_out_reset_req;                                       // rst_controller_001:reset_req -> [data_ram_1:reset_req2, rst_translator_001:reset_req_in]
-	wire          rst_controller_002_reset_out_reset;                                           // rst_controller_002:reset_out -> [dc_fifo_0:in_reset_n, i2c_master_0:reset, imu_spim:reset, irq_mapper:reset, mm_bridge_1:reset, mm_interconnect_1:mm_bridge_1_reset_reset_bridge_in_reset_reset, mm_interconnect_2:msgdma_0_reset_n_reset_bridge_in_reset_reset, mm_interconnect_3:mm_bridge_1_reset_reset_bridge_in_reset_reset, mm_interconnect_3:motor_controller_5_reset_reset_bridge_in_reset_reset, mm_interconnect_4:msgdma_0_reset_n_reset_bridge_in_reset_reset, msgdma_0:reset_n_reset_n, pio_0:reset_n, pio_1:reset_n, pio_2:reset_n, pio_3:reset_n, pio_4:reset_n, spim_0:reset_n, st_packets_to_bytes_0:reset_n, timer_0:reset_n, vector_controller_master_0:reset, vic_0:reset_reset]
+	wire          rst_controller_002_reset_out_reset;                                           // rst_controller_002:reset_out -> [dc_fifo_0:in_reset_n, i2c_master_0:reset, imu_spim:reset, irq_mapper:reset, mm_bridge_1:reset, mm_interconnect_1:mm_bridge_1_reset_reset_bridge_in_reset_reset, mm_interconnect_2:msgdma_0_reset_n_reset_bridge_in_reset_reset, mm_interconnect_3:mm_bridge_1_reset_reset_bridge_in_reset_reset, mm_interconnect_3:motor_controller_5_reset_reset_bridge_in_reset_reset, mm_interconnect_4:msgdma_0_reset_n_reset_bridge_in_reset_reset, msgdma_0:reset_n_reset_n, pio_0:reset_n, pio_1:reset_n, pio_2:reset_n, spim_0:reset_n, st_packets_to_bytes_0:reset_n, timer_0:reset_n, vector_controller_master_0:reset, vic_0:reset_reset]
 	wire          nios_0_debug_reset_request_reset;                                             // nios_0:debug_reset_request -> [rst_controller_002:reset_in1, rst_controller_003:reset_in1]
 	wire          rst_controller_003_reset_out_reset;                                           // rst_controller_003:reset_out -> motor_controller_5:reset
 
@@ -697,6 +693,7 @@ module controller (
 		.clk                   (clk_sys_clk),                                          //        clk.clk
 		.reset                 (rst_controller_003_reset_out_reset),                   //      reset.reset
 		.fault                 (mc5_fault_fault),                                      //      fault.fault
+		.brake                 (mc5_fault_brake),                                      //           .brake
 		.status_driver_otw_n   (mc5_status_driver_otw_n),                              //     status.driver_otw_n
 		.status_driver_fault_n (mc5_status_driver_fault_n),                            //           .driver_fault_n
 		.status_hall_fault_n   (mc5_status_hall_fault_n),                              //           .hall_fault_n
@@ -840,22 +837,6 @@ module controller (
 		.out_port   (pio_2_export)                           // external_connection.export
 	);
 
-	controller_pio_3 pio_3 (
-		.clk      (clk_sys_clk),                         //                 clk.clk
-		.reset_n  (~rst_controller_002_reset_out_reset), //               reset.reset_n
-		.address  (mm_interconnect_3_pio_3_s1_address),  //                  s1.address
-		.readdata (mm_interconnect_3_pio_3_s1_readdata), //                    .readdata
-		.in_port  (pio3_export)                          // external_connection.export
-	);
-
-	controller_pio_3 pio_4 (
-		.clk      (clk_sys_clk),                         //                 clk.clk
-		.reset_n  (~rst_controller_002_reset_out_reset), //               reset.reset_n
-		.address  (mm_interconnect_3_pio_4_s1_address),  //                  s1.address
-		.readdata (mm_interconnect_3_pio_4_s1_readdata), //                    .readdata
-		.in_port  (pio4_export)                          // external_connection.export
-	);
-
 	SPISlaveToAvalonMasterBridge #(
 		.SYNC_DEPTH (2)
 	) spi_slave_to_avalon_mm_master_bridge_0 (
@@ -930,6 +911,7 @@ module controller (
 		.clk                         (clk_sys_clk),                                                  //                   clk.clk
 		.reset                       (rst_controller_002_reset_out_reset),                           //                 reset.reset
 		.fault                       (vc_fault_fault),                                               //                 fault.fault
+		.brake                       (vc_fault_brake),                                               //                      .brake
 		.status_driver_otw_n         (vc_status_driver_otw_n),                                       //                status.driver_otw_n
 		.status_driver_fault_n       (vc_status_driver_fault_n),                                     //                      .driver_fault_n
 		.status_hall_fault_n         (vc_status_hall_fault_n),                                       //                      .hall_fault_n
@@ -1434,10 +1416,6 @@ module controller (
 		.pio_2_s1_readdata                                    (mm_interconnect_3_pio_2_s1_readdata),                          //                                               .readdata
 		.pio_2_s1_writedata                                   (mm_interconnect_3_pio_2_s1_writedata),                         //                                               .writedata
 		.pio_2_s1_chipselect                                  (mm_interconnect_3_pio_2_s1_chipselect),                        //                                               .chipselect
-		.pio_3_s1_address                                     (mm_interconnect_3_pio_3_s1_address),                           //                                       pio_3_s1.address
-		.pio_3_s1_readdata                                    (mm_interconnect_3_pio_3_s1_readdata),                          //                                               .readdata
-		.pio_4_s1_address                                     (mm_interconnect_3_pio_4_s1_address),                           //                                       pio_4_s1.address
-		.pio_4_s1_readdata                                    (mm_interconnect_3_pio_4_s1_readdata),                          //                                               .readdata
 		.spim_0_spi_control_port_address                      (mm_interconnect_3_spim_0_spi_control_port_address),            //                        spim_0_spi_control_port.address
 		.spim_0_spi_control_port_write                        (mm_interconnect_3_spim_0_spi_control_port_write),              //                                               .write
 		.spim_0_spi_control_port_read                         (mm_interconnect_3_spim_0_spi_control_port_read),               //                                               .read

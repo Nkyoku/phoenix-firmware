@@ -10,6 +10,7 @@
 #include <phoenix_msgs/msg/stream_data_adc2.hpp>
 #include <phoenix_msgs/msg/stream_data_status.hpp>
 #include <phoenix_msgs/msg/stream_data_motion.hpp>
+#include <phoenix_msgs/msg/stream_data_control.hpp>
 #include "../include/phoenix/stream_data.hpp"
 #include "../include/phoenix/status_flags.hpp"
 
@@ -29,7 +30,7 @@ public:
     /**
      * コンストラクタ
      */
-    StreamPublisherNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) : Node("stream_publisher"), _Uart(new Uart) {
+    StreamPublisherNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) : Node("phoenix_stream"), _Uart(new Uart) {
         using namespace std::chrono_literals;
         (void)options;
 
@@ -46,10 +47,11 @@ public:
         // publisherを作成する
         rclcpp::QoS qos(rclcpp::QoSInitialization(RMW_QOS_POLICY_HISTORY_KEEP_LAST, QOS_DEPTH));
         _Timer = this->create_wall_timer(1ms, std::bind(&StreamPublisherNode::TimerCallback, this));
-        _StatusPublisher = this->create_publisher<phoenix_msgs::msg::StreamDataStatus>("stream_data_status", qos);
-        _Adc2Publisher = this->create_publisher<phoenix_msgs::msg::StreamDataAdc2>("stream_data_adc2", qos);
-        _MotionPublisher = this->create_publisher<phoenix_msgs::msg::StreamDataMotion>("stream_data_motion", qos);
-        _ImuPublisher = this->create_publisher<sensor_msgs::msg::Imu>("stream_data_motion_imu", qos);
+        _StatusPublisher = this->create_publisher<phoenix_msgs::msg::StreamDataStatus>("phoenix_status", qos);
+        _Adc2Publisher = this->create_publisher<phoenix_msgs::msg::StreamDataAdc2>("phoenix_adc2", qos);
+        _MotionPublisher = this->create_publisher<phoenix_msgs::msg::StreamDataMotion>("phoenix_motion", qos);
+        _ControlPublisher = this->create_publisher<phoenix_msgs::msg::StreamDataControl>("phoenix_control", qos);
+        _ImuPublisher = this->create_publisher<sensor_msgs::msg::Imu>("phoenix_imu", qos);
 
         // ペイロード受信バッファを確保しておく
         _Payload.reserve(MAXIMUM_PAYLOAD_LENGTH);
@@ -109,6 +111,12 @@ private:
         case StreamIdMotion:
             if (payload.size() == sizeof(StreamDataMotion_t)) {
                 PublishMotion(reinterpret_cast<const StreamDataMotion_t *>(payload.data()));
+            }
+            break;
+
+        case StreamIdControl:
+            if (payload.size() == sizeof(StreamDataControl_t)) {
+                PublishControl(reinterpret_cast<const StreamDataControl_t *>(payload.data()));
             }
             break;
 
@@ -178,16 +186,14 @@ private:
     void PublishMotion(const StreamDataMotion_t *data) {
         // StreamDataMotionを配信する
         phoenix_msgs::msg::StreamDataMotion msg;
-        msg.performance_counter = data->performance_counter;
         for (int axis = 0; axis < 3; axis++) {
             msg.accelerometer[axis] = data->accelerometer[axis];
             msg.gyroscope[axis] = data->gyroscope[axis];
         }
         for (int index = 0; index < 4; index++) {
             msg.wheel_velocity[index] = data->wheel_velocity[index];
-            msg.wheel_current_meas_d[index] = data->wheel_current_meas_d[index];
-            msg.wheel_current_meas_q[index] = data->wheel_current_meas_q[index];
-            msg.wheel_current_ref_q[index] = data->wheel_current_ref_q[index];
+            msg.wheel_current_d[index] = data->wheel_current_d[index];
+            msg.wheel_current_q[index] = data->wheel_current_q[index];
         }
         _MotionPublisher->publish(msg);
 
@@ -201,6 +207,19 @@ private:
         imu_msg.angular_velocity.y = msg.gyroscope[1];
         imu_msg.angular_velocity.z = msg.gyroscope[2];
         _ImuPublisher->publish(imu_msg);
+    }
+
+    /**
+     * StreamDataControlを配信する
+     */
+    void PublishControl(const StreamDataControl_t *data) {
+        phoenix_msgs::msg::StreamDataControl msg;
+        msg.performance_counter = data->performance_counter;
+        for (int index = 0; index < 4; index++) {
+            msg.wheel_velocity_ref[index] = data->wheel_velocity_ref[index];
+            msg.wheel_current_ref[index] = data->wheel_current_ref[index];
+        }
+        _ControlPublisher->publish(msg);
     }
 
     /// UARTデバイス
@@ -227,8 +246,11 @@ private:
     /// StreamDataAdc2(FPGAに繋がったADC2の測定値)を配信するpublisher
     rclcpp::Publisher<phoenix_msgs::msg::StreamDataAdc2>::SharedPtr _Adc2Publisher;
 
-    /// StreamDataMotion(IMUやモーター制御の情報)を配信するpublisher
+    /// StreamDataMotion(IMUやセンサーの情報)を配信するpublisher
     rclcpp::Publisher<phoenix_msgs::msg::StreamDataMotion>::SharedPtr _MotionPublisher;
+
+    /// StreamDataControl(モーター制御の情報)を配信するpublisher
+    rclcpp::Publisher<phoenix_msgs::msg::StreamDataControl>::SharedPtr _ControlPublisher;
 
     /// IMUの測定値を配信するpublisher
     rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr _ImuPublisher;

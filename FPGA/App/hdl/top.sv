@@ -330,7 +330,9 @@ module PhoenixFPGA (
     // Controller 1...4 -> Driver 1...4 -> Motor 1...4 (Wheel motors)
     // Controller 5     -> Driver 5     -> Motor 5 (Dribble motor)
     logic pwm_fault, pwm_fault_150mhz;
+    logic [4:1] pwm_brake;
     logic pwm_fault_5, pwm_fault_5_150mhz;
+    logic pwm_brake_5, pwm_brake_5_150mhz;
     logic [15:0] controller_5_pwm_data;
     logic controller_5_pwm_valid;
     logic controller_5_pwm_ready;
@@ -407,6 +409,7 @@ module PhoenixFPGA (
                     .clk(clk_75mhz),
                     .reset(reset_75mhz),
                     .fault(pwm_fault),
+                    .brake(pwm_brake[i]),
                     .pulse_1khz(pulse_1khz),
                     .pulse_8khz(pulse_8khz),
                     .sensor_hall_uvw(sensor_hall_uvw[i]),
@@ -444,6 +447,7 @@ module PhoenixFPGA (
                     .reset(reset_150mhz),
                     .trigger(pwm_trigger_150mhz),
                     .fault(pwm_fault_5_150mhz),
+                    .brake(pwm_brake_5_150mhz),
                     .pwm_sink_data(driver_pwm_data),
                     .pwm_sink_valid(driver_pwm_valid),
                     .sensor_hall_uvw(sensor_hall_uvw[i]),
@@ -488,14 +492,15 @@ module PhoenixFPGA (
         .out_clk(clk_150mhz),
         .out_sig(pwm_fault_5_150mhz)
     );
+    cdb_signal_module pwm_brake_5_bridge (
+        .in_rst(reset_75mhz),
+        .in_clk(clk_75mhz),
+        .in_sig(pwm_brake_5),
+        .out_rst(reset_150mhz),
+        .out_clk(clk_150mhz),
+        .out_sig(pwm_brake_5_150mhz)
+    );
     
-    logic [31:0] pio3_latch;
-    always @(posedge clk_75mhz) begin
-        if (adc1_valid == 1'b1) begin
-            pio3_latch <= {-adc1_u_data[1], -adc1_v_data[1]};
-        end
-    end
-
     wire adc2_sda_oe;
     wire adc2_scl_oe;
     assign ADC2_SDA = adc2_sda_oe ? 1'b0 : 1'bz;
@@ -564,6 +569,7 @@ module PhoenixFPGA (
 		.imu_spi_cs_n              (IMU_CS_N),
 		.imu_spi_int_n             (IMU_INT_N),
         .vc_fault_fault            (pwm_fault),
+        .vc_fault_brake            (pwm_brake),
 		.vc_status_driver_otw_n    (status_driver_otw_n[4:1]),
 		.vc_status_driver_fault_n  (status_driver_fault_n[4:1]),
 		.vc_status_hall_fault_n    (status_hall_fault_n[4:1]),
@@ -593,6 +599,7 @@ module PhoenixFPGA (
 		.vc_param_kp               (param_kp),
 		.vc_param_ki               (param_ki),
         .mc5_fault_fault           (pwm_fault_5),
+        .mc5_fault_brake           (pwm_brake_5),
 		.mc5_status_driver_otw_n   (status_driver_otw_n[5]),
 		.mc5_status_driver_fault_n (status_driver_fault_n[5]),
 		.mc5_status_hall_fault_n   (status_hall_fault_n[5]),
@@ -605,9 +612,7 @@ module PhoenixFPGA (
 		.host_spi_sclk_to_the_spislave_inst_for_spichain          (FPGA_SPI_SCLK),
         .reset_100mhz_reset_n      (~reset_100mhz),
         .clk_100mhz_clk            (clk_100mhz),
-		.uart_txd                  (FPGA_UART_TX),
-        .pio3_export(pio3_latch),
-        .pio4_export({14'h0000, status_pos_error[1], status_pos_uncertain[1], 7'h00, pos_theta[1]})
+		.uart_txd                  (FPGA_UART_TX)
     );
 endmodule
 

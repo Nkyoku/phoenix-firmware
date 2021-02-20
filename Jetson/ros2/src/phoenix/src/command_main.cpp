@@ -37,7 +37,7 @@ public:
     /**
      * コンストラクタ
      */
-    CommandServerNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) : Node("command_server") {
+    CommandServerNode(const rclcpp::NodeOptions &options = rclcpp::NodeOptions()) : Node("phoenix_command") {
         using namespace std::placeholders;
         (void)options;
 
@@ -112,13 +112,13 @@ private:
 
         // パラメータをコピーする
         _SharedMemory.Parameters.FrameNumber++;
-        for (int index = 0; index < 4; index++) {
-            _SharedMemory.Parameters.wheel_speed[index] = request->wheel_speed[index];
-        }
+        _SharedMemory.Parameters.speed_x = request->speed_x;
+        _SharedMemory.Parameters.speed_y = request->speed_y;
+        _SharedMemory.Parameters.speed_omega = request->speed_omega;
         _SharedMemory.Parameters.dribble_power = request->dribble_power;
         _SharedMemory.Parameters.speed_gain_p = std::fmaxf(0.0f, static_cast<float>(get_parameter(PARAM_SPEED_KP).as_double()));
         _SharedMemory.Parameters.speed_gain_i = std::fmaxf(0.0f, static_cast<float>(get_parameter(PARAM_SPEED_KI).as_double()));
-
+        
         // チェックサムを計算して格納する
         uint32_t checksum = _SharedMemory.Parameters.CalculateChecksum();
         _SharedMemory.HeadChecksum = checksum;

@@ -113,8 +113,28 @@ public:
     }
 
 	static bool IsFault(void) {
-	    return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->FAULT) != 0;
+	    return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->FAULT) & 0x1;
 	}
+
+	static void SetBrakeEnabled(int number) {
+        __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x1 << (2 * number));
+    }
+
+    static void ClearBrakeEnabled(int number) {
+        __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x2 << (2 * number));
+    }
+
+    static bool IsBrakeEnabled(int number) {
+        return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->FAULT) & (0x1 << (2 * number));
+    }
+
+    static void SetAllBrakeEnabled(void){
+        __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x154);
+    }
+
+    static void ClearAllBrakeEnabled(void){
+        __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x2A8);
+    }
 
 	static int GetPositionStatus(void) {
 		return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->POSITION);

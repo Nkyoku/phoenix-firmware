@@ -100,6 +100,7 @@ set_interface_property fault CMSIS_SVD_VARIABLES ""
 set_interface_property fault SVD_ADDRESS_GROUP ""
 
 add_interface_port fault fault fault Output 1
+add_interface_port fault brake brake Output 4
 
 
 # 

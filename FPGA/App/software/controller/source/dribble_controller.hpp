@@ -27,12 +27,16 @@ public:
     /**
      * 指令値を更新する
      * @param new_parameters 共有メモリーのParametersが更新されたときにtrueを指定する
+     * @param brake_enabled ショートブレーキを使用するときに指定する
      */
-    static void Update(bool new_parameters);
+    static void Update(bool new_parameters, bool brake_enabled);
 
 private:
-    /// POWERレジスタの値の変化量の制限
-    static constexpr int SLEWRATE_LIMIT = 54;
+    /// 加速時の電圧ランプレート制限 [V/s]
+    static constexpr float ACCELERATION_RAMP_RATE_LIMIT = 500.0f;
+
+    /// 減速時の電圧ランプレート制限 [V/s]
+    static constexpr float DECELERATION_RAMP_RATE_LIMIT = 100.0f;
 
     /// 電流制限値[mA]
     static constexpr int CURRENT_LIMIT = 716;

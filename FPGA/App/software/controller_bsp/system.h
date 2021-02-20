@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_0' in SOPC Builder design 'controller'
  * SOPC Builder design path: ../../controller.sopcinfo
  *
- * Generated: Thu Feb 11 15:54:08 JST 2021
+ * Generated: Fri Feb 19 23:28:00 JST 2021
  */
 
 /*
@@ -675,60 +675,6 @@
 
 
 /*
- * pio_3 configuration
- *
- */
-
-#define ALT_MODULE_CLASS_pio_3 altera_avalon_pio
-#define PIO_3_BASE 0xe800
-#define PIO_3_BIT_CLEARING_EDGE_REGISTER 0
-#define PIO_3_BIT_MODIFYING_OUTPUT_REGISTER 0
-#define PIO_3_CAPTURE 0
-#define PIO_3_DATA_WIDTH 32
-#define PIO_3_DO_TEST_BENCH_WIRING 0
-#define PIO_3_DRIVEN_SIM_VALUE 0
-#define PIO_3_EDGE_TYPE "NONE"
-#define PIO_3_FREQ 75000000
-#define PIO_3_HAS_IN 1
-#define PIO_3_HAS_OUT 0
-#define PIO_3_HAS_TRI 0
-#define PIO_3_IRQ -1
-#define PIO_3_IRQ_INTERRUPT_CONTROLLER_ID -1
-#define PIO_3_IRQ_TYPE "NONE"
-#define PIO_3_NAME "/dev/pio_3"
-#define PIO_3_RESET_VALUE 0
-#define PIO_3_SPAN 16
-#define PIO_3_TYPE "altera_avalon_pio"
-
-
-/*
- * pio_4 configuration
- *
- */
-
-#define ALT_MODULE_CLASS_pio_4 altera_avalon_pio
-#define PIO_4_BASE 0xe900
-#define PIO_4_BIT_CLEARING_EDGE_REGISTER 0
-#define PIO_4_BIT_MODIFYING_OUTPUT_REGISTER 0
-#define PIO_4_CAPTURE 0
-#define PIO_4_DATA_WIDTH 32
-#define PIO_4_DO_TEST_BENCH_WIRING 0
-#define PIO_4_DRIVEN_SIM_VALUE 0
-#define PIO_4_EDGE_TYPE "NONE"
-#define PIO_4_FREQ 75000000
-#define PIO_4_HAS_IN 1
-#define PIO_4_HAS_OUT 0
-#define PIO_4_HAS_TRI 0
-#define PIO_4_IRQ -1
-#define PIO_4_IRQ_INTERRUPT_CONTROLLER_ID -1
-#define PIO_4_IRQ_TYPE "NONE"
-#define PIO_4_NAME "/dev/pio_4"
-#define PIO_4_RESET_VALUE 0
-#define PIO_4_SPAN 16
-#define PIO_4_TYPE "altera_avalon_pio"
-
-
-/*
  * spim_0 configuration
  *
  */
@@ -771,7 +717,7 @@
 #define SYSID_QSYS_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_0_NAME "/dev/sysid_qsys_0"
 #define SYSID_QSYS_0_SPAN 8
-#define SYSID_QSYS_0_TIMESTAMP 1613025884
+#define SYSID_QSYS_0_TIMESTAMP 1613744796
 #define SYSID_QSYS_0_TYPE "altera_avalon_sysid_qsys"
 
 

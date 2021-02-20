@@ -2,6 +2,13 @@
 
 #include <stdint.h>
 
+/// ADC2で測定したデータ
+struct Adc2Data_t {
+    float Dc48vVoltage;
+    float DribbleVoltage;
+    float DribbleCurrent;
+};
+
 /// 機体の動きに関するデータ
 struct MotionData_t {
     struct Imu_t {
@@ -10,17 +17,17 @@ struct MotionData_t {
     } Imu;
     struct Wheel_t {
         float Velocity;
-        float CurrentMeasD;
-        float CurrentMeasQ;
-        float CurrentRefQ;
+        float CurrentD;
+        float CurrentQ;
     } Wheels[4];
 };
 
-/// ADC2で測定したデータ
-struct Adc2Data_t {
-    float Dc48vVoltage;
-    float DribbleVoltage;
-    float DribbleCurrent;
+/// 制御に関するデータ
+struct ControlData_t {
+    struct Wheel_t {
+        float VelocityRef;
+        float CurrentRef;
+    } Wheels[4];
 };
 
 /**
@@ -40,6 +47,14 @@ public:
     static void FetchAdc2Result(void);
 
     /**
+     * Adc2Dataを取得する
+     * @return Adc2Dataへの参照
+     */
+    static const Adc2Data_t& GetAdc2Data(void){
+        return _Adc2Data;
+    }
+
+    /**
      * MotionDataを取得する
      * @return　MotionDataへの参照
      */
@@ -48,17 +63,20 @@ public:
     }
 
     /**
-     * Adc2Dataを取得する
-     * @return Adc2Dataへの参照
+     * ControlDataを取得する
+     * @return　ControlDataへの参照
      */
-    static const Adc2Data_t& GetAdc2Data(void){
-        return _Adc2Data;
+    static const ControlData_t& GetControlData(void){
+        return _ControlData;
     }
 
 private:
+    /// ADC2で測定したデータ
+    static Adc2Data_t _Adc2Data;
+
     /// 機体の動きに関するデータ
     static MotionData_t _MotionData;
 
-    /// ADC2で測定したデータ
-    static Adc2Data_t _Adc2Data;
+    /// 制御に関するデータ
+    static ControlData_t _ControlData;
 };

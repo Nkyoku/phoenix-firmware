@@ -16,14 +16,13 @@ module controller (
 	imu_spi_cs_n,
 	imu_spi_int_n,
 	mc5_fault_fault,
+	mc5_fault_brake,
 	mc5_pwm_data,
 	mc5_pwm_valid,
 	mc5_pwm_ready,
 	mc5_status_driver_otw_n,
 	mc5_status_driver_fault_n,
 	mc5_status_hall_fault_n,
-	pio3_export,
-	pio4_export,
 	pio_0_export,
 	pio_1_export,
 	pio_2_export,
@@ -76,14 +75,13 @@ module controller (
 	output		imu_spi_cs_n;
 	input		imu_spi_int_n;
 	output		mc5_fault_fault;
+	output		mc5_fault_brake;
 	output	[15:0]	mc5_pwm_data;
 	output		mc5_pwm_valid;
 	input		mc5_pwm_ready;
 	input		mc5_status_driver_otw_n;
 	input		mc5_status_driver_fault_n;
 	input		mc5_status_hall_fault_n;
-	input	[31:0]	pio3_export;
-	input	[31:0]	pio4_export;
 	input		pio_0_export;
 	input	[31:0]	pio_1_export;
 	output	[9:0]	pio_2_export;

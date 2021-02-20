@@ -16,14 +16,13 @@
 			imu_spi_cs_n                                             : out   std_logic;                                        -- cs_n
 			imu_spi_int_n                                            : in    std_logic                     := 'X';             -- int_n
 			mc5_fault_fault                                          : out   std_logic;                                        -- fault
+			mc5_fault_brake                                          : out   std_logic;                                        -- brake
 			mc5_pwm_data                                             : out   std_logic_vector(15 downto 0);                    -- data
 			mc5_pwm_valid                                            : out   std_logic;                                        -- valid
 			mc5_pwm_ready                                            : in    std_logic                     := 'X';             -- ready
 			mc5_status_driver_otw_n                                  : in    std_logic                     := 'X';             -- driver_otw_n
 			mc5_status_driver_fault_n                                : in    std_logic                     := 'X';             -- driver_fault_n
 			mc5_status_hall_fault_n                                  : in    std_logic                     := 'X';             -- hall_fault_n
-			pio3_export                                              : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
-			pio4_export                                              : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			pio_0_export                                             : in    std_logic                     := 'X';             -- export
 			pio_1_export                                             : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			pio_2_export                                             : out   std_logic_vector(9 downto 0);                     -- export
@@ -80,14 +79,13 @@
 			imu_spi_cs_n                                             => CONNECTED_TO_imu_spi_cs_n,                                             --             .cs_n
 			imu_spi_int_n                                            => CONNECTED_TO_imu_spi_int_n,                                            --             .int_n
 			mc5_fault_fault                                          => CONNECTED_TO_mc5_fault_fault,                                          --    mc5_fault.fault
+			mc5_fault_brake                                          => CONNECTED_TO_mc5_fault_brake,                                          --             .brake
 			mc5_pwm_data                                             => CONNECTED_TO_mc5_pwm_data,                                             --      mc5_pwm.data
 			mc5_pwm_valid                                            => CONNECTED_TO_mc5_pwm_valid,                                            --             .valid
 			mc5_pwm_ready                                            => CONNECTED_TO_mc5_pwm_ready,                                            --             .ready
 			mc5_status_driver_otw_n                                  => CONNECTED_TO_mc5_status_driver_otw_n,                                  --   mc5_status.driver_otw_n
 			mc5_status_driver_fault_n                                => CONNECTED_TO_mc5_status_driver_fault_n,                                --             .driver_fault_n
 			mc5_status_hall_fault_n                                  => CONNECTED_TO_mc5_status_hall_fault_n,                                  --             .hall_fault_n
-			pio3_export                                              => CONNECTED_TO_pio3_export,                                              --         pio3.export
-			pio4_export                                              => CONNECTED_TO_pio4_export,                                              --         pio4.export
 			pio_0_export                                             => CONNECTED_TO_pio_0_export,                                             --        pio_0.export
 			pio_1_export                                             => CONNECTED_TO_pio_1_export,                                             --        pio_1.export
 			pio_2_export                                             => CONNECTED_TO_pio_2_export,                                             --        pio_2.export

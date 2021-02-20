@@ -11,6 +11,7 @@ module vector_controller #(
         input  wire                       clk,
         input  wire                       reset,
         input  wire                       fault, // フォルト発生時に内部状態をリセットする
+        input  wire                       brake, // ショートブレーキをかける
         input  wire                       pulse_1khz, // エンコーダ回転速度のラッチタイミングパルス
         input  wire                       pulse_8khz, // 電流制御のタイミングパルス
         input  wire [2:0]                 sensor_hall_uvw, // {u, v, w}
@@ -164,6 +165,7 @@ module vector_controller #(
         .clk(clk),
         .reset(reset | fault),
         .trigger(pulse_8khz),
+        .brake(brake),
         .param_kp(param_kp),
         .param_ki(param_ki),
         .in_ref_data(current_reference_data),

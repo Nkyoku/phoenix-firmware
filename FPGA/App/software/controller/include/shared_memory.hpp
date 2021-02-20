@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#pragma pack(push, 4)
+
 /**
  * 共有メモリーの構造を定義する構造体 (最大1024バイト)
  */
@@ -34,9 +36,19 @@ struct SharedMemory_t {
         uint32_t FrameNumber;
 
         /**
-         * 車輪の速度[m/s]
+         * 車体左右の並進移動速度指令[m/s]
          */
-        float wheel_speed[4];
+        float speed_x;
+
+        /**
+         * 車体前後の並進移動速度指令[m/s]
+         */
+        float speed_y;
+
+        /**
+         * 回転速度指令[rad/s]
+         */
+        float speed_omega;
 
         /**
          * ドリブルパワー (-1.0 ～ 1.0)
@@ -75,3 +87,5 @@ struct SharedMemory_t {
      */
     uint32_t TailChecksum;
 };
+
+#pragma pack(pop)

@@ -44,10 +44,6 @@ Progress: Adding pio_1 [altera_avalon_pio 20.1]
 Progress: Parameterizing module pio_1
 Progress: Adding pio_2 [altera_avalon_pio 20.1]
 Progress: Parameterizing module pio_2
-Progress: Adding pio_3 [altera_avalon_pio 20.1]
-Progress: Parameterizing module pio_3
-Progress: Adding pio_4 [altera_avalon_pio 20.1]
-Progress: Parameterizing module pio_4
 Progress: Adding spi_slave_to_avalon_mm_master_bridge_0 [spi_slave_to_avalon_mm_master_bridge 20.1]
 Progress: Parameterizing module spi_slave_to_avalon_mm_master_bridge_0
 Progress: Adding spim_0 [altera_avalon_spi 20.1]
@@ -67,8 +63,6 @@ Progress: Parameterizing connections
 Progress: Validating
 Progress: Done reading input file
 Info: controller.jtag_uart_0: JTAG UART IP input clock need to be at least double (2x) the operating frequency of JTAG TCK on board
-Info: controller.pio_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: controller.pio_4: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: controller.sysid_qsys_0: System ID is not assigned automatically. Edit the System ID parameter to provide a unique ID
 Info: controller.sysid_qsys_0: Time stamp will be automatically updated when this component is generated.
 Info: controller: Generating controller "controller" for QUARTUS_SYNTH
@@ -80,11 +74,11 @@ Warning: controller: "No matching role found for nios_0_custom_instruction_maste
 Warning: controller: "No matching role found for nios_0_custom_instruction_master_multi_xconnect:ci_slave:ci_slave_estatus (estatus)"
 Info: avalon_st_uart_tx_0: "controller" instantiated avalon_st_uart_tx "avalon_st_uart_tx_0"
 Info: data_ram_0: Starting RTL generation for module 'controller_data_ram_0'
-Info: data_ram_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_data_ram_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0007_data_ram_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0007_data_ram_0_gen//controller_data_ram_0_component_configuration.pl  --do_build_sim=0  ]
+Info: data_ram_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_data_ram_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0005_data_ram_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0005_data_ram_0_gen//controller_data_ram_0_component_configuration.pl  --do_build_sim=0  ]
 Info: data_ram_0: Done RTL generation for module 'controller_data_ram_0'
 Info: data_ram_0: "controller" instantiated altera_avalon_onchip_memory2 "data_ram_0"
 Info: data_ram_1: Starting RTL generation for module 'controller_data_ram_1'
-Info: data_ram_1:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_data_ram_1 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0008_data_ram_1_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0008_data_ram_1_gen//controller_data_ram_1_component_configuration.pl  --do_build_sim=0  ]
+Info: data_ram_1:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_data_ram_1 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0006_data_ram_1_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0006_data_ram_1_gen//controller_data_ram_1_component_configuration.pl  --do_build_sim=0  ]
 Info: data_ram_1: Done RTL generation for module 'controller_data_ram_1'
 Info: data_ram_1: "controller" instantiated altera_avalon_onchip_memory2 "data_ram_1"
 Info: dc_fifo_0: "controller" instantiated altera_avalon_dc_fifo "dc_fifo_0"
@@ -93,11 +87,11 @@ Info: fpu_0: "controller" instantiated altera_nios_custom_instr_floating_point_2
 Info: i2c_master_0: "controller" instantiated i2c_master "i2c_master_0"
 Info: imu_spim: "controller" instantiated imu_spim "imu_spim"
 Info: instruction_rom_0: Starting RTL generation for module 'controller_instruction_rom_0'
-Info: instruction_rom_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_instruction_rom_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0013_instruction_rom_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0013_instruction_rom_0_gen//controller_instruction_rom_0_component_configuration.pl  --do_build_sim=0  ]
+Info: instruction_rom_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=controller_instruction_rom_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0011_instruction_rom_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0011_instruction_rom_0_gen//controller_instruction_rom_0_component_configuration.pl  --do_build_sim=0  ]
 Info: instruction_rom_0: Done RTL generation for module 'controller_instruction_rom_0'
 Info: instruction_rom_0: "controller" instantiated altera_avalon_onchip_memory2 "instruction_rom_0"
 Info: jtag_uart_0: Starting RTL generation for module 'controller_jtag_uart_0'
-Info: jtag_uart_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_jtag_uart -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_jtag_uart/generate_rtl.pl --name=controller_jtag_uart_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0014_jtag_uart_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0014_jtag_uart_0_gen//controller_jtag_uart_0_component_configuration.pl  --do_build_sim=0  ]
+Info: jtag_uart_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_jtag_uart -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_jtag_uart/generate_rtl.pl --name=controller_jtag_uart_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0012_jtag_uart_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0012_jtag_uart_0_gen//controller_jtag_uart_0_component_configuration.pl  --do_build_sim=0  ]
 Info: jtag_uart_0: Done RTL generation for module 'controller_jtag_uart_0'
 Info: jtag_uart_0: "controller" instantiated altera_avalon_jtag_uart "jtag_uart_0"
 Info: mm_bridge_0: "controller" instantiated altera_avalon_mm_bridge "mm_bridge_0"
@@ -105,35 +99,31 @@ Info: motor_controller_5: "controller" instantiated motor_controller "motor_cont
 Info: msgdma_0: "controller" instantiated altera_msgdma "msgdma_0"
 Info: nios_0: "controller" instantiated altera_nios2_gen2 "nios_0"
 Info: performance_counter_0: Starting RTL generation for module 'controller_performance_counter_0'
-Info: performance_counter_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_performance_counter -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_performance_counter/generate_rtl.pl --name=controller_performance_counter_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0017_performance_counter_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0017_performance_counter_0_gen//controller_performance_counter_0_component_configuration.pl  --do_build_sim=0  ]
+Info: performance_counter_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_performance_counter -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_performance_counter/generate_rtl.pl --name=controller_performance_counter_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0015_performance_counter_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0015_performance_counter_0_gen//controller_performance_counter_0_component_configuration.pl  --do_build_sim=0  ]
 Info: performance_counter_0: Done RTL generation for module 'controller_performance_counter_0'
 Info: performance_counter_0: "controller" instantiated altera_avalon_performance_counter "performance_counter_0"
 Info: pio_0: Starting RTL generation for module 'controller_pio_0'
-Info: pio_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0018_pio_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0018_pio_0_gen//controller_pio_0_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0016_pio_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0016_pio_0_gen//controller_pio_0_component_configuration.pl  --do_build_sim=0  ]
 Info: pio_0: Done RTL generation for module 'controller_pio_0'
 Info: pio_0: "controller" instantiated altera_avalon_pio "pio_0"
 Info: pio_1: Starting RTL generation for module 'controller_pio_1'
-Info: pio_1:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_1 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0019_pio_1_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0019_pio_1_gen//controller_pio_1_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_1:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_1 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0017_pio_1_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0017_pio_1_gen//controller_pio_1_component_configuration.pl  --do_build_sim=0  ]
 Info: pio_1: Done RTL generation for module 'controller_pio_1'
 Info: pio_1: "controller" instantiated altera_avalon_pio "pio_1"
 Info: pio_2: Starting RTL generation for module 'controller_pio_2'
-Info: pio_2:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_2 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0020_pio_2_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0020_pio_2_gen//controller_pio_2_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_2:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_2 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0018_pio_2_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0018_pio_2_gen//controller_pio_2_component_configuration.pl  --do_build_sim=0  ]
 Info: pio_2: Done RTL generation for module 'controller_pio_2'
 Info: pio_2: "controller" instantiated altera_avalon_pio "pio_2"
-Info: pio_3: Starting RTL generation for module 'controller_pio_3'
-Info: pio_3:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=controller_pio_3 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0021_pio_3_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0021_pio_3_gen//controller_pio_3_component_configuration.pl  --do_build_sim=0  ]
-Info: pio_3: Done RTL generation for module 'controller_pio_3'
-Info: pio_3: "controller" instantiated altera_avalon_pio "pio_3"
 Info: spi_slave_to_avalon_mm_master_bridge_0: "controller" instantiated spi_slave_to_avalon_mm_master_bridge "spi_slave_to_avalon_mm_master_bridge_0"
 Info: spim_0: Starting RTL generation for module 'controller_spim_0'
-Info: spim_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_spi -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_spi/generate_rtl.pl --name=controller_spim_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0023_spim_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0023_spim_0_gen//controller_spim_0_component_configuration.pl  --do_build_sim=0  ]
+Info: spim_0:   Generation command is [exec C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/bin/perl.exe -I C:/opt/intelfpga_lite/20.1/quartus/bin64/perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_spi -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_spi/generate_rtl.pl --name=controller_spim_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0020_spim_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0020_spim_0_gen//controller_spim_0_component_configuration.pl  --do_build_sim=0  ]
 Info: spim_0: Done RTL generation for module 'controller_spim_0'
 Info: spim_0: "controller" instantiated altera_avalon_spi "spim_0"
 Info: st_packets_to_bytes_0: "controller" instantiated altera_avalon_st_packets_to_bytes "st_packets_to_bytes_0"
 Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_avalon_st_packets_to_bytes.v
 Info: sysid_qsys_0: "controller" instantiated altera_avalon_sysid_qsys "sysid_qsys_0"
 Info: timer_0: Starting RTL generation for module 'controller_timer_0'
-Info: timer_0:   Generation command is [exec C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/bin/perl.exe -I C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_timer -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_timer/generate_rtl.pl --name=controller_timer_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0026_timer_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0026_timer_0_gen//controller_timer_0_component_configuration.pl  --do_build_sim=0  ]
+Info: timer_0:   Generation command is [exec C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/bin/perl.exe -I C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_timer -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_timer/generate_rtl.pl --name=controller_timer_0 --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0023_timer_0_gen/ --quartus_dir=C:/opt/intelfpga_lite/20.1/quartus --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0023_timer_0_gen//controller_timer_0_component_configuration.pl  --do_build_sim=0  ]
 Info: timer_0: Done RTL generation for module 'controller_timer_0'
 Info: timer_0: "controller" instantiated altera_avalon_timer "timer_0"
 Info: vector_controller_master_0: "controller" instantiated vector_controller_master "vector_controller_master_0"
@@ -166,8 +156,6 @@ Info: avalon_st_adapter_004: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_005: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_006: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_007: Inserting error_adapter: error_adapter_0
-Info: avalon_st_adapter_008: Inserting error_adapter: error_adapter_0
-Info: avalon_st_adapter_009: Inserting error_adapter: error_adapter_0
 Info: mm_interconnect_3: "controller" instantiated altera_mm_interconnect "mm_interconnect_3"
 Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
@@ -179,21 +167,21 @@ Info: fpci_multi: "fpu_0" instantiated altera_nios_custom_instr_floating_point_2
 Info: dispatcher_internal: "msgdma_0" instantiated modular_sgdma_dispatcher "dispatcher_internal"
 Info: read_mstr_internal: "msgdma_0" instantiated dma_read_master "read_mstr_internal"
 Info: cpu: Starting RTL generation for module 'controller_nios_0_cpu'
-Info: cpu:   Generation command is [exec C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/bin/perl.exe -I C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/cpu_lib -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/nios_lib -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/generate_rtl.pl --name=controller_nios_0_cpu --dir=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0038_cpu_gen/ --quartus_bindir=C:/opt/intelFPGA_lite/20.1/quartus/bin64/ --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8669_9024437076449384472.dir/0038_cpu_gen//controller_nios_0_cpu_processor_configuration.pl  --do_build_sim=0  ]
-Info: cpu: # 2021.02.11 15:45:13 (*) Starting Nios II generation
-Info: cpu: # 2021.02.11 15:45:13 (*)   Elaborating CPU configuration settings
-Info: cpu: # 2021.02.11 15:45:13 (*)   Creating all objects for CPU
-Info: cpu: # 2021.02.11 15:45:13 (*)     Testbench
-Info: cpu: # 2021.02.11 15:45:13 (*)     Instruction decoding
-Info: cpu: # 2021.02.11 15:45:13 (*)       Instruction fields
-Info: cpu: # 2021.02.11 15:45:13 (*)       Instruction decodes
-Info: cpu: # 2021.02.11 15:45:13 (*)       Signals for RTL simulation waveforms
-Info: cpu: # 2021.02.11 15:45:13 (*)       Instruction controls
-Info: cpu: # 2021.02.11 15:45:13 (*)     Pipeline frontend
-Info: cpu: # 2021.02.11 15:45:13 (*)     Pipeline backend
-Info: cpu: # 2021.02.11 15:45:14 (*)   Generating RTL from CPU objects
-Info: cpu: # 2021.02.11 15:45:14 (*)   Creating plain-text RTL
-Info: cpu: # 2021.02.11 15:45:14 (*) Done Nios II generation
+Info: cpu:   Generation command is [exec C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/bin/perl.exe -I C:/opt/intelFPGA_lite/20.1/quartus/bin64//perl/lib -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin/europa -I C:/opt/intelfpga_lite/20.1/quartus/sopc_builder/bin -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/cpu_lib -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/nios_lib -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -I C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2 -- C:/opt/intelfpga_lite/20.1/quartus/../ip/altera/nios2_ip/altera_nios2_gen2/generate_rtl.pl --name=controller_nios_0_cpu --dir=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0035_cpu_gen/ --quartus_bindir=C:/opt/intelFPGA_lite/20.1/quartus/bin64/ --verilog --config=C:/Users/fujii/AppData/Local/Temp/alt8677_7101271770899003306.dir/0035_cpu_gen//controller_nios_0_cpu_processor_configuration.pl  --do_build_sim=0  ]
+Info: cpu: # 2021.02.19 23:27:07 (*) Starting Nios II generation
+Info: cpu: # 2021.02.19 23:27:08 (*)   Elaborating CPU configuration settings
+Info: cpu: # 2021.02.19 23:27:08 (*)   Creating all objects for CPU
+Info: cpu: # 2021.02.19 23:27:08 (*)     Testbench
+Info: cpu: # 2021.02.19 23:27:08 (*)     Instruction decoding
+Info: cpu: # 2021.02.19 23:27:08 (*)       Instruction fields
+Info: cpu: # 2021.02.19 23:27:08 (*)       Instruction decodes
+Info: cpu: # 2021.02.19 23:27:08 (*)       Signals for RTL simulation waveforms
+Info: cpu: # 2021.02.19 23:27:08 (*)       Instruction controls
+Info: cpu: # 2021.02.19 23:27:08 (*)     Pipeline frontend
+Info: cpu: # 2021.02.19 23:27:08 (*)     Pipeline backend
+Info: cpu: # 2021.02.19 23:27:09 (*)   Generating RTL from CPU objects
+Info: cpu: # 2021.02.19 23:27:09 (*)   Creating plain-text RTL
+Info: cpu: # 2021.02.19 23:27:09 (*) Done Nios II generation
 Info: cpu: Done RTL generation for module 'controller_nios_0_cpu'
 Info: cpu: "nios_0" instantiated altera_nios2_gen2_unit "cpu"
 Info: vic_csr: "vic_0" instantiated altera_vic_csr "vic_csr"
@@ -235,7 +223,7 @@ Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesi
 Info: avalon_st_adapter_005: "mm_interconnect_2" instantiated altera_avalon_st_adapter "avalon_st_adapter_005"
 Info: router: "mm_interconnect_3" instantiated altera_merlin_router "router"
 Info: router_001: "mm_interconnect_3" instantiated altera_merlin_router "router_001"
-Info: router_006: "mm_interconnect_3" instantiated altera_merlin_router "router_006"
+Info: router_004: "mm_interconnect_3" instantiated altera_merlin_router "router_004"
 Info: motor_controller_5_slave_burst_adapter: "mm_interconnect_3" instantiated altera_merlin_burst_adapter "motor_controller_5_slave_burst_adapter"
 Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_address_alignment.sv
 Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_avalon_st_pipeline_base.v
@@ -245,7 +233,7 @@ Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesi
 Info: rsp_demux: "mm_interconnect_3" instantiated altera_merlin_demultiplexer "rsp_demux"
 Info: rsp_mux: "mm_interconnect_3" instantiated altera_merlin_multiplexer "rsp_mux"
 Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
-Info: avalon_st_adapter_005: "mm_interconnect_3" instantiated altera_avalon_st_adapter "avalon_st_adapter_005"
+Info: avalon_st_adapter_003: "mm_interconnect_3" instantiated altera_avalon_st_adapter "avalon_st_adapter_003"
 Info: router: "mm_interconnect_4" instantiated altera_merlin_router "router"
 Info: router_001: "mm_interconnect_4" instantiated altera_merlin_router "router_001"
 Info: cmd_demux: "mm_interconnect_4" instantiated altera_merlin_demultiplexer "cmd_demux"
@@ -256,7 +244,7 @@ Info: rsp_mux: "mm_interconnect_4" instantiated altera_merlin_multiplexer "rsp_m
 Info: Reusing file C:/work/Robocup/phoenix-firmware/FPGA/App/controller/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: error_adapter_0: "avalon_st_adapter" instantiated error_adapter "error_adapter_0"
 Info: error_adapter_0: "avalon_st_adapter_005" instantiated error_adapter "error_adapter_0"
-Info: error_adapter_0: "avalon_st_adapter_005" instantiated error_adapter "error_adapter_0"
-Info: controller: Done "controller" with 91 modules, 159 files
+Info: error_adapter_0: "avalon_st_adapter_003" instantiated error_adapter "error_adapter_0"
+Info: controller: Done "controller" with 90 modules, 158 files
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis

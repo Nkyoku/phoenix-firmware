@@ -62,7 +62,7 @@ void CentralizedMonitor::Adc2Callback(void) {
     DataHolder::FetchAdc2Result();
     auto &adc2_data = DataHolder::GetAdc2Data();
     if (adc2_data.Dc48vVoltage < DC48V_UNDER_VOLTAGE_THRESHOLD) {
-        SetErrorFlags(ErrorCauseDc48vUnderVoltage);
+        //SetErrorFlags(ErrorCauseDc48vUnderVoltage);
     }
     else if (DC48V_OVER_VOLTAGE_THRESHOLD < adc2_data.Dc48vVoltage) {
         SetErrorFlags(ErrorCauseDc48vOverVoltage);
@@ -175,9 +175,10 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
     PERF_START_MEASURING(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
     PERF_BEGIN(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
 
-    // IMU、モータードライバ等のデータを読み、Jetsonへ送信する
+    // IMU、モータードライバ、制御データなどを読みJetsonへ送信する
     DataHolder::FetchRegistersOnPreControlLoop();
-    StreamTransmitter::TransmitMotion(DataHolder::GetMotionData(), performance_counter);
+    StreamTransmitter::TransmitMotion(DataHolder::GetMotionData());
+    StreamTransmitter::TransmitControl(DataHolder::GetControlData(), performance_counter);
 
     // ADC2のタイムアウトカウンタを減算しすでに0だったらフォルトを発生する
     int adc2_timeout = _Adc2Timeout;
@@ -193,10 +194,10 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
         bool new_parameters = SharedMemory::UpdateParameters();
 
         // 車輪モーターの指令値を更新する
-        WheelController::Update(new_parameters);
+        WheelController::Update(new_parameters, false);
 
         // ドリブルモーターの指令値を更新する
-        DribbleController::Update(new_parameters);
+        DribbleController::Update(new_parameters, false);
 
 #if DEBUG_PRINTF
         if (new_parameters) {
