@@ -37,6 +37,14 @@ public:
         return _SpeedReference;
     }
 
+    /**
+     * 回生エネルギーを取得する
+     * @return 回生エネルギーの配列へのポインタ (インデックスは0~3のみ有効)
+     */
+    static const float* GetWheelRenegerationEnergy(void) {
+        return _CurrentLimit;
+    }
+
 private:
     /// 速度制御の指令値
     static float _SpeedReference[4];
@@ -46,6 +54,10 @@ private:
 
     /// 電流制御の指令値
     static float _CurrentReference[4];
+
+    /// モーターの発生させた回生エネルギー (負の値をとる)
+    static float _RegenerationEnergy[4];
+    static float _CurrentLimit[4];
 
     /// 電流制御の比例ゲイン
     static constexpr int CURRENT_CONTROL_GAIN_P = 3500;
@@ -66,11 +78,23 @@ private:
     static constexpr float MAX_SPEED_REFERENCE = 20.0f;
 
     /// 電流指令値の最大値[A]
-    static constexpr float CURRENT_LIMIT = 1.0f;
+    static constexpr float CURRENT_LIMIT_PER_MOTOR = 3.75f;
 
-    /// ブレーキを有効化する速度差の閾値[m/s]
-    static constexpr float BRAKE_ENABLE_THRESHOLD = 0.5f;
+    /// 全てのモーターの電流指令値の絶対合計の最大値[A]
+    static constexpr float TOTAL_CURRENT_LIMIT = 8.0f;
 
-    /// ブレーキを無効化する速度差の閾値[m/s]
-    static constexpr float BRAKE_DISABLE_THRESHOLD = 0.25f;
+    /// モーターの逆起電力定数(相間) [V/rps]
+    static constexpr float MOTOR_SPEED_CONSTANT = 1.0f / 72.7f * 60.0f;
+
+    /// モーターの巻線抵抗(相間) [Ω]
+    static constexpr float MOTOR_RESISTANCE = 6.89f;
+
+    /// モータードライバのベース消費電力 [W]
+    static constexpr float BASE_POWER_CONSUMPTION_PER_MOTOR = 0.25f;
+
+    /// ブレーキを有効にする回生エネルギーの閾値
+    static constexpr float BRAKE_ENABLE_THRESHOLD = -0.025f;
+
+    /// ブレーキを無効にする回生エネルギーの閾値
+    static constexpr float BRAKE_DISABLE_THRESHOLD = -0.0125f;
 };

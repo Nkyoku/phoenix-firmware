@@ -35,6 +35,10 @@ void DataHolder::FetchRegistersOnPreControlLoop(void){
     _ControlData.Wheels[1].CurrentRef = VectorController::GetCurrentReferenceQ(2) * ADC1_CURRENT_SCALE;
     _ControlData.Wheels[2].CurrentRef = VectorController::GetCurrentReferenceQ(3) * ADC1_CURRENT_SCALE;
     _ControlData.Wheels[3].CurrentRef = VectorController::GetCurrentReferenceQ(4) * ADC1_CURRENT_SCALE;
+    _ControlData.Wheels[0].Energy = WheelController::GetWheelRenegerationEnergy()[0];
+    _ControlData.Wheels[1].Energy = WheelController::GetWheelRenegerationEnergy()[1];
+    _ControlData.Wheels[2].Energy = WheelController::GetWheelRenegerationEnergy()[2];
+    _ControlData.Wheels[3].Energy = WheelController::GetWheelRenegerationEnergy()[3];
 }
 
 void DataHolder::FetchAdc2Result(void){

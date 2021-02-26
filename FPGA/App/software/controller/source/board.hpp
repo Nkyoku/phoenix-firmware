@@ -24,11 +24,11 @@ static constexpr float WHEEL_CIRCUMFERENCE = 0.157f;
 /// 車輪が一回転したときのエンコーダのパルス数
 static constexpr float ENCODER_PPR = 4096;
 
+/// 機体の質量 [kg]
+static constexpr float MACHINE_WEIGHT = 2.0f;
 
-
-
-
-
+/// 重心の高さ [m]
+static constexpr float CENTER_OF_GRAVITY_HEIGHT = 0.1f;
 
 /**
  * 単精度浮動小数点数を半精度浮動小数点数に変換する

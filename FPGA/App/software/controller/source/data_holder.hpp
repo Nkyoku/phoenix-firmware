@@ -12,8 +12,18 @@ struct Adc2Data_t {
 /// 機体の動きに関するデータ
 struct MotionData_t {
     struct Imu_t {
-        float AccelX, AccelY, AccelZ;
-        float GyroX, GyroY, GyroZ;
+        union {
+            struct {
+                float AccelX, AccelY, AccelZ;
+            };
+            float Accel[3];
+        };
+        union {
+            struct {
+                float GyroX, GyroY, GyroZ;
+            };
+            float Gyro[3];
+        };
     } Imu;
     struct Wheel_t {
         float Velocity;
@@ -27,6 +37,7 @@ struct ControlData_t {
     struct Wheel_t {
         float VelocityRef;
         float CurrentRef;
+        float Energy;
     } Wheels[4];
 };
 
@@ -50,7 +61,7 @@ public:
      * Adc2Dataを取得する
      * @return Adc2Dataへの参照
      */
-    static const Adc2Data_t& GetAdc2Data(void){
+    static const Adc2Data_t& GetAdc2Data(void) {
         return _Adc2Data;
     }
 
@@ -58,7 +69,7 @@ public:
      * MotionDataを取得する
      * @return　MotionDataへの参照
      */
-    static const MotionData_t& GetMotionData(void){
+    static const MotionData_t& GetMotionData(void) {
         return _MotionData;
     }
 
@@ -66,7 +77,7 @@ public:
      * ControlDataを取得する
      * @return　ControlDataへの参照
      */
-    static const ControlData_t& GetControlData(void){
+    static const ControlData_t& GetControlData(void) {
         return _ControlData;
     }
 

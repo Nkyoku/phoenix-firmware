@@ -43,6 +43,7 @@ add_executable(gui
   src/main_window.cpp
   src/node_thread.cpp
   src/image_viewer.cpp
+  src/gamepad_thread.cpp
 )
 ament_target_dependencies(gui
   rclcpp

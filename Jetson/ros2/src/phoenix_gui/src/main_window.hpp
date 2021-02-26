@@ -5,6 +5,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsEllipseItem>
 #include <QtWidgets/QGraphicsLineItem>
+#include <QtCore/QFile>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/battery_state.hpp>
 #include <sensor_msgs/msg/image.hpp>
@@ -16,6 +17,7 @@
 #include <phoenix_msgs/srv/set_speed.hpp>
 #include "node_thread.hpp"
 #include "image_viewer.hpp"
+#include "gamepad_thread.hpp"
 
 class Ui_MainWindow;
 
@@ -41,6 +43,8 @@ private:
     //void closeEvent(QCloseEvent *event) override;
 
     virtual bool eventFilter(QObject *obj, QEvent *event) override;
+    
+    Q_SLOT void connectToGamepad(int index);
 
     Q_SLOT void reloadNamespaceList(void);
 
@@ -50,6 +54,10 @@ private:
 
     void generateTelemetryTreeItems(void);
 
+    Q_SLOT void startLogging(void);
+
+    Q_SLOT void stopLogging(void);
+
     Q_SLOT void quitNodeThread(void);
 
     Q_SIGNAL void updateRequest(void);
@@ -57,6 +65,8 @@ private:
     Q_SLOT void sendCommand(void);
 
     static std::shared_ptr<rclcpp::Node> createNode(void);
+
+    void quitGamepadThread(void);
 
     /// Qt Designerで作成したUI要素
     Ui_MainWindow *_Ui;
@@ -92,9 +102,18 @@ private:
             QTreeWidgetItem *wheel_velocity[4], *wheel_current_d[4], *wheel_current_q[4];
         } motion;
         struct Control_t {
-            QTreeWidgetItem *perf_counter, *wheel_velocity_ref[4], *wheel_current_ref[4];;
+            QTreeWidgetItem *perf_counter, *wheel_velocity_ref[4], *wheel_current_ref[4], *wheel_energy[4];
         } control;
     } _TreeItems;
+
+    /// ゲームパッド入力を処理するスレッド
+    GamepadThread *_GamepadThread = nullptr;
+
+    /// テレメトリのログを保存するファイル
+    std::shared_ptr<QFile> _LogFile;
+
+    /// テレメトリのログに含まれるフレーム番号
+    uint32_t _LogFrameNumber = 0;
 
     /// ROS2のネットワークを監視するためのノード
     std::shared_ptr<rclcpp::Node> _NetworkAwarenessNode;

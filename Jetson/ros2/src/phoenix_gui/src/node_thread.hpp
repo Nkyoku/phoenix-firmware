@@ -15,6 +15,11 @@ public:
     NodeThread(QObject *parent, std::shared_ptr<rclcpp::Node> node) : QThread(parent), _Node(node) {}
 
     /**
+     * デストラクタ
+     */
+    virtual ~NodeThread(){}
+
+    /**
      * rclcpp::Nodeを取得する
      * @return rclcpp::Node
      */

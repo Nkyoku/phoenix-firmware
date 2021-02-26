@@ -55,14 +55,28 @@
         <number>4</number>
        </property>
        <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Namespace :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="namespaceComboBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="reloadButton">
          <property name="text">
           <string>Reload</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="namespaceComboBox"/>
        </item>
        <item>
         <widget class="Line" name="line">
@@ -111,6 +125,33 @@
          </property>
         </spacer>
        </item>
+       <item>
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Gamepad :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="gamepadComboBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToContents</enum>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -136,7 +177,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="telemetryTab">
         <attribute name="title">
@@ -185,6 +226,27 @@
             </property>
            </column>
           </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QPushButton" name="saveLogButton">
+             <property name="text">
+              <string>Save Log...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stopLogButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Stop Log</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>

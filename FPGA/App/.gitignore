@@ -8,3 +8,6 @@
 *.log
 /software/*/obj
 /software/.metadata
+/software/controller/*.map
+/software/controller/*.objdump
+/software/controller/*.elf

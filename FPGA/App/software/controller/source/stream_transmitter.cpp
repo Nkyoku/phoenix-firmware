@@ -62,6 +62,10 @@ void StreamTransmitter::TransmitControl(const ControlData_t &control_data, int p
     __builtin_sthio(&StreamDataControl.wheel_current_ref[1], Fp32ToFp16(control_data.Wheels[1].CurrentRef));
     __builtin_sthio(&StreamDataControl.wheel_current_ref[2], Fp32ToFp16(control_data.Wheels[2].CurrentRef));
     __builtin_sthio(&StreamDataControl.wheel_current_ref[3], Fp32ToFp16(control_data.Wheels[3].CurrentRef));
+    __builtin_sthio(&StreamDataControl.wheel_energy[0], Fp32ToFp16(control_data.Wheels[0].Energy));
+    __builtin_sthio(&StreamDataControl.wheel_energy[1], Fp32ToFp16(control_data.Wheels[1].Energy));
+    __builtin_sthio(&StreamDataControl.wheel_energy[2], Fp32ToFp16(control_data.Wheels[2].Energy));
+    __builtin_sthio(&StreamDataControl.wheel_energy[3], Fp32ToFp16(control_data.Wheels[3].Energy));
     StreamDataDesciptorControl.TransmitAsync(_Device);
 }
 
