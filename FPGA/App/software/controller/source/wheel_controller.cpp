@@ -32,35 +32,61 @@ void WheelController::StopControl(void) {
 
 void WheelController::Update(bool new_parameters, bool brake_enabled) {
     // センサーデータを取得する
-    auto &motion_data = DataHolder::GetMotionData();
+    auto &motion = DataHolder::GetMotionData();
 
-    // 加速度センサーをフィルタリングする
-    // バタワース特性4次IIRフィルタ, カットオフ20Hz
-    float accel[3];
+    // 車輪速度をフィルタリングする
+    float wheel_velocity[4];
+    for (int index = 0; index < 4; index++) {
+        wheel_velocity[index] = _LpfWheelVelocity[index](motion.Wheels[index].Velocity);
+    }
+
+    // カルマンフィルタにより加速度センサーと車輪速度から機体速度を求める
     {
-        static float accel_z1[3][2];
-        static float accel_z2[3][2];
-        for (int axis = 0; axis < 3; axis++) {
-            // セクション1
-            static constexpr float S1 = 0.00376220298169872977f;
-            static constexpr float A21 = -1.89341560102250028f;
-            static constexpr float A31 = 0.908464412949295252f;
-            static constexpr float B21 = 2.0f;
-            float temp1 = S1 * motion_data.Imu.Accel[axis] - A21 * accel_z1[axis][0] - A31 * accel_z1[axis][1];
-            float sect1 = temp1 + B21 * accel_z1[axis][0] + accel_z1[axis][1];
-            accel_z1[axis][1] = accel_z1[axis][0];
-            accel_z1[axis][0] = temp1;
-
-            // セクション2
-            static constexpr float S2 = 0.00353349592337796892f;
-            static constexpr float A22 = -1.77831348813943535f;
-            static constexpr float A32 = 0.792447471832947059f;
-            static constexpr float B22 = 2.0f;
-            float temp2 = S2 * sect1 - A22 * accel_z2[axis][0] - A32 * accel_z2[axis][1];
-            accel[axis] = temp2 + B22 * accel_z2[axis][0] + accel_z2[axis][1];
-            accel_z2[axis][1] = accel_z2[axis][0];
-            accel_z2[axis][0] = temp2;
+        // 電流をベクトル合成してモーターが機体に与える力を計算する
+        // モーターが車輪を回す力は小さいので無視する
+        float accel_by_motor_x, accel_by_motor_y;
+        {
+            float i1 = motion.Wheels[0].CurrentQ;
+            float i2 = motion.Wheels[1].CurrentQ;
+            float i3 = motion.Wheels[2].CurrentQ;
+            float i4 = motion.Wheels[3].CurrentQ;
+            accel_by_motor_x = (i2 - i1 + i3 - i4) * MOTOR_TORQUE_CONSTANT / WHEEL_RADIUS * (WHEEL_POS_Y / sqrt(WHEEL_POS_R_2)) / MACHINE_WEIGHT;
+            accel_by_motor_y = (i1 + i2 - i3 - i4) * MOTOR_TORQUE_CONSTANT / WHEEL_RADIUS * (WHEEL_POS_X / sqrt(WHEEL_POS_R_2)) / MACHINE_WEIGHT;
         }
+
+        // スリップとスタックを検知する
+        float slip_stuck_x = fabsf(_LpfSlipStuck[0](accel_by_motor_x - motion.Imu.AccelX));
+        float slip_stuck_y = fabsf(_LpfSlipStuck[1](accel_by_motor_y - motion.Imu.AccelY));
+
+        // 車輪速度をベクトル合成して機体速度に変換する
+        float velocity_by_motor_x = (wheel_velocity[1] - wheel_velocity[0] + wheel_velocity[2] - wheel_velocity[3]) * (WHEEL_POS_Y / sqrt(WHEEL_POS_R_2)) / 4;
+        float velocity_by_motor_y = (wheel_velocity[0] + wheel_velocity[1] - wheel_velocity[2] - wheel_velocity[3]) * (WHEEL_POS_X / sqrt(WHEEL_POS_R_2)) / 4;
+
+        // 車輪速度から求めた機体速度の不確かさを求める
+        // スリップ・スタックの度合が小さく車輪速度から求めた機体速度の絶対値が小さいほど不確かさが小さい
+        static constexpr float WHEEL_VELOCITY_SIGMA_2 = 0.01f;
+        float sigma_vx = velocity_by_motor_x * velocity_by_motor_x * slip_stuck_x * WHEEL_VELOCITY_SIGMA_2;
+        float sigma_vy = velocity_by_motor_y * velocity_by_motor_y * slip_stuck_y * WHEEL_VELOCITY_SIGMA_2;
+
+        // 信念分布を更新する
+        static constexpr float ACCELEROMETER_SIGMA_2 = 0.1f;
+        float SIGMA_hat_11 = _MachineVelocitySigma[0] + ACCELEROMETER_SIGMA_2 * (1.0f / IMU_OUTPUT_RATE / IMU_OUTPUT_RATE);
+        float SIGMA_hat_22 = _MachineVelocitySigma[1] + ACCELEROMETER_SIGMA_2 * (1.0f / IMU_OUTPUT_RATE / IMU_OUTPUT_RATE);
+
+        // カルマンゲインを計算する
+        float K_11 = SIGMA_hat_11 / (sigma_vx + SIGMA_hat_11);
+        float K_22 = SIGMA_hat_22 / (sigma_vy + SIGMA_hat_22);
+
+        // 観測値を元に信念分布の分散を更新する
+        _MachineVelocitySigma[0] = (1.0f - K_11) * SIGMA_hat_11;
+        _MachineVelocitySigma[1] = (1.0f - K_22) * SIGMA_hat_22;
+
+        // 観測値を元に信念分布の平均を更新する
+        float mu_hat_1 = _MachineVelocity[0] + motion.Imu.AccelX * (1.0f / IMU_OUTPUT_RATE);
+        _MachineVelocity[0] = K_11 * (velocity_by_motor_x - mu_hat_1) + mu_hat_1;
+        float mu_hat_2 = _MachineVelocity[1] + motion.Imu.AccelY * (1.0f / IMU_OUTPUT_RATE);
+        _MachineVelocity[1] = K_22 * (velocity_by_motor_y - mu_hat_2) + mu_hat_2;
+        _MachineVelocity[2] = motion.Imu.GyroZ;
     }
 
     if (VectorController::IsFault() == false) {
@@ -70,41 +96,38 @@ void WheelController::Update(bool new_parameters, bool brake_enabled) {
         float speed_gain_i = fmaxf(0.0f, parameters.speed_gain_i);
         float speed_x_ref = parameters.speed_x;
         float speed_y_ref = parameters.speed_y;
-        float speed_r_ref = parameters.speed_omega * sqrt(WHEEL_POS_R2);
+        float speed_r_ref = parameters.speed_omega * sqrt(WHEEL_POS_R_2);
 
-        // ベクトル合成して現在の車体の速度を求める
-        /*float v1_meas = motion_data.Wheels[0].Velocity;
-         float v2_meas = motion_data.Wheels[1].Velocity;
-         float v3_meas = motion_data.Wheels[2].Velocity;
-         float v4_meas = motion_data.Wheels[3].Velocity;
-         float speed_x_meas = (-v1_meas + v2_meas + v3_meas - v4_meas) * (WHEEL_POS_Y / sqrt(WHEEL_POS_R2));
-         float speed_y_meas = (+v1_meas + v2_meas - v3_meas - v4_meas) * (WHEEL_POS_X / sqrt(WHEEL_POS_R2));
-         float speed_r_meas = (+v1_meas + v2_meas + v3_meas + v4_meas);*/
-
-        // 車輪の荷重を計算し、荷重の掛かっているモーターにより多くの電流を割り当てる
-        float current_limit[4];
+        // 車輪のスリップを検知して電流制限値を求める
         {
-            float ax = accel[0] * (MACHINE_WEIGHT * CENTER_OF_GRAVITY_HEIGHT / (WHEEL_POS_X * 4));
-            float ay = accel[1] * (MACHINE_WEIGHT * CENTER_OF_GRAVITY_HEIGHT / (WHEEL_POS_Y * 4));
-            float az = accel[2] * MACHINE_WEIGHT;
-            float weight[4];
-            weight[0] = fmaxf(0.0f, az - ax - ay);
-            weight[1] = fmaxf(0.0f, az - ax + ay);
-            weight[2] = fmaxf(0.0f, az + ax + ay);
-            weight[3] = fmaxf(0.0f, az + ax - ay);
-            float total_weight = fabsf(weight[0]) + fabsf(weight[1]) + fabsf(weight[2]) + fabsf(weight[3]);
-            float limit_coeffient = TOTAL_CURRENT_LIMIT / fmaxf(total_weight, 1e-3f);
-            static constexpr float I_LIMIT_MAX = CURRENT_LIMIT_PER_MOTOR;
-            static constexpr float I_LIMIT_MIN = TOTAL_CURRENT_LIMIT / 2 - CURRENT_LIMIT_PER_MOTOR;
-            for (int index = 0; index < 4; index++) {
-                current_limit[index] = fmaxf(I_LIMIT_MIN, fminf(weight[index] * limit_coeffient, I_LIMIT_MAX));
-                _CurrentLimit[index] = current_limit[index];
+            // 機体速度からあるべき車輪速度を求める
+            float abs_velocity_diff[4];
+            float vx = _MachineVelocity[0] * (WHEEL_POS_Y / sqrt(WHEEL_POS_R_2));
+            float vy = _MachineVelocity[1] * (WHEEL_POS_X / sqrt(WHEEL_POS_R_2));
+            float vr = _MachineVelocity[2] * sqrt(WHEEL_POS_R_2);
+            abs_velocity_diff[0] = fabsf(vy - vx + vr - wheel_velocity[0]);
+            abs_velocity_diff[1] = fabsf(vx + vy + vr - wheel_velocity[1]);
+            abs_velocity_diff[2] = fabsf(vx - vy + vr - wheel_velocity[2]);
+            abs_velocity_diff[3] = fabsf(vr - vx - vy - wheel_velocity[3]);
+
+            // あるべき車輪速度とのずれが大きい車輪はスリップしていると見なして電流制限値を減らす
+            static constexpr float CURRENT_AVERAGING = 0.01f;
+            static constexpr float GAIN_I = -0.01;
+            float sum = 0.0f;
+            for(int index = 0; index < 4; index++){
+                float current_limit = fmaxf(_CurrentLimit[index] + GAIN_I * abs_velocity_diff[index] + CURRENT_AVERAGING, MIN_CURRENT_LIMIT_PER_MOTOR);
+                _CurrentLimit[index] = current_limit;
+                sum += current_limit;
+            }
+            float limit_factor = TOTAL_CURRENT_LIMIT / sum;
+            for(int index = 0; index < 4; index++){
+                _CurrentLimit[index] =  fminf(_CurrentLimit[index] * limit_factor, MAX_CURRENT_LIMIT_PER_MOTOR);
             }
         }
 
         // ベクトル分解して各車輪の速度指令値を求める
-        float vx = speed_x_ref * (WHEEL_POS_Y / sqrt(WHEEL_POS_R2));
-        float vy = speed_y_ref * (WHEEL_POS_X / sqrt(WHEEL_POS_R2));
+        float vx = speed_x_ref * (WHEEL_POS_Y / sqrt(WHEEL_POS_R_2));
+        float vy = speed_y_ref * (WHEEL_POS_X / sqrt(WHEEL_POS_R_2));
         float vr = speed_r_ref;
         _SpeedReference[0] = -vx + vy + vr;
         _SpeedReference[1] = +vx + vy + vr;
@@ -133,7 +156,7 @@ void WheelController::Update(bool new_parameters, bool brake_enabled) {
             for (int index = 0; index < 4; index++) {
                 // 速度のPI制御を行う(微分PI)
                 float speed_ref = _SpeedReference[index];
-                float speed_meas = motion_data.Wheels[index].Velocity;
+                float speed_meas = motion.Wheels[index].Velocity;
                 float error = speed_ref - speed_meas;
                 float value_i = speed_gain_i * error;
                 float value_p = speed_gain_p * (error - _LastSpeedError[index]);
@@ -147,21 +170,14 @@ void WheelController::Update(bool new_parameters, bool brake_enabled) {
                 current_ref *= current_decay;
 
                 // 電流制限をかける
-                current_ref = fmaxf(-current_limit[index], fminf(current_ref, current_limit[index]));
+                current_ref = fmaxf(-_CurrentLimit[index], fminf(current_ref, _CurrentLimit[index]));
                 _CurrentReference[index] = current_ref;
             }
-
-            // 運動に寄与しない電流を打ち消す
-            /*float current_decay = (_CurrentReference[0] - _CurrentReference[1] + _CurrentReference[2] - _CurrentReference[3]) * 0.01f;
-             _CurrentReference[0] -= current_decay;
-             _CurrentReference[1] += current_decay;
-             _CurrentReference[2] -= current_decay;
-             _CurrentReference[3] += current_decay;*/
 
             // 回生エネルギーを計算する
             for (int index = 0; index < 4; index++) {
                 static constexpr float KV = MOTOR_SPEED_CONSTANT / WHEEL_CIRCUMFERENCE;
-                float speed_meas = motion_data.Wheels[index].Velocity;
+                float speed_meas = motion.Wheels[index].Velocity;
                 float current_ref = _CurrentReference[index];
                 float power = (KV * speed_meas + MOTOR_RESISTANCE * current_ref) * current_ref;
                 float energy = _RegenerationEnergy[index];
@@ -209,3 +225,7 @@ float WheelController::_LastSpeedError[4];
 float WheelController::_CurrentReference[4];
 float WheelController::_RegenerationEnergy[4];
 float WheelController::_CurrentLimit[4];
+float WheelController::_MachineVelocity[3];
+float WheelController::_MachineVelocitySigma[2];
+Lpf2ndOrder50 WheelController::_LpfWheelVelocity[4];
+Lpf2ndOrder200 WheelController::_LpfSlipStuck[2];

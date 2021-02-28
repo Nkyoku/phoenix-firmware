@@ -139,8 +139,8 @@ bool Imu::Initialize(void) {
     WriteRegister(ICM42688_BANK0_INTF_CONFIG1, 0x95);  // RTC_MODE <= RTC clock input is required
     WriteRegister(ICM42688_BANK0_PWR_MGMT0, 0x0F);     // GYRO_MODE <= LN Mode, ACCEL_MODE <= LN Mode
     usleep(200);
-    WriteRegister(ICM42688_BANK0_GYRO_CONFIG1, 0xF6);  // TEMP_FILT_BW <= (DLPF BW = 5Hz; DLPF Latency = 32ms)
-    //WriteRegister(ICM42688_BANK0_GYRO_ACCEL_CONFIG0, );
+    WriteRegister(ICM42688_BANK0_GYRO_CONFIG1, 0xF6);  // TEMP_FILT_BW <= (DLPF BW = 5Hz; DLPF Latency = 32ms), GYRO_UI_FILT_ORD = 1 (2nd Order)
+    WriteRegister(ICM42688_BANK0_GYRO_ACCEL_CONFIG0, 0x77); // ACCEL_UI_FILT_BW <= 7 (Fc = 21.3Hz), GYRO_UI_FILT_BW <= 7 (Fc = 21.3Hz)
     WriteRegister(ICM42688_BANK0_INT_CONFIG, 0x02);   // INT1_MODE <= Pulsed mode, INT1_DRIVE_CIRCUIT <= Push pull, INT1_POLARITY <= Active low
     WriteRegister(ICM42688_BANK0_INT_CONFIG1, 0x00);  // INT_ASYNC_RESET <= 0
     //WriteRegister(ICM42688_BANK0_INT_CONFIG0, 0x20); // UI_DRDY_INT_CLEAR <= Clear on Sensor Register Read

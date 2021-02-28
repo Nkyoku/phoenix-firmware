@@ -275,10 +275,13 @@ void MainWindow::connectToNodes(const QString &namespace_name) {
                     stream << control_msg->wheel_current_ref[1] << sep;
                     stream << control_msg->wheel_current_ref[2] << sep;
                     stream << control_msg->wheel_current_ref[3] << sep;
-                    /*stream << control_msg->wheel_energy[0] << sep;
+                    stream << control_msg->wheel_energy[0] << sep;
                     stream << control_msg->wheel_energy[1] << sep;
                     stream << control_msg->wheel_energy[2] << sep;
-                    stream << control_msg->wheel_energy[3] << sep;*/
+                    stream << control_msg->wheel_energy[3] << sep;
+                    stream << control_msg->machine_velocity[0] << sep;
+                    stream << control_msg->machine_velocity[1] << sep;
+                    stream << control_msg->machine_velocity[2] << sep;
                     stream << msg->accelerometer[0] << sep;
                     stream << msg->accelerometer[1] << sep;
                     stream << msg->accelerometer[2] << sep;
@@ -374,6 +377,9 @@ void MainWindow::updateTelemertyTreeItems(void) {
             _TreeItems.control.wheel_current_ref[index]->setText(COL, QString::number(msg->wheel_current_ref[index], 'f', 3));
             _TreeItems.control.wheel_energy[index]->setText(COL, QString::number(msg->wheel_energy[index], 'f', 4));
         }
+        for (int index = 0; index < 3; index++) {
+            _TreeItems.control.machine_velocity[index]->setText(COL, QString::number(msg->machine_velocity[index], 'f', 3));
+        }
     }
 }
 
@@ -442,6 +448,9 @@ void MainWindow::generateTelemetryTreeItems(void) {
     _TreeItems.control.wheel_energy[1] = new QTreeWidgetItem(control_top, {"Wheel 2 Energy", "", "J"});
     _TreeItems.control.wheel_energy[2] = new QTreeWidgetItem(control_top, {"Wheel 3 Energy", "", "J"});
     _TreeItems.control.wheel_energy[3] = new QTreeWidgetItem(control_top, {"Wheel 4 Energy", "", "J"});
+    _TreeItems.control.machine_velocity[0] = new QTreeWidgetItem(control_top, {"Machine Velocity X", "", "m/s"});
+    _TreeItems.control.machine_velocity[1] = new QTreeWidgetItem(control_top, {"Machine Velocity Y", "", "m/s"});
+    _TreeItems.control.machine_velocity[2] = new QTreeWidgetItem(control_top, {u8"Machine Velocity \u03C9", "", "rad/s"});
 
     // カラム幅を文字に合わせてリサイズする
     _Ui->telemetryTree->expandAll();
@@ -467,8 +476,9 @@ void MainWindow::startLogging(void) {
                 stream << ",Velocity " << index << " Ref";
             for (int index = 1; index <= 4; index++)
                 stream << ",Current " << index << " Ref";
-            //for (int index = 1; index <= 4; index++)
-            //    stream << ",Energy " << index;
+            for (int index = 1; index <= 4; index++)
+                stream << ",Energy " << index;
+            stream << ",Machine Vx,Machine Vy,Machine Omega";
             stream << ",Accel X,Accel Y,Accel Z";
             stream << ",Gyro X,Gyro Y,Gyro Z";
             stream << ",DC48V,Battery Voltage,Battery Current\n";

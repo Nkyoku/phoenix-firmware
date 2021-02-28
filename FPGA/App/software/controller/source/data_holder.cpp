@@ -39,6 +39,9 @@ void DataHolder::FetchRegistersOnPreControlLoop(void){
     _ControlData.Wheels[1].Energy = WheelController::GetWheelRenegerationEnergy()[1];
     _ControlData.Wheels[2].Energy = WheelController::GetWheelRenegerationEnergy()[2];
     _ControlData.Wheels[3].Energy = WheelController::GetWheelRenegerationEnergy()[3];
+    _ControlData.MachineVelocity[0] = WheelController::GetEstimatedMachineVelocity()[0];
+    _ControlData.MachineVelocity[1] = WheelController::GetEstimatedMachineVelocity()[1];
+    _ControlData.MachineVelocity[2] = WheelController::GetEstimatedMachineVelocity()[2];
 }
 
 void DataHolder::FetchAdc2Result(void){

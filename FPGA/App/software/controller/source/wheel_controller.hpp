@@ -1,5 +1,7 @@
 #pragma once
 
+#include "filter.hpp"
+
 /**
  * 車輪制御を行う
  */
@@ -42,7 +44,14 @@ public:
      * @return 回生エネルギーの配列へのポインタ (インデックスは0~3のみ有効)
      */
     static const float* GetWheelRenegerationEnergy(void) {
-        return _CurrentLimit;
+        return _CurrentLimit;//_RegenerationEnergy;
+    }
+
+    /**
+     * 機体速度の推定値を取得する
+     */
+    static const float* GetEstimatedMachineVelocity(void){
+        return _MachineVelocity;
     }
 
 private:
@@ -57,7 +66,12 @@ private:
 
     /// モーターの発生させた回生エネルギー (負の値をとる)
     static float _RegenerationEnergy[4];
+
     static float _CurrentLimit[4];
+
+    static float _MachineVelocity[3];
+
+    static float _MachineVelocitySigma[2];
 
     /// 電流制御の比例ゲイン
     static constexpr int CURRENT_CONTROL_GAIN_P = 3500;
@@ -72,13 +86,16 @@ private:
     static constexpr float WHEEL_POS_Y = 0.042f;
 
     /// 車体中心から車輪までの距離[m]
-    static constexpr float WHEEL_POS_R2 = WHEEL_POS_X * WHEEL_POS_X + WHEEL_POS_Y * WHEEL_POS_Y;
+    static constexpr float WHEEL_POS_R_2 = WHEEL_POS_X * WHEEL_POS_X + WHEEL_POS_Y * WHEEL_POS_Y;
 
     /// 速度指令値の最大値[m/s]
     static constexpr float MAX_SPEED_REFERENCE = 20.0f;
 
+    /// 電流指令値の最小値[A]
+    static constexpr float MIN_CURRENT_LIMIT_PER_MOTOR = 0.5f;
+
     /// 電流指令値の最大値[A]
-    static constexpr float CURRENT_LIMIT_PER_MOTOR = 3.75f;
+    static constexpr float MAX_CURRENT_LIMIT_PER_MOTOR = 3.5f;
 
     /// 全てのモーターの電流指令値の絶対合計の最大値[A]
     static constexpr float TOTAL_CURRENT_LIMIT = 8.0f;
@@ -89,6 +106,9 @@ private:
     /// モーターの巻線抵抗(相間) [Ω]
     static constexpr float MOTOR_RESISTANCE = 6.89f;
 
+    /// モーターのトルク定数 [Nm/A]
+    static constexpr float MOTOR_TORQUE_CONSTANT = 0.131f;
+
     /// モータードライバのベース消費電力 [W]
     static constexpr float BASE_POWER_CONSUMPTION_PER_MOTOR = 0.25f;
 
@@ -97,4 +117,10 @@ private:
 
     /// ブレーキを無効にする回生エネルギーの閾値
     static constexpr float BRAKE_DISABLE_THRESHOLD = -0.0125f;
+
+    /// 車輪の回転速度に適用するLPF
+    static Lpf2ndOrder50 _LpfWheelVelocity[4];
+
+    /// スリップスタック検知に用いるLPF
+    static Lpf2ndOrder200 _LpfSlipStuck[2];
 };

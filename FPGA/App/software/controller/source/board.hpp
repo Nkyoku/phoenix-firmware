@@ -18,14 +18,17 @@ static constexpr float IMU_GYROSCOPE_SCALE =  1.06526444e-3f;
 /// IMUの割り込み周期 [Hz]
 static constexpr float IMU_OUTPUT_RATE = 1000;
 
+/// 車輪の実効的な半径 [m]
+static constexpr float WHEEL_RADIUS = 0.0275f;
+
 /// 車輪の実効的な円周 [m]
-static constexpr float WHEEL_CIRCUMFERENCE = 0.157f;
+static constexpr float WHEEL_CIRCUMFERENCE = 0.173f;
 
 /// 車輪が一回転したときのエンコーダのパルス数
 static constexpr float ENCODER_PPR = 4096;
 
 /// 機体の質量 [kg]
-static constexpr float MACHINE_WEIGHT = 2.0f;
+static constexpr float MACHINE_WEIGHT = 1.7f;
 
 /// 重心の高さ [m]
 static constexpr float CENTER_OF_GRAVITY_HEIGHT = 0.1f;

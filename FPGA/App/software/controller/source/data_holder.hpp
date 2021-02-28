@@ -39,6 +39,7 @@ struct ControlData_t {
         float CurrentRef;
         float Energy;
     } Wheels[4];
+    float MachineVelocity[3];
 };
 
 /**

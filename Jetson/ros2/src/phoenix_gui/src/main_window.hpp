@@ -102,7 +102,7 @@ private:
             QTreeWidgetItem *wheel_velocity[4], *wheel_current_d[4], *wheel_current_q[4];
         } motion;
         struct Control_t {
-            QTreeWidgetItem *perf_counter, *wheel_velocity_ref[4], *wheel_current_ref[4], *wheel_energy[4];
+            QTreeWidgetItem *perf_counter, *wheel_velocity_ref[4], *wheel_current_ref[4], *wheel_energy[4], *machine_velocity[3];
         } control;
     } _TreeItems;
 
