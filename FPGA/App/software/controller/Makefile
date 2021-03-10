@@ -89,11 +89,7 @@ ACDS_VERSION := 20.1
 ELF := controller.elf
 
 # Paths to C, C++, and assembly source files.
-C_SRCS += source/microshell/core/microshell.c
-C_SRCS += source/microshell/core/mscore.c
-C_SRCS += source/microshell/util/mscmd.c
-C_SRCS += source/microshell/util/msopt.c
-C_SRCS += source/microshell/util/ntlibc.c
+C_SRCS :=
 CXX_SRCS += source/driver/adc2.cpp
 CXX_SRCS += source/driver/imu.cpp
 CXX_SRCS += source/main.cpp
