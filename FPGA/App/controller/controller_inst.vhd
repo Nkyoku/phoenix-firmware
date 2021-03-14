@@ -27,6 +27,7 @@
 			pio_1_export                                             : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			pio_2_export                                             : out   std_logic_vector(9 downto 0);                     -- export
 			reset_100mhz_reset_n                                     : in    std_logic                     := 'X';             -- reset_n
+			reset_ext_reset                                          : in    std_logic                     := 'X';             -- reset
 			reset_sys_reset_n                                        : in    std_logic                     := 'X';             -- reset_n
 			uart_txd                                                 : out   std_logic;                                        -- txd
 			vc_encoder_encoder_1_data                                : in    std_logic_vector(15 downto 0) := (others => 'X'); -- encoder_1_data
@@ -34,6 +35,7 @@
 			vc_encoder_encoder_3_data                                : in    std_logic_vector(15 downto 0) := (others => 'X'); -- encoder_3_data
 			vc_encoder_encoder_4_data                                : in    std_logic_vector(15 downto 0) := (others => 'X'); -- encoder_4_data
 			vc_fault_fault                                           : out   std_logic;                                        -- fault
+			vc_fault_brake                                           : out   std_logic_vector(3 downto 0);                     -- brake
 			vc_imeas1_data                                           : in    std_logic_vector(31 downto 0) := (others => 'X'); -- data
 			vc_imeas1_valid                                          : in    std_logic                     := 'X';             -- valid
 			vc_imeas2_data                                           : in    std_logic_vector(31 downto 0) := (others => 'X'); -- data
@@ -90,6 +92,7 @@
 			pio_1_export                                             => CONNECTED_TO_pio_1_export,                                             --        pio_1.export
 			pio_2_export                                             => CONNECTED_TO_pio_2_export,                                             --        pio_2.export
 			reset_100mhz_reset_n                                     => CONNECTED_TO_reset_100mhz_reset_n,                                     -- reset_100mhz.reset_n
+			reset_ext_reset                                          => CONNECTED_TO_reset_ext_reset,                                          --    reset_ext.reset
 			reset_sys_reset_n                                        => CONNECTED_TO_reset_sys_reset_n,                                        --    reset_sys.reset_n
 			uart_txd                                                 => CONNECTED_TO_uart_txd,                                                 --         uart.txd
 			vc_encoder_encoder_1_data                                => CONNECTED_TO_vc_encoder_encoder_1_data,                                --   vc_encoder.encoder_1_data
@@ -97,6 +100,7 @@
 			vc_encoder_encoder_3_data                                => CONNECTED_TO_vc_encoder_encoder_3_data,                                --             .encoder_3_data
 			vc_encoder_encoder_4_data                                => CONNECTED_TO_vc_encoder_encoder_4_data,                                --             .encoder_4_data
 			vc_fault_fault                                           => CONNECTED_TO_vc_fault_fault,                                           --     vc_fault.fault
+			vc_fault_brake                                           => CONNECTED_TO_vc_fault_brake,                                           --             .brake
 			vc_imeas1_data                                           => CONNECTED_TO_vc_imeas1_data,                                           --    vc_imeas1.data
 			vc_imeas1_valid                                          => CONNECTED_TO_vc_imeas1_valid,                                          --             .valid
 			vc_imeas2_data                                           => CONNECTED_TO_vc_imeas2_data,                                           --    vc_imeas2.data

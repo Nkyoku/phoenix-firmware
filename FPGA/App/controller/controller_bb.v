@@ -27,6 +27,7 @@ module controller (
 	pio_1_export,
 	pio_2_export,
 	reset_100mhz_reset_n,
+	reset_ext_reset,
 	reset_sys_reset_n,
 	uart_txd,
 	vc_encoder_encoder_1_data,
@@ -34,6 +35,7 @@ module controller (
 	vc_encoder_encoder_3_data,
 	vc_encoder_encoder_4_data,
 	vc_fault_fault,
+	vc_fault_brake,
 	vc_imeas1_data,
 	vc_imeas1_valid,
 	vc_imeas2_data,
@@ -86,6 +88,7 @@ module controller (
 	input	[31:0]	pio_1_export;
 	output	[9:0]	pio_2_export;
 	input		reset_100mhz_reset_n;
+	input		reset_ext_reset;
 	input		reset_sys_reset_n;
 	output		uart_txd;
 	input	[15:0]	vc_encoder_encoder_1_data;
@@ -93,6 +96,7 @@ module controller (
 	input	[15:0]	vc_encoder_encoder_3_data;
 	input	[15:0]	vc_encoder_encoder_4_data;
 	output		vc_fault_fault;
+	output	[3:0]	vc_fault_brake;
 	input	[31:0]	vc_imeas1_data;
 	input		vc_imeas1_valid;
 	input	[31:0]	vc_imeas2_data;

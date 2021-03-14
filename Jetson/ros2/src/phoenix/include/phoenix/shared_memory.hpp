@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#pragma pack(push, 4)
+
 /**
  * 共有メモリーの構造を定義する構造体 (最大1024バイト)
  */
@@ -85,3 +87,5 @@ struct SharedMemory_t {
      */
     uint32_t TailChecksum;
 };
+
+#pragma pack(pop)

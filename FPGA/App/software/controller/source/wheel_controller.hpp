@@ -185,8 +185,14 @@ private:
     /// 回転速度指令の最大値[m/s]
     static constexpr float MAX_OMEGA_REFERENCE = 50.0f;
 
-    /// 加速度の制限 [m/s^2], [rad/s^2]
-    static constexpr float ACCELERATION_LIMIT = 10.0f;
+    /// 加速度の制限 [m/s^2]
+    static constexpr float ACCELERATION_LIMIT_VX = 5.0f;
+
+    /// 加速度の制限 [m/s^2]
+    static constexpr float ACCELERATION_LIMIT_VY = 10.0f;
+
+    /// 加速度の制限 [rad/s^2]
+    static constexpr float ACCELERATION_LIMIT_OMEGA = 20.0f;
 
     /// 電流指令値の最小値[A]
     static constexpr float MIN_CURRENT_LIMIT_PER_MOTOR = 0.2f;

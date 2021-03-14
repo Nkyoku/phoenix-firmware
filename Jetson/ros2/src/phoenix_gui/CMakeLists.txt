@@ -44,6 +44,9 @@ add_executable(gui
   src/node_thread.cpp
   src/image_viewer.cpp
   src/gamepad_thread.cpp
+  src/cintelhex/ihex_copy.c
+  src/cintelhex/ihex_parse.c
+  src/cintelhex/ihex_record.c
 )
 ament_target_dependencies(gui
   rclcpp

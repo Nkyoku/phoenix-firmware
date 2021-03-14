@@ -176,6 +176,7 @@ private:
     void PublishAdc2(const StreamDataAdc2_t *data) {
         phoenix_msgs::msg::StreamDataAdc2 msg;
         msg.dc48v_voltage = data->dc48v_voltage;
+        msg.dribble_voltage = data->dribble_voltage;
         msg.dribble_current = data->dribble_current;
         _Adc2Publisher->publish(msg);
     }
@@ -218,6 +219,10 @@ private:
         for (int index = 0; index < 4; index++) {
             msg.wheel_velocity_ref[index] = data->wheel_velocity_ref[index];
             msg.wheel_current_ref[index] = data->wheel_current_ref[index];
+            msg.wheel_energy[index] = data->wheel_energy[index];
+        }
+        for (int index = 0; index < 3; index++) {
+            msg.machine_velocity[index] = data->machine_velocity[index];
         }
         _ControlPublisher->publish(msg);
     }

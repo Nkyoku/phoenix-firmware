@@ -32,14 +32,6 @@ static inline void initialize_peripheral(void) {
     CentralizedMonitor::Initialize();
     WheelController::Initialize();
     DribbleController::Initialize();
-
-    /*VectorController::SetFault();
-     VectorController::SetCurrentReferenceD(1, 0);
-     VectorController::SetCurrentReferenceQ(1, 0);
-     VectorController::SetGainP(3568);
-     VectorController::SetGainI(525);
-     MotorController::SetFault();
-     LoadSwitch::SetAllOn();*/
 }
 
 static inline void start_peripheral(void) {

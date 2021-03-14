@@ -42,7 +42,7 @@
 
 `timescale 1 ns / 1 ns
 
-module controller_mm_interconnect_4_router_default_decode
+module controller_mm_interconnect_4_router_003_default_decode
   #(
      parameter DEFAULT_CHANNEL = 0,
                DEFAULT_WR_CHANNEL = -1,
@@ -81,7 +81,7 @@ module controller_mm_interconnect_4_router_default_decode
 endmodule
 
 
-module controller_mm_interconnect_4_router
+module controller_mm_interconnect_4_router_003
 (
     // -------------------
     // Clock & Reset
@@ -120,7 +120,7 @@ module controller_mm_interconnect_4_router
     localparam PKT_PROTECTION_L = 74;
     localparam ST_DATA_W = 86;
     localparam ST_CHANNEL_W = 2;
-    localparam DECODER_TYPE = 0;
+    localparam DECODER_TYPE = 1;
 
     localparam PKT_TRANS_WRITE = 54;
     localparam PKT_TRANS_READ  = 55;
@@ -134,13 +134,12 @@ module controller_mm_interconnect_4_router
     // Figure out the number of bits to mask off for each slave span
     // during address decoding
     // -------------------------------------------------------
-    localparam PAD0 = log2ceil(64'h8000 - 64'h0); 
     // -------------------------------------------------------
     // Work out which address bits are significant based on the
     // address range of the slaves. If the required width is too
     // large or too small, we use the address field width instead.
     // -------------------------------------------------------
-    localparam ADDR_RANGE = 64'h8000;
+    localparam ADDR_RANGE = 64'h0;
     localparam RANGE_ADDR_WIDTH = log2ceil(ADDR_RANGE);
     localparam OPTIMIZED_ADDR_H = (RANGE_ADDR_WIDTH > PKT_ADDR_W) ||
                                   (RANGE_ADDR_WIDTH == 0) ?
@@ -150,6 +149,7 @@ module controller_mm_interconnect_4_router
     localparam RG = RANGE_ADDR_WIDTH;
     localparam REAL_ADDRESS_RANGE = OPTIMIZED_ADDR_H - PKT_ADDR_L;
 
+    reg [PKT_DEST_ID_W-1 : 0] destid;
 
     // -------------------------------------------------------
     // Pass almost everything through, untouched
@@ -158,16 +158,20 @@ module controller_mm_interconnect_4_router
     assign src_valid         = sink_valid;
     assign src_startofpacket = sink_startofpacket;
     assign src_endofpacket   = sink_endofpacket;
-    wire [PKT_DEST_ID_W-1:0] default_destid;
     wire [2-1 : 0] default_src_channel;
 
 
 
 
+    // -------------------------------------------------------
+    // Write and read transaction signals
+    // -------------------------------------------------------
+    wire read_transaction;
+    assign read_transaction  = sink_data[PKT_TRANS_READ];
 
 
-    controller_mm_interconnect_4_router_default_decode the_default_decode(
-      .default_destination_id (default_destid),
+    controller_mm_interconnect_4_router_003_default_decode the_default_decode(
+      .default_destination_id (),
       .default_wr_channel   (),
       .default_rd_channel   (),
       .default_src_channel  (default_src_channel)
@@ -176,19 +180,19 @@ module controller_mm_interconnect_4_router
     always @* begin
         src_data    = sink_data;
         src_channel = default_src_channel;
-        src_data[PKT_DEST_ID_H:PKT_DEST_ID_L] = default_destid;
 
         // --------------------------------------------------
-        // Address Decoder
-        // Sets the channel and destination ID based on the address
+        // DestinationID Decoder
+        // Sets the channel based on the destination ID.
         // --------------------------------------------------
-           
-         
-          // ( 0 .. 8000 )
-          src_channel = 2'b1;
-          src_data[PKT_DEST_ID_H:PKT_DEST_ID_L] = 1;
-	     
-        
+        destid      = sink_data[PKT_DEST_ID_H : PKT_DEST_ID_L];
+
+
+
+        if (destid == 1  && read_transaction) begin
+            src_channel = 2'b1;
+        end
+
 
 end
 

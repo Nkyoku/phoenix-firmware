@@ -12,6 +12,7 @@
 #include <chrono>
 #include <algorithm>
 #include "format_value.hpp"
+#include "cintelhex/cintelhex.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // UIを生成する
@@ -79,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(_Ui->gamepadComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &MainWindow::connectToGamepad);
     connect(_Ui->saveLogButton, &QPushButton::clicked, this, &MainWindow::startLogging);
     connect(_Ui->stopLogButton, &QPushButton::clicked, this, &MainWindow::stopLogging);
+    connect(_Ui->programNiosButton, &QPushButton::clicked, this, &MainWindow::programNios);
 
     // リストを更新する
     reloadNamespaceList();
@@ -308,10 +310,18 @@ void MainWindow::connectToNodes(const QString &namespace_name) {
 
         QString set_speed_service_name = namespace_name + "/set_speed";
         _Clients.set_speed = _NodeThread->node()->create_client<phoenix_msgs::srv::SetSpeed>(set_speed_service_name.toStdString());
-
         if (_Clients.set_speed->wait_for_service(std::chrono::milliseconds(1000)) == false) {
             _Clients.set_speed.reset();
             _Ui->enableControllerCheckBox->setChecked(false);
+        }
+
+        QString program_nios_service_name = namespace_name + "/program_nios";
+        _Clients.program_nios = _NodeThread->node()->create_client<phoenix_msgs::srv::ProgramNios>(program_nios_service_name.toStdString());
+        if (_Clients.program_nios->wait_for_service(std::chrono::milliseconds(1000)) == false) {
+            _Clients.program_nios.reset();
+            _Ui->programNiosButton->setEnabled(false);
+        } else {
+            _Ui->programNiosButton->setEnabled(true);
         }
 
         // スレッドを実行
@@ -461,33 +471,32 @@ void MainWindow::generateTelemetryTreeItems(void) {
 
 void MainWindow::startLogging(void) {
     QString path = QFileDialog::getSaveFileName(this, "Save Log File", "", "CSV (*.csv)");
-    if (!path.isEmpty()) {
-        auto file = std::make_shared<QFile>(path);
-        if (file->open(QIODevice::WriteOnly | QIODevice::Text)) {
-            _LogFrameNumber = 0;
-            _LogFile = file;
-            QTextStream stream(_LogFile.get());
-            stream << "Time";
-            for (int index = 1; index <= 4; index++)
-                stream << ",Velocity " << index << " Meas";
-            for (int index = 1; index <= 4; index++)
-                stream << ",Current " << index << " Meas";
-            for (int index = 1; index <= 4; index++)
-                stream << ",Velocity " << index << " Ref";
-            for (int index = 1; index <= 4; index++)
-                stream << ",Current " << index << " Ref";
-            for (int index = 1; index <= 4; index++)
-                stream << ",Energy " << index;
-            stream << ",Machine Vx,Machine Vy,Machine Omega";
-            stream << ",Accel X,Accel Y,Accel Z";
-            stream << ",Gyro X,Gyro Y,Gyro Z";
-            stream << ",DC48V,Battery Voltage,Battery Current\n";
-        }
-        _Ui->saveLogButton->setEnabled(false);
-        _Ui->stopLogButton->setEnabled(true);
-    } else {
-        QMessageBox::warning(this, "Telemtry Logging", "Failed to open file.");
+    if (path.isEmpty()) {
+        return;
     }
+    auto file = std::make_shared<QFile>(path);
+    if (file->open(QIODevice::WriteOnly | QIODevice::Text)) {
+        _LogFrameNumber = 0;
+        _LogFile = file;
+        QTextStream stream(_LogFile.get());
+        stream << "Time";
+        for (int index = 1; index <= 4; index++)
+            stream << ",Velocity " << index << " Meas";
+        for (int index = 1; index <= 4; index++)
+            stream << ",Current " << index << " Meas";
+        for (int index = 1; index <= 4; index++)
+            stream << ",Velocity " << index << " Ref";
+        for (int index = 1; index <= 4; index++)
+            stream << ",Current " << index << " Ref";
+        for (int index = 1; index <= 4; index++)
+            stream << ",Energy " << index;
+        stream << ",Machine Vx,Machine Vy,Machine Omega";
+        stream << ",Accel X,Accel Y,Accel Z";
+        stream << ",Gyro X,Gyro Y,Gyro Z";
+        stream << ",DC48V,Battery Voltage,Battery Current\n";
+    }
+    _Ui->saveLogButton->setEnabled(false);
+    _Ui->stopLogButton->setEnabled(true);
 }
 
 void MainWindow::stopLogging(void) {
@@ -508,6 +517,8 @@ void MainWindow::quitNodeThread(void) {
 
         // Clientsを破棄する
         _Clients.set_speed.reset();
+        _Clients.program_nios.reset();
+        _Ui->programNiosButton->setEnabled(false);
 
         // スレッドを終了する
         // deleteはdeleteLater()スロットにより行われるのでここでする必要はない
@@ -528,7 +539,7 @@ void MainWindow::sendCommand(void) {
             if (input_state) {
                 request->speed_x = 4.0f * input_state->leftStickX;
                 request->speed_y = 4.0f * input_state->leftStickY;
-                request->speed_omega = -10.0f * input_state->rightStickX;
+                request->speed_omega = -5.0f * input_state->rightStickX;
                 request->dribble_power = -input_state->rightTrigger;
             }
         } else {
@@ -538,6 +549,58 @@ void MainWindow::sendCommand(void) {
         }
         auto result = _Clients.set_speed->async_send_request(request);
         result.wait();
+    }
+}
+
+void MainWindow::programNios(void) {
+    QString path = QFileDialog::getOpenFileName(this, "Open HEX File", "", "Intel HEX (*.hex)");
+    if (path.isEmpty()) {
+        return;
+    }
+    auto request = std::make_shared<phoenix_msgs::srv::ProgramNios::Request>();
+
+    // Hexファイルを読み込む
+    ihex_recordset_t *recored_set = ihex_rs_from_file(path.toStdString().c_str());
+    size_t copied_bytes = 0;
+    uint_t i = 0;
+    ihex_record_t *record;
+    int err;
+    do {
+        uint32_t offset;
+        err = ihex_rs_iterate_data(recored_set, &i, &record, &offset);
+        if (err || record == 0) break;
+        uint32_t address = offset + record->ihr_address;
+        uint32_t length = record->ihr_length;
+        if ((length % 4) != 0){
+            err = 1;
+            break;
+        }
+        if ((0 <= address * 4) && ((address * 4 + length) <= request->program.size())) {
+            const uint32_t *src = reinterpret_cast<const uint32_t*>(record->ihr_data);
+            uint32_t *dst = reinterpret_cast<uint32_t*>(request->program.data() + address * 4);
+            for(size_t index = 0; index < (length / 4); index++){
+                uint32_t data = *src++;
+                *dst++ = ((data >> 24) & 0xFFu) | ((data >> 8) & 0xFF00u) | ((data << 8) & 0xFF0000u) | (data << 24);
+            }
+            copied_bytes += length;
+        }
+    } while (0 < i);
+    ihex_rs_free(recored_set);
+    if (err || (copied_bytes != request->program.size())) {
+        QMessageBox::warning(this, "Program NIOS", "An error occured while loading HEX file");
+        return;
+    }
+
+    // プログラムを転送する
+    auto result = _Clients.program_nios->async_send_request(request);
+    result.wait();
+    auto response = result.get();
+    if (!response) {
+        QMessageBox::warning(this, "Program NIOS", "Service didn't respond");
+    } else if (!response->succeeded) {
+        QMessageBox::warning(this, "Program NIOS", "An error occured while programming memory");
+    } else {
+        QMessageBox::information(this, "Program NIOS", "Finished");
     }
 }
 

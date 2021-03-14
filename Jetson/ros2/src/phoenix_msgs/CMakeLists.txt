@@ -28,6 +28,7 @@ rosidl_generate_interfaces(
   msg/StreamDataControl.msg
   srv/ClearError.srv
   srv/SetSpeed.srv
+  srv/ProgramNios.srv
 )
 
 if(BUILD_TESTING)

@@ -26,6 +26,7 @@
 		.pio_1_export                                             (<connected-to-pio_1_export>),                                             //        pio_1.export
 		.pio_2_export                                             (<connected-to-pio_2_export>),                                             //        pio_2.export
 		.reset_100mhz_reset_n                                     (<connected-to-reset_100mhz_reset_n>),                                     // reset_100mhz.reset_n
+		.reset_ext_reset                                          (<connected-to-reset_ext_reset>),                                          //    reset_ext.reset
 		.reset_sys_reset_n                                        (<connected-to-reset_sys_reset_n>),                                        //    reset_sys.reset_n
 		.uart_txd                                                 (<connected-to-uart_txd>),                                                 //         uart.txd
 		.vc_encoder_encoder_1_data                                (<connected-to-vc_encoder_encoder_1_data>),                                //   vc_encoder.encoder_1_data
@@ -33,6 +34,7 @@
 		.vc_encoder_encoder_3_data                                (<connected-to-vc_encoder_encoder_3_data>),                                //             .encoder_3_data
 		.vc_encoder_encoder_4_data                                (<connected-to-vc_encoder_encoder_4_data>),                                //             .encoder_4_data
 		.vc_fault_fault                                           (<connected-to-vc_fault_fault>),                                           //     vc_fault.fault
+		.vc_fault_brake                                           (<connected-to-vc_fault_brake>),                                           //             .brake
 		.vc_imeas1_data                                           (<connected-to-vc_imeas1_data>),                                           //    vc_imeas1.data
 		.vc_imeas1_valid                                          (<connected-to-vc_imeas1_valid>),                                          //             .valid
 		.vc_imeas2_data                                           (<connected-to-vc_imeas2_data>),                                           //    vc_imeas2.data

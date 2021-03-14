@@ -15,6 +15,7 @@
 #include <phoenix_msgs/msg/stream_data_control.hpp>
 #include <phoenix_msgs/srv/clear_error.hpp>
 #include <phoenix_msgs/srv/set_speed.hpp>
+#include <phoenix_msgs/srv/program_nios.hpp>
 #include "node_thread.hpp"
 #include "image_viewer.hpp"
 #include "gamepad_thread.hpp"
@@ -63,6 +64,8 @@ private:
     Q_SIGNAL void updateRequest(void);
 
     Q_SLOT void sendCommand(void);
+
+    Q_SLOT void programNios(void);
 
     static std::shared_ptr<rclcpp::Node> createNode(void);
 
@@ -143,6 +146,7 @@ private:
     struct Clients_t{
         rclcpp::Client<phoenix_msgs::srv::SetSpeed>::SharedPtr set_speed;
         std::shared_future<std::shared_ptr<phoenix_msgs::srv::SetSpeed_Response>> set_speed_future;
+        rclcpp::Client<phoenix_msgs::srv::ProgramNios>::SharedPtr program_nios;
     } _Clients;
 
     /// GUIのノード名の頭に付ける文字列

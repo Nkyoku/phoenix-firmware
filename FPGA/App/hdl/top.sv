@@ -556,6 +556,7 @@ module PhoenixFPGA (
     controller ctrl (
         .reset_sys_reset_n         (~reset_75mhz),
         .clk_sys_clk               (clk_75mhz),
+        .reset_ext_reset           (~FPGA_MODE),
         .pio_0_export              (pio_0_in),
 		.pio_1_export              (pio_1_in),
         .pio_2_export              (pio_2_out),

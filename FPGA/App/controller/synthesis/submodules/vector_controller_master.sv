@@ -187,8 +187,8 @@ module vector_controller_master (
     } REGISTER_MAP;
 
     // Fault
-    logic fault_set;
-    logic fault_clear;
+    logic fault_set = 1'b0;
+    logic fault_clear = 1'b0;
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
             fault <= 1'b0;
@@ -204,8 +204,8 @@ module vector_controller_master (
     end
     
     // Brake
-    logic [3:0] brake_set;
-    logic [3:0] brake_clear;
+    logic [3:0] brake_set = '0;
+    logic [3:0] brake_clear = '0;
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
             brake <= '0;

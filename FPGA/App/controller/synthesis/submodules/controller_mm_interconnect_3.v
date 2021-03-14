@@ -3597,7 +3597,7 @@ module controller_mm_interconnect_3 (
 		.in_command_size_data (3'b000)                                                                // (terminated)
 	);
 
-	controller_mm_interconnect_1_avalon_st_adapter #(
+	controller_mm_interconnect_0_avalon_st_adapter #(
 		.inBitsPerSymbol (34),
 		.inUsePackets    (0),
 		.inDataWidth     (34),
@@ -3626,7 +3626,7 @@ module controller_mm_interconnect_3 (
 		.out_0_error    (avalon_st_adapter_out_0_error)                  //         .error
 	);
 
-	controller_mm_interconnect_1_avalon_st_adapter #(
+	controller_mm_interconnect_0_avalon_st_adapter #(
 		.inBitsPerSymbol (34),
 		.inUsePackets    (0),
 		.inDataWidth     (34),
@@ -3655,7 +3655,7 @@ module controller_mm_interconnect_3 (
 		.out_0_error    (avalon_st_adapter_001_out_0_error)              //         .error
 	);
 
-	controller_mm_interconnect_1_avalon_st_adapter #(
+	controller_mm_interconnect_0_avalon_st_adapter #(
 		.inBitsPerSymbol (34),
 		.inUsePackets    (0),
 		.inDataWidth     (34),
@@ -3800,7 +3800,7 @@ module controller_mm_interconnect_3 (
 		.out_0_error    (avalon_st_adapter_006_out_0_error)                            //         .error
 	);
 
-	controller_mm_interconnect_1_avalon_st_adapter #(
+	controller_mm_interconnect_0_avalon_st_adapter #(
 		.inBitsPerSymbol (34),
 		.inUsePackets    (0),
 		.inDataWidth     (34),
