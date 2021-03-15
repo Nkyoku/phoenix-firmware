@@ -219,11 +219,12 @@ private:
         for (int index = 0; index < 4; index++) {
             msg.wheel_velocity_ref[index] = data->wheel_velocity_ref[index];
             msg.wheel_current_ref[index] = data->wheel_current_ref[index];
-            msg.wheel_energy[index] = data->wheel_energy[index];
+            msg.wheel_current_limit[index] = data->wheel_current_limit[index];
         }
         for (int index = 0; index < 3; index++) {
             msg.machine_velocity[index] = data->machine_velocity[index];
         }
+        msg.slip_flags = data->slip_flags;
         _ControlPublisher->publish(msg);
     }
 

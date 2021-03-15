@@ -32,6 +32,7 @@ struct StreamDataControl_t {
     uint16_t performance_counter;
     __fp16 wheel_velocity_ref[4];
     __fp16 wheel_current_ref[4];
-    __fp16 wheel_energy[4];
+    __fp16 wheel_current_limit[4];
     __fp16 machine_velocity[3];
+    uint16_t slip_flags;
 };

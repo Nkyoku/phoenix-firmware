@@ -35,13 +35,14 @@ void DataHolder::FetchRegistersOnPreControlLoop(void){
     _ControlData.Wheels[1].CurrentRef = VectorController::GetCurrentReferenceQ(2) * ADC1_CURRENT_SCALE;
     _ControlData.Wheels[2].CurrentRef = VectorController::GetCurrentReferenceQ(3) * ADC1_CURRENT_SCALE;
     _ControlData.Wheels[3].CurrentRef = VectorController::GetCurrentReferenceQ(4) * ADC1_CURRENT_SCALE;
-    _ControlData.Wheels[0].Energy = WheelController::GetWheelRenegerationEnergy()[0];
-    _ControlData.Wheels[1].Energy = WheelController::GetWheelRenegerationEnergy()[1];
-    _ControlData.Wheels[2].Energy = WheelController::GetWheelRenegerationEnergy()[2];
-    _ControlData.Wheels[3].Energy = WheelController::GetWheelRenegerationEnergy()[3];
+    _ControlData.Wheels[0].CurrentLimit = WheelController::GetWheelCurrentLimit()[0];
+    _ControlData.Wheels[1].CurrentLimit = WheelController::GetWheelCurrentLimit()[1];
+    _ControlData.Wheels[2].CurrentLimit = WheelController::GetWheelCurrentLimit()[2];
+    _ControlData.Wheels[3].CurrentLimit = WheelController::GetWheelCurrentLimit()[3];
     _ControlData.MachineVelocity[0] = WheelController::GetEstimatedMachineVelocity().Vx;
     _ControlData.MachineVelocity[1] = WheelController::GetEstimatedMachineVelocity().Vy;
     _ControlData.MachineVelocity[2] = WheelController::GetEstimatedMachineVelocity().Omega;
+    _ControlData.SlipFlags = WheelController::GetSlipFlags();
 }
 
 void DataHolder::FetchAdc2Result(void){

@@ -24,6 +24,24 @@ static constexpr float WHEEL_RADIUS = 0.0275f;
 /// 車輪の実効的な円周 [m]
 static constexpr float WHEEL_CIRCUMFERENCE = 0.173f;
 
+/// 車体中心を原点とした車輪のX座標[m]
+static constexpr float WHEEL_POS_X = 0.063f;
+
+/// 車体中心を原点とした車輪のY座標[m]
+static constexpr float WHEEL_POS_Y = 0.042f;
+
+/// 車体中心から車輪までの距離の二乗[m]
+static constexpr float WHEEL_POS_R_2 = WHEEL_POS_X * WHEEL_POS_X + WHEEL_POS_Y * WHEEL_POS_Y;
+
+/// モーターの逆起電力定数(相間) [V/rps]
+static constexpr float MOTOR_SPEED_CONSTANT = 1.0f / 72.7f * 60.0f;
+
+/// モーターのトルク定数 [Nm/A]
+static constexpr float MOTOR_TORQUE_CONSTANT = 0.131f;
+
+/// モーターの巻線抵抗(相間) [Ω]
+static constexpr float MOTOR_RESISTANCE = 6.89f;
+
 /// 車輪が一回転したときのエンコーダのパルス数
 static constexpr float ENCODER_PPR = 4096;
 
@@ -35,6 +53,9 @@ static constexpr float MACHINE_INERTIA = 0.007f;
 
 /// 重心の高さ [m]
 static constexpr float CENTER_OF_GRAVITY_HEIGHT = 0.1f;
+
+/// 48Vバス電圧 [V]
+static constexpr float DC48V_VOLTAGE = 48.0f;
 
 /**
  * 単精度浮動小数点数を半精度浮動小数点数に変換する

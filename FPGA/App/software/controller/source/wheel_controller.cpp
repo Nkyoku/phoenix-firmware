@@ -1,5 +1,4 @@
 #include "wheel_controller.hpp"
-#include <board.hpp>
 #include <peripheral/vector_controller.hpp>
 #include "shared_memory_manager.hpp"
 
@@ -96,6 +95,8 @@ static const float * const FORCE_MATRIX_TABLE[16] = {
 };
 
 void WheelController::StartControl(void) {
+    static constexpr int CURRENT_CONTROL_GAIN_P = 3500; // 電流制御の比例ゲイン
+    static constexpr int CURRENT_CONTROL_GAIN_I = 500; // 電流制御の積分ゲイン
     VectorController::SetGainP(CURRENT_CONTROL_GAIN_P);
     VectorController::SetGainI(CURRENT_CONTROL_GAIN_I);
     VectorController::ClearFault();
@@ -109,6 +110,8 @@ void WheelController::StartControl(void) {
     memset(_CurrentReferenceOfWheel, 0, sizeof(_CurrentReferenceOfWheel));
     memset(_CurrentReferenceOfMachine, 0, sizeof(_CurrentReferenceOfMachine));
     memset(_RegenerationEnergy, 0, sizeof(_RegenerationEnergy));
+    memset(_LastCompensationForce, 0, sizeof(_LastCompensationForce));
+    _SlipFlags = 0;
 }
 
 void WheelController::StopControl(void) {
@@ -122,9 +125,7 @@ void WheelController::StopControl(void) {
     VectorController::SetGainI(0);
 }
 
-void WheelController::Update(bool new_parameters, bool force_brake) {
-    (void)force_brake;
-
+void WheelController::Update(bool new_parameters, bool sensor_only) {
     // センサーデータを取得する
     auto &motion = DataHolder::GetMotionData();
 
@@ -145,11 +146,11 @@ void WheelController::Update(bool new_parameters, bool force_brake) {
 
     // _SlipIndicatorの大きい上位2つの車輪を挙げる
     // 結果はslipped_wheelsに車輪1が1ビット目、車輪2が2ビット目・・・というように格納される
-    int slipped_wheels = 0;
     {
         static constexpr float TRIP_THRESHOLD = 1.0f; // スリップ判定をONにする値
         static constexpr float RELEASE_THRESHOLD = 0.8f; // スリップ判定をOFFにする値
         static bool last_state[4];
+        int slipped_wheels = 0;
         float biggest_one = fmaxf(fmaxf(_SlipIndicator[0], _SlipIndicator[1]), fmaxf(_SlipIndicator[2], _SlipIndicator[3]));
         slipped_wheels |= static_cast<int>(biggest_one == _SlipIndicator[0]);
         slipped_wheels |= static_cast<int>(biggest_one == _SlipIndicator[1]) << 1;
@@ -177,6 +178,7 @@ void WheelController::Update(bool new_parameters, bool force_brake) {
             else
                 slipped_wheels &= ~(1 << index);
         }
+        _SlipFlags = slipped_wheels;
     }
 
     // フォルト状態だったらモーター制御をしない
@@ -213,19 +215,27 @@ void WheelController::Update(bool new_parameters, bool force_brake) {
     brake_enabled[2] = VectorController::IsBrakeEnabled(3);
     brake_enabled[3] = VectorController::IsBrakeEnabled(4);
 
-    if (speed_ok) {
+    if (speed_ok && !sensor_only) {
         // 指令値と指令値の変化を制限する
         {
             // 指令値を実現可能な速度に制限する
-            //LimitInputVelocity
+            MachineVelocity_t input = {parameters.speed_x, parameters.speed_y, parameters.speed_omega};
+            float max_velocity = MaximumWheelVelocity(input);
+            float voltage_limit = WHEEL_VELOCITY_LIMIT / fmaxf(max_velocity, WHEEL_VELOCITY_LIMIT);
+            float total_current = SteadyCurrent(input);
+            float current_limit = STEADY_CURRENT_LIMIT / fmaxf(total_current, STEADY_CURRENT_LIMIT);
+            float limit = fminf(voltage_limit, sqrtf(current_limit));
+            input.Vx *= limit;
+            input.Vy *= limit;
+            input.Omega *= limit;
 
             // 指令値の変化を制限する
             static constexpr float DELTA_VX = ACCELERATION_LIMIT_VX / IMU_OUTPUT_RATE;
             static constexpr float DELTA_VY = ACCELERATION_LIMIT_VY / IMU_OUTPUT_RATE;
             static constexpr float DELTA_OMEGA = ACCELERATION_LIMIT_OMEGA / IMU_OUTPUT_RATE;
-            float dvx = fminf(fmaxf(parameters.speed_x - _MachineVelocityReference.Vx, -DELTA_VX), DELTA_VX);
-            float dvy = fminf(fmaxf(parameters.speed_y - _MachineVelocityReference.Vy, -DELTA_VY), DELTA_VY);
-            float omega = fminf(fmaxf(parameters.speed_omega,_MachineVelocityReference.Omega - DELTA_OMEGA), _MachineVelocityReference.Omega + DELTA_OMEGA);
+            float dvx = fminf(fmaxf(input.Vx - _MachineVelocityReference.Vx, -DELTA_VX), DELTA_VX);
+            float dvy = fminf(fmaxf(input.Vy - _MachineVelocityReference.Vy, -DELTA_VY), DELTA_VY);
+            float omega = fminf(fmaxf(input.Omega, _MachineVelocityReference.Omega - DELTA_OMEGA), _MachineVelocityReference.Omega + DELTA_OMEGA);
             _MachineVelocityReference.Omega = omega;
             float dtheta = omega * (1.0f / IMU_OUTPUT_RATE);
             float vx = _MachineVelocityReference.Vx + _MachineVelocityReference.Vy * dtheta; // 本来は三角関数が必要だがcos(x)=1, sin(x)=xと近似している
@@ -234,43 +244,46 @@ void WheelController::Update(bool new_parameters, bool force_brake) {
             _MachineVelocityReference.Vy = vy + dvy;
         }
 
-        // 車輪のスリップ度合いから指令値を無視するか決定する
-        bool ignore_vx, ignore_vy;
-        {
-            static constexpr int ignore_vx_table = 0b1110111011100000;
-            static constexpr int ignore_vy_table = 0b1111110010101000;
-            ignore_vx = (ignore_vx_table >> slipped_wheels) & 0x1;
-            ignore_vy = (ignore_vy_table >> slipped_wheels) & 0x1;
-        }
+        // 車輪速度の指令値を計算する
+        WheelVelocity_t wheel_ref = VelocityVectorDecomposition(_MachineVelocityReference);
+        _SpeedReference[0] = wheel_ref.V[0];
+        _SpeedReference[1] = wheel_ref.V[1];
+        _SpeedReference[2] = wheel_ref.V[2];
+        _SpeedReference[3] = wheel_ref.V[3];
 
         // 機体速度と指令値の誤差から得られた車輪速度の補正量を計算する
-        float speed_gain_p = fmaxf(0.0f, parameters.speed_gain_p);
-        float speed_gain_i = fmaxf(0.0f, parameters.speed_gain_i);
+        float compensation_gain_p = fmaxf(0.0f, parameters.compensation_gain_p);
+        float compensation_gain_i = fmaxf(0.0f, parameters.compensation_gain_i);
         float current_usage_for_compensation;
         {
             static constexpr float VX_COMPENSATION_LIMIT = 0.2f; // X方向のずれを補正する最大値 [m/s]
             static constexpr float VY_COMPENSATION_LIMIT = 0.2f; // Y方向のずれを補正する最大値 [m/s]
-            static constexpr float OMEGA_COMPENSATION_LIMIT = 2.0f; // 回転速度のずれを補正する最大値 [rad/s]
-            static constexpr float TOTAL_CURRENT_LIMIT = 4.0f;
-            static constexpr float CURRENT_LIMIT_PER_MOTOR = 2.0f;
+            static constexpr float OMEGA_COMPENSATION_LIMIT = 1.0f; // 回転速度のずれを補正する最大値 [rad/s]
+            static constexpr float TOTAL_CURRENT_LIMIT = 6.0f;
+            static constexpr float CURRENT_LIMIT_PER_MOTOR = 3.0f;
             static constexpr float DECAY_MIN = 1.0f - 10.0f / IMU_OUTPUT_RATE; // 0.99f at 1kHz
+            static constexpr int ignore_vx_table = 0b1110111011100000;
+            static constexpr int ignore_vy_table = 0b1111110010101000;
+            bool ignore_vx = (ignore_vx_table >> _SlipFlags) & 0x1;
+            bool ignore_vy = (ignore_vy_table >> _SlipFlags) & 0x1;
             float decay = fminf(fabsf(_MachineVelocityReference.Vx) + fabsf(_MachineVelocityReference.Vy) + fabsf(_MachineVelocityReference.Omega) + DECAY_MIN, 1.0f); // 指令速度が0に近いときに電流を減衰させる
             float error_vx = ignore_vx ? 0.0f : (_MachineVelocityReference.Vx - _MachineVelocity.Vx);
             float error_vy = ignore_vy ? 0.0f : (_MachineVelocityReference.Vy - _MachineVelocity.Vy);
-            float error_omega = (_MachineVelocityReference.Omega - _MachineVelocity.Omega);
+            float error_omega = _MachineVelocityReference.Omega - _MachineVelocity.Omega;
             MachineVelocity_t error;
             error.Vx = fminf(fmaxf(error_vx, -VX_COMPENSATION_LIMIT), VX_COMPENSATION_LIMIT);
             error.Vy = fminf(fmaxf(error_vy, -VY_COMPENSATION_LIMIT), VY_COMPENSATION_LIMIT);
-            error.Omega = fminf(fmaxf(error_omega, -OMEGA_COMPENSATION_LIMIT), OMEGA_COMPENSATION_LIMIT) * (WHEEL_POS_R_2 / MACHINE_INERTIA * MACHINE_WEIGHT);
-            float fx = error.Vx * (MACHINE_WEIGHT * sqrt(WHEEL_POS_R_2) / WHEEL_POS_Y);
-            float fy = error.Vy * (MACHINE_WEIGHT * sqrt(WHEEL_POS_R_2) / WHEEL_POS_X);
-            float torque = error.Omega * (MACHINE_INERTIA / sqrt(WHEEL_POS_R_2));
-            const float* force_matrix = FORCE_MATRIX_TABLE[slipped_wheels];
+            error.Omega = fminf(fmaxf(error_omega, -OMEGA_COMPENSATION_LIMIT), OMEGA_COMPENSATION_LIMIT);
+            const float* force_matrix = FORCE_MATRIX_TABLE[_SlipFlags];
             float total_current = 0.0f;
             float max_current = 0.0f;
             for (int index = 0; index < 4; index++) {
-                float force = force_matrix[3 * index] * fx + force_matrix[3 * index + 1] * fy + force_matrix[3 * index + 2] * torque;
-                float current = speed_gain_i * force + speed_gain_p * (force - _LastCompensationForce[index]) + _CurrentReferenceOfMachine[index] * decay;
+                float force = force_matrix[3 * index] * error.Vx + force_matrix[3 * index + 1] * error.Vy + force_matrix[3 * index + 2] * error.Omega;
+                float current = _CurrentReferenceOfMachine[index] * decay;
+                if (_SlipFlags & (1 << index)){
+                    current *= 0.9f;
+                }
+                current += compensation_gain_i * force + compensation_gain_p * (force - _LastCompensationForce[index]);
                 _LastCompensationForce[index] = force;
                 _CurrentReferenceOfMachine[index] = current;
                 total_current += fabsf(current);
@@ -285,60 +298,21 @@ void WheelController::Update(bool new_parameters, bool force_brake) {
             current_usage_for_compensation = total_current * weight;
         }
 
-        slipped_wheels = 0;
-        ignore_vx = false;
-        ignore_vy = false;
-
-        // 車輪速度の指令値を計算する
-        // ignore_vx, ignore_vyによって一部の指令値を無視することになっている場合、指令値の代わりに現在の速度を計算に適用する
-        WheelVelocity_t wheel_ref;
-        {
-            MachineVelocity_t machine;
-            machine.Vx = ignore_vx ? _MachineVelocity.Vx : _MachineVelocityReference.Vx;
-            machine.Vy = ignore_vy ? _MachineVelocity.Vy : _MachineVelocityReference.Vy;
-            machine.Omega = _MachineVelocityReference.Omega;
-            wheel_ref = VelocityVectorDeconmosition(machine);
-            _SpeedReference[0] = wheel_ref.V[0];
-            _SpeedReference[1] = wheel_ref.V[1];
-            _SpeedReference[2] = wheel_ref.V[2];
-            _SpeedReference[3] = wheel_ref.V[3];
-        }
-
         // 電流制限値を計算する
+        // 個々のモーターが加速に使用する電力を (TOTAL_CURRENT_LIMIT - current_usage_for_compensation) * DC48V_VOLTAGE / 4 [W]に制限する
         // 電流制限値は_CurrentLimitに格納される
         {
-            // 加速に必要な力・トルクを計算する
-            float fx = (_MachineVelocityReference.Vx - _MachineVelocity.Vx) * (MACHINE_WEIGHT * sqrt(WHEEL_POS_R_2) / WHEEL_POS_Y * ACCELERATION_LIMIT_VX);
-            float fy = (_MachineVelocityReference.Vy - _MachineVelocity.Vy) * (MACHINE_WEIGHT * sqrt(WHEEL_POS_R_2) / WHEEL_POS_X * ACCELERATION_LIMIT_VY);
-            float torque = (_MachineVelocityReference.Omega - _MachineVelocity.Omega) * (MACHINE_INERTIA / sqrt(WHEEL_POS_R_2) * ACCELERATION_LIMIT_OMEGA);
-
-            static constexpr int ignore_vx_table = 0b1110111011100000;
-            static constexpr int ignore_vy_table = 0b1111110010101000;
-            _MachineVelocityDummy.Vx = (ignore_vx_table >> slipped_wheels) & 0x1;//_MachineVelocity.Vx;
-            _MachineVelocityDummy.Vy = (ignore_vy_table >> slipped_wheels) & 0x1;//_MachineVelocity.Vy;
-            _MachineVelocityDummy.Omega = slipped_wheels;        //_MachineVelocity.Omega;
-
-            // 現在の円運動を維持するのに必要な力を加算する
-            fx -= _MachineVelocityReference.Vy * _MachineVelocityReference.Omega * (MACHINE_WEIGHT * sqrt(WHEEL_POS_R_2) / WHEEL_POS_Y);
-            fy += _MachineVelocityReference.Vx * _MachineVelocityReference.Omega * (MACHINE_WEIGHT * sqrt(WHEEL_POS_R_2) / WHEEL_POS_X);
-
-            // 必要な電流を求め、電流制限値を決定する
-            const float* force_matrix = FORCE_MATRIX_TABLE[slipped_wheels];
-            //const float* force_matrix = FORCE_MATRIX_TABLE[0];
-            float current[4];
-            float total_current = 0.0f;
+            float temp = (TOTAL_CURRENT_LIMIT - current_usage_for_compensation) * MOTOR_RESISTANCE * DC48V_VOLTAGE;
             for (int index = 0; index < 4; index++) {
-                float force = force_matrix[3 * index] * fx + force_matrix[3 * index + 1] * fy + force_matrix[3 * index + 2] * torque;
-                current[index] = fmaxf(fabsf(force) * (WHEEL_RADIUS / MOTOR_TORQUE_CONSTANT), MIN_CURRENT_LIMIT_PER_MOTOR);
-                total_current += current[index];
-            }
-            float current_limit_coeffient = (TOTAL_CURRENT_LIMIT - current_usage_for_compensation) / total_current;
-            for (int index = 0; index < 4; index++) {
-                _CurrentLimit[index] = fminf(current[index] * current_limit_coeffient, MAX_CURRENT_LIMIT_PER_MOTOR);
+                float emf_voltage = wheel_ref.V[index] * (MOTOR_SPEED_CONSTANT / WHEEL_CIRCUMFERENCE);
+                float current = sqrtf(emf_voltage * emf_voltage + temp) - fabsf(emf_voltage) / (2.0f * MOTOR_RESISTANCE);
+                _CurrentLimit[index] = fminf(fmaxf(current, MIN_CURRENT_LIMIT_PER_MOTOR), MAX_CURRENT_LIMIT_PER_MOTOR);
             }
         }
 
         // 各モーターの速度制御を行う
+        float speed_gain_p = fmaxf(0.0f, parameters.speed_gain_p);
+        float speed_gain_i = fmaxf(0.0f, parameters.speed_gain_i);
         for (int index = 0; index < 4; index++) {
             static constexpr float DECAY = 1.0f - 10.0f / IMU_OUTPUT_RATE; // 0.99f at 1kHz
 
@@ -347,8 +321,8 @@ void WheelController::Update(bool new_parameters, bool force_brake) {
             float speed_meas = motion.Wheels[index].Velocity;
             float speed_error_from_wheel = speed_ref - speed_meas;
             float weight = fminf(fabsf(speed_meas) + fabsf(speed_ref) + DECAY, 1.0f); // 指令速度と実際の速度がともに0に近いときに電流を減衰させる
-            float value_i = 0.05f * speed_error_from_wheel;
-            float value_p = 5.0f * (speed_error_from_wheel - _LastSpeedError[index]);
+            float value_i = speed_gain_i * speed_error_from_wheel;
+            float value_p = speed_gain_p * (speed_error_from_wheel - _LastSpeedError[index]);
             _LastSpeedError[index] = speed_error_from_wheel;
             _CurrentReferenceOfWheel[index] = _CurrentReferenceOfWheel[index] * weight + value_p + value_i;
         }
@@ -356,11 +330,11 @@ void WheelController::Update(bool new_parameters, bool force_brake) {
         // 打ち消す方向に働く電流を徐々に減衰させる
         {
             static constexpr float CANCELLED_CURRENT_DECAY = 10.0f / IMU_OUTPUT_RATE; // 0.01f at 1kHz
-            float cancel_current = (_CurrentLimit[0] - _CurrentLimit[1] + _CurrentLimit[2] - _CurrentLimit[3]) * CANCELLED_CURRENT_DECAY;
-            _CurrentLimit[0] -= cancel_current;
-            _CurrentLimit[1] += cancel_current;
-            _CurrentLimit[2] -= cancel_current;
-            _CurrentLimit[3] += cancel_current;
+            float cancel_current = (_CurrentReferenceOfWheel[0] - _CurrentReferenceOfWheel[1] + _CurrentReferenceOfWheel[2] - _CurrentReferenceOfWheel[3]) * CANCELLED_CURRENT_DECAY;
+            _CurrentReferenceOfWheel[0] -= cancel_current;
+            _CurrentReferenceOfWheel[1] += cancel_current;
+            _CurrentReferenceOfWheel[2] -= cancel_current;
+            _CurrentReferenceOfWheel[3] += cancel_current;
         }
 
         // 回生エネルギーを計算する
@@ -432,19 +406,8 @@ float WheelController::SteadyCurrent(const MachineVelocity_t &machine) {
 }
 
 float WheelController::MaximumWheelVelocity(const MachineVelocity_t &machine) {
-    WheelVelocity_t wheel = VelocityVectorDeconmosition(machine);
+    WheelVelocity_t wheel = VelocityVectorDecomposition(machine);
     return fmaxf(fmaxf(fabsf(wheel.V1), fabsf(wheel.V2)), fmaxf(fabsf(wheel.V3), fabsf(wheel.V4)));
-}
-
-void WheelController::LimitInputVelocity(MachineVelocity_t *machine) {
-    float max_velocity = MaximumWheelVelocity(*machine);
-    float voltage_limit = WHEEL_VELOCITY_LIMIT / fminf(max_velocity, WHEEL_VELOCITY_LIMIT);
-    float total_current = SteadyCurrent(*machine);
-    float current_limit = STEADY_CURRENT_LIMIT / fminf(total_current, STEADY_CURRENT_LIMIT);
-    float limit = fminf(voltage_limit, sqrt(current_limit));
-    machine->Vx *= limit;
-    machine->Vy *= limit;
-    machine->Omega *= limit;
 }
 
 void WheelController::EstimateMachineVelocity(const WheelVelocity_t &wheel, const MotionData_t::Imu_t &imu) {
@@ -493,13 +456,14 @@ void WheelController::EstimateMachineVelocity(const WheelVelocity_t &wheel, cons
 void WheelController::DetectSlip(const WheelVelocity_t &wheel, const float *reference_current) {
     static constexpr float DECAY = 1.0f - 10.0f / IMU_OUTPUT_RATE; // 0.99 at 1kHz
     static constexpr float BASE_CURRENT = 1.0f;
-    WheelVelocity_t wheel_from_imu = VelocityVectorDeconmosition(_MachineVelocity);
+    WheelVelocity_t wheel_from_imu = VelocityVectorDecomposition(_MachineVelocity);
     for (int index = 0; index < 4; index++) {
         float den = fmaxf(fabsf(reference_current[index]), BASE_CURRENT);
-        _SlipIndicator[index] = fmaxf(fabsf(wheel.V[index] - wheel_from_imu.V[index]), _SlipIndicator[index] * DECAY) / den;
+        _SlipIndicator[index] = fmaxf(fabsf(wheel.V[index] - wheel_from_imu.V[index]) / den, _SlipIndicator[index] * DECAY);
     }
 }
 
+int WheelController::_Timeout = 0;
 MachineVelocity_t WheelController::_MachineVelocityReference;
 float WheelController::_SpeedReference[4];
 float WheelController::_LastSpeedError[4];
@@ -510,7 +474,6 @@ float WheelController::_RegenerationEnergy[4];
 float WheelController::_CurrentLimit[4];
 float WheelController::_LastCompensationForce[4];
 float WheelController::_SlipIndicator[4];
-//bool WheelController::_IgnoreVx, WheelController::_IgnoreVy;
+uint32_t WheelController::_SlipFlags;
 MachineVelocity_t WheelController::_MachineVelocity;
-MachineVelocity_t WheelController::_MachineVelocityDummy;
 Lpf2ndOrder50 WheelController::_LpfWheelVelocity[4];

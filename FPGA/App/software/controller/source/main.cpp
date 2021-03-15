@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <sys/alt_stdio.h>
 #include <peripheral/motor_controller.hpp>
 #include <peripheral/vector_controller.hpp>
 #include <driver/adc2.hpp>
@@ -46,9 +45,6 @@ int main(void) {
         initialize_peripheral();
         start_peripheral();
     }
-
-    // 起動メッセージを表示する
-    alt_putstr("Hello from Nios II!\n");
 
     while (true) {
     }

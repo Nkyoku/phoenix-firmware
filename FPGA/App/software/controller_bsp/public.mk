@@ -167,7 +167,7 @@ ELF_PATCH_FLAG  += --timestamp 1615649612
 
 # Enable JTAG UART driver to recover when host is inactive causing buffer to 
 # full without returning error. Printf will not fail with this recovery. none 
-# setting altera_avalon_jtag_uart_driver.enable_jtag_uart_ignore_fifo_full_error is true
+# setting altera_avalon_jtag_uart_driver.enable_jtag_uart_ignore_fifo_full_error is false
 
 # Small-footprint (polled mode) driver none 
 # setting altera_avalon_jtag_uart_driver.enable_small_driver is false
@@ -407,12 +407,6 @@ ALT_CFLAGS += -mcustom-floatis=250
 ALT_CFLAGS += -mcustom-fmuls=252
 ALT_CFLAGS += -mcustom-fnegs=225
 ALT_CFLAGS += -mcustom-fsubs=254
-
-#------------------------------------------------------------------------------
-#        SOFTWARE COMPONENT & DRIVER SETTING-PRODUCED DEFINITIONS
-#------------------------------------------------------------------------------
-
-ALT_CPPFLAGS += -DALTERA_AVALON_JTAG_UART_IGNORE_FIFO_FULL_ERROR
 
 #END MANAGED
 

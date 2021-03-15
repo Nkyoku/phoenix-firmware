@@ -62,13 +62,14 @@ void StreamTransmitter::TransmitControl(const ControlData_t &control_data, int p
     __builtin_sthio(&StreamDataControl.wheel_current_ref[1], Fp32ToFp16(control_data.Wheels[1].CurrentRef));
     __builtin_sthio(&StreamDataControl.wheel_current_ref[2], Fp32ToFp16(control_data.Wheels[2].CurrentRef));
     __builtin_sthio(&StreamDataControl.wheel_current_ref[3], Fp32ToFp16(control_data.Wheels[3].CurrentRef));
-    __builtin_sthio(&StreamDataControl.wheel_energy[0], Fp32ToFp16(control_data.Wheels[0].Energy));
-    __builtin_sthio(&StreamDataControl.wheel_energy[1], Fp32ToFp16(control_data.Wheels[1].Energy));
-    __builtin_sthio(&StreamDataControl.wheel_energy[2], Fp32ToFp16(control_data.Wheels[2].Energy));
-    __builtin_sthio(&StreamDataControl.wheel_energy[3], Fp32ToFp16(control_data.Wheels[3].Energy));
+    __builtin_sthio(&StreamDataControl.wheel_current_limit[0], Fp32ToFp16(control_data.Wheels[0].CurrentLimit));
+    __builtin_sthio(&StreamDataControl.wheel_current_limit[1], Fp32ToFp16(control_data.Wheels[1].CurrentLimit));
+    __builtin_sthio(&StreamDataControl.wheel_current_limit[2], Fp32ToFp16(control_data.Wheels[2].CurrentLimit));
+    __builtin_sthio(&StreamDataControl.wheel_current_limit[3], Fp32ToFp16(control_data.Wheels[3].CurrentLimit));
     __builtin_sthio(&StreamDataControl.machine_velocity[0], Fp32ToFp16(control_data.MachineVelocity[0]));
     __builtin_sthio(&StreamDataControl.machine_velocity[1], Fp32ToFp16(control_data.MachineVelocity[1]));
     __builtin_sthio(&StreamDataControl.machine_velocity[2], Fp32ToFp16(control_data.MachineVelocity[2]));
+    __builtin_sthio(&StreamDataControl.slip_flags, control_data.SlipFlags);
     StreamDataDesciptorControl.TransmitAsync(_Device);
 }
 

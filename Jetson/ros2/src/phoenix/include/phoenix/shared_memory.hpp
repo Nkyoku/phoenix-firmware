@@ -66,6 +66,16 @@ struct SharedMemory_t {
         float speed_gain_i;
 
         /**
+         * 姿勢補正制御の比例ゲイン
+         */
+        float compensation_gain_p;
+
+        /**
+         * 姿勢補正制御の積分ゲイン
+         */
+        float compensation_gain_i;
+
+        /**
          * チェックサムを計算する
          * この関数はParameters_tが4の倍数バイトの大きさであることを前提にしている
          * @return チェックサム

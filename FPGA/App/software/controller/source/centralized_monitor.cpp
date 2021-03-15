@@ -192,12 +192,19 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
     if (IsAnyProblemOccured() == false) {
         // Jetsonから書き込まれた制御パラメータを確認する
         bool new_parameters = SharedMemory::UpdateParameters();
+        if (new_parameters) {
+            _ParameterTimeout = PARAMETER_TIMEOUT;
+        }
+        else if (0 < _ParameterTimeout) {
+            _ParameterTimeout--;
+        }
+        bool stop_motors = _ParameterTimeout <= 0;
 
         // 車輪モーターの指令値を更新する
-        WheelController::Update(new_parameters, false);
+        WheelController::Update(new_parameters, stop_motors);
 
         // ドリブルモーターの指令値を更新する
-        DribbleController::Update(new_parameters, false);
+        DribbleController::Update(new_parameters, stop_motors);
 
 #if DEBUG_PRINTF
         if (new_parameters) {
@@ -209,6 +216,9 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
         // パラメータをクリアする
         SharedMemory::ClearParameters();
 
+        // 車輪モーターのセンサーデータ等を更新する
+        WheelController::Update(false, true);
+
         // Jetsonからエラーフラグのクリアが指示されていればクリアを試みる
         if (SharedMemory::IsRequestedClearingErrorFlags() == true) {
 #if DEBUG_PRINTF
@@ -216,6 +226,8 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
 #endif
             ClearErrorFlags();
         }
+
+        _ParameterTimeout = 0;
     }
 
     // パフォーマンスカウンタのセクション1の測定を終了する
@@ -345,3 +357,4 @@ void CentralizedMonitor::ResetMotorInterruptFlags(void) {
 volatile uint32_t CentralizedMonitor::_ErrorFlags = 0;
 volatile uint32_t CentralizedMonitor::_FaultFlags = 0;
 int CentralizedMonitor::_Adc2Timeout = ADC2_TIMEOUT_THRESHOLD;
+int CentralizedMonitor::_ParameterTimeout = 0;

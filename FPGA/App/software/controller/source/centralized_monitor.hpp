@@ -117,11 +117,17 @@ private:
     /// ADC2のタイムアウトカウンタ
     static int _Adc2Timeout;
 
+    /// 指令値のタイムアウトカウンタ
+    static int _ParameterTimeout;
+
     /// ADC2のタイムアウトカウンタの初期値
     static constexpr int ADC2_TIMEOUT_THRESHOLD = 50;
 
+    /// 指令値が更新されなくなってから自動停止するまでの時間
+    static constexpr int PARAMETER_TIMEOUT = 1000;
+
     /// DC48Vの下限電圧[mV]
-    static constexpr float DC48V_UNDER_VOLTAGE_THRESHOLD = 30.0f; // T.B.D.
+    static constexpr float DC48V_UNDER_VOLTAGE_THRESHOLD = 40.0f;
 
     /// DC48Vの上限電圧[mV]
     static constexpr float DC48V_OVER_VOLTAGE_THRESHOLD = 52.5f;

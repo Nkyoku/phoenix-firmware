@@ -37,9 +37,10 @@ struct ControlData_t {
     struct Wheel_t {
         float VelocityRef;
         float CurrentRef;
-        float Energy;
+        float CurrentLimit;
     } Wheels[4];
     float MachineVelocity[3];
+    uint32_t SlipFlags;
 };
 
 /**

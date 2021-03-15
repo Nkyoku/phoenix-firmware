@@ -277,13 +277,14 @@ void MainWindow::connectToNodes(const QString &namespace_name) {
                     stream << control_msg->wheel_current_ref[1] << sep;
                     stream << control_msg->wheel_current_ref[2] << sep;
                     stream << control_msg->wheel_current_ref[3] << sep;
-                    stream << control_msg->wheel_energy[0] << sep;
-                    stream << control_msg->wheel_energy[1] << sep;
-                    stream << control_msg->wheel_energy[2] << sep;
-                    stream << control_msg->wheel_energy[3] << sep;
+                    stream << control_msg->wheel_current_limit[0] << sep;
+                    stream << control_msg->wheel_current_limit[1] << sep;
+                    stream << control_msg->wheel_current_limit[2] << sep;
+                    stream << control_msg->wheel_current_limit[3] << sep;
                     stream << control_msg->machine_velocity[0] << sep;
                     stream << control_msg->machine_velocity[1] << sep;
                     stream << control_msg->machine_velocity[2] << sep;
+                    stream << control_msg->slip_flags << sep;
                     stream << msg->accelerometer[0] << sep;
                     stream << msg->accelerometer[1] << sep;
                     stream << msg->accelerometer[2] << sep;
@@ -385,11 +386,12 @@ void MainWindow::updateTelemertyTreeItems(void) {
         for (int index = 0; index < 4; index++) {
             _TreeItems.control.wheel_velocity_ref[index]->setText(COL, QString::number(msg->wheel_velocity_ref[index], 'f', 3));
             _TreeItems.control.wheel_current_ref[index]->setText(COL, QString::number(msg->wheel_current_ref[index], 'f', 3));
-            _TreeItems.control.wheel_energy[index]->setText(COL, QString::number(msg->wheel_energy[index], 'f', 4));
+            _TreeItems.control.wheel_current_limit[index]->setText(COL, QString::number(msg->wheel_current_limit[index], 'f', 4));
         }
         for (int index = 0; index < 3; index++) {
             _TreeItems.control.machine_velocity[index]->setText(COL, QString::number(msg->machine_velocity[index], 'f', 3));
         }
+         _TreeItems.control.slip_flags->setText(COL, QString::number(msg->slip_flags, 'f', 3));
     }
 }
 
@@ -454,13 +456,14 @@ void MainWindow::generateTelemetryTreeItems(void) {
     _TreeItems.control.wheel_current_ref[1] = new QTreeWidgetItem(control_top, {"Wheel 2 Current Ref", "", "A"});
     _TreeItems.control.wheel_current_ref[2] = new QTreeWidgetItem(control_top, {"Wheel 3 Current Ref", "", "A"});
     _TreeItems.control.wheel_current_ref[3] = new QTreeWidgetItem(control_top, {"Wheel 4 Current Ref", "", "A"});
-    _TreeItems.control.wheel_energy[0] = new QTreeWidgetItem(control_top, {"Wheel 1 Energy", "", "J"});
-    _TreeItems.control.wheel_energy[1] = new QTreeWidgetItem(control_top, {"Wheel 2 Energy", "", "J"});
-    _TreeItems.control.wheel_energy[2] = new QTreeWidgetItem(control_top, {"Wheel 3 Energy", "", "J"});
-    _TreeItems.control.wheel_energy[3] = new QTreeWidgetItem(control_top, {"Wheel 4 Energy", "", "J"});
+    _TreeItems.control.wheel_current_limit[0] = new QTreeWidgetItem(control_top, {"Wheel 1 Current Limit", "", "A"});
+    _TreeItems.control.wheel_current_limit[1] = new QTreeWidgetItem(control_top, {"Wheel 2 Current Limit", "", "A"});
+    _TreeItems.control.wheel_current_limit[2] = new QTreeWidgetItem(control_top, {"Wheel 3 Current Limit", "", "A"});
+    _TreeItems.control.wheel_current_limit[3] = new QTreeWidgetItem(control_top, {"Wheel 4 Current Limit", "", "A"});
     _TreeItems.control.machine_velocity[0] = new QTreeWidgetItem(control_top, {"Machine Velocity X", "", "m/s"});
     _TreeItems.control.machine_velocity[1] = new QTreeWidgetItem(control_top, {"Machine Velocity Y", "", "m/s"});
     _TreeItems.control.machine_velocity[2] = new QTreeWidgetItem(control_top, {u8"Machine Velocity \u03C9", "", "rad/s"});
+    _TreeItems.control.slip_flags = new QTreeWidgetItem(control_top, {"Slip Flags", "", ""});
 
     // カラム幅を文字に合わせてリサイズする
     _Ui->telemetryTree->expandAll();
@@ -476,9 +479,7 @@ void MainWindow::startLogging(void) {
     }
     auto file = std::make_shared<QFile>(path);
     if (file->open(QIODevice::WriteOnly | QIODevice::Text)) {
-        _LogFrameNumber = 0;
-        _LogFile = file;
-        QTextStream stream(_LogFile.get());
+        QTextStream stream(file.get());
         stream << "Time";
         for (int index = 1; index <= 4; index++)
             stream << ",Velocity " << index << " Meas";
@@ -491,9 +492,13 @@ void MainWindow::startLogging(void) {
         for (int index = 1; index <= 4; index++)
             stream << ",Energy " << index;
         stream << ",Machine Vx,Machine Vy,Machine Omega";
+        stream << ",Slip Flags";
         stream << ",Accel X,Accel Y,Accel Z";
         stream << ",Gyro X,Gyro Y,Gyro Z";
         stream << ",DC48V,Battery Voltage,Battery Current\n";
+        stream.flush();
+        _LogFrameNumber = 0;
+        _LogFile = file;
     }
     _Ui->saveLogButton->setEnabled(false);
     _Ui->stopLogButton->setEnabled(true);
@@ -539,7 +544,7 @@ void MainWindow::sendCommand(void) {
             if (input_state) {
                 request->speed_x = 4.0f * input_state->leftStickX;
                 request->speed_y = 4.0f * input_state->leftStickY;
-                request->speed_omega = -5.0f * input_state->rightStickX;
+                request->speed_omega = -10.0f * input_state->rightStickX;
                 request->dribble_power = -input_state->rightTrigger;
             }
         } else {

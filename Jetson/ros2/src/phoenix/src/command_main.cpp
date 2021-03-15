@@ -30,6 +30,12 @@ static const std::string PARAM_SPEED_KP("speed_kp");
 /// 速度制御の積分ゲインのパラメータ名
 static const std::string PARAM_SPEED_KI("speed_ki");
 
+/// 姿勢補正制御の比例ゲインのパラメータ名
+static const std::string PARAM_COMPENSATION_KP("compensation_kp");
+
+/// 姿勢補正制御の積分ゲインのパラメータ名
+static const std::string PARAM_COMPENSATION_KI("compensation_ki");
+
 /// Nios IIの共有メモリーのベースアドレス
 static constexpr uint32_t NIOS_SHARED_RAM_BASE = 0x0u;
 
@@ -72,8 +78,10 @@ public:
         _ProgramNiosService = create_service<phoenix_msgs::srv::ProgramNios>("program_nios", std::bind(&CommandServerNode::ProgramNiosCallback, this, _1, _2, _3));
 
         // パラメータを宣言する
-        declare_parameter<double>(PARAM_SPEED_KP, 0.0);
-        declare_parameter<double>(PARAM_SPEED_KI, 0.0);
+        declare_parameter<double>(PARAM_SPEED_KP, 5.0);
+        declare_parameter<double>(PARAM_SPEED_KI, 0.05);
+        declare_parameter<double>(PARAM_COMPENSATION_KP, 2.0);
+        declare_parameter<double>(PARAM_COMPENSATION_KI, 0.02);
     }
 
 private:
@@ -132,6 +140,8 @@ private:
         _SharedMemory.Parameters.dribble_power = request->dribble_power;
         _SharedMemory.Parameters.speed_gain_p = std::fmaxf(0.0f, GetFloatParameter(PARAM_SPEED_KP));
         _SharedMemory.Parameters.speed_gain_i = std::fmaxf(0.0f, GetFloatParameter(PARAM_SPEED_KI));
+        _SharedMemory.Parameters.compensation_gain_p = std::fmaxf(0.0f, GetFloatParameter(PARAM_COMPENSATION_KP));
+        _SharedMemory.Parameters.compensation_gain_i = std::fmaxf(0.0f, GetFloatParameter(PARAM_COMPENSATION_KI));
 
         // チェックサムを計算して格納する
         uint32_t checksum = _SharedMemory.Parameters.CalculateChecksum();

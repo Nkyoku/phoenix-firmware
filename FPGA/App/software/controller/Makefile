@@ -121,7 +121,7 @@ APP_CFLAGS_UNDEFINED_SYMBOLS :=
 APP_CFLAGS_OPTIMIZATION := -Os
 APP_CFLAGS_DEBUG_LEVEL := -g
 APP_CFLAGS_WARNINGS := -Wall
-APP_CFLAGS_USER_FLAGS := -ffunction-sections -fdata-sections -g
+APP_CFLAGS_USER_FLAGS := -ffunction-sections -fdata-sections -g -fno-exceptions
 
 APP_ASFLAGS_USER :=
 APP_LDFLAGS_USER := -Wl,--gc-sections
