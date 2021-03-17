@@ -24,7 +24,7 @@ set_module_property VERSION 1.0
 set_module_property INTERNAL false
 set_module_property OPAQUE_ADDRESS_MAP true
 set_module_property AUTHOR "Fujii Naomichi"
-set_module_property DISPLAY_NAME "FP16 to FP32 Converter"
+set_module_property DISPLAY_NAME "FP32 to FP16 Converter"
 set_module_property INSTANTIATE_IN_SYSTEM_MODULE true
 set_module_property EDITABLE true
 set_module_property REPORT_TO_TALKBACK false
