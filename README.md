@@ -4,7 +4,13 @@
 ## Wiki
 詳細は[Wiki](https://github.com/Nkyoku/phoenix-firmware/wiki)を参照
 
-## Files
+## 開発環境
+- Jetson Nano Developer Kit SD Card Image 32.4.4
+- ROS2 Eloquent Elusor
+- Quartus Prime Lite Edition 20.1.1
+- IP-NIOS (FPGAのコンパイルにNios II/fのライセンスが必要)
+
+## ファイル
 - CYPD5125-40LQXI
   - noboot.hex  
   USB PDコントローラのファームウェア
