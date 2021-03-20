@@ -1,0 +1,20 @@
+# system info rsu on 2021.03.20.19:34:50
+system_info:
+name,value
+DEVICE,10CL025YU256C8G
+DEVICE_FAMILY,Cyclone 10 LP
+GENERATION_ID,1616236489
+#
+#
+# Files generated for rsu on 2021.03.20.19:34:50
+files:
+filepath,kind,attributes,module,is_top
+simulation/rsu.v,VERILOG,,rsu,true
+simulation/submodules/rsu_remote_update_0.v,VERILOG,,rsu_remote_update_0,false
+simulation/submodules/altera_remote_update_core.v,VERILOG,,altera_remote_update_core,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+rsu.remote_update_0,rsu_remote_update_0
+rsu.remote_update_0.remote_update_core,altera_remote_update_core

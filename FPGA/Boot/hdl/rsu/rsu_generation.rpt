@@ -1,0 +1,17 @@
+Info: Starting: Create HDL design files for synthesis
+Info: qsys-generate C:\work\Robocup\phoenix-firmware\FPGA\Boot\hdl\rsu.qsys --synthesis=VERILOG --output-directory=C:\work\Robocup\phoenix-firmware\FPGA\Boot\hdl\rsu\synthesis --family="Cyclone 10 LP" --part=10CL025YU256C8G
+Progress: Loading hdl/rsu.qsys
+Progress: Reading input file
+Progress: Adding remote_update_0 [altera_remote_update 20.1]
+Progress: Parameterizing module remote_update_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: rsu: Generating rsu "rsu" for QUARTUS_SYNTH
+Info: remote_update_0: "rsu" instantiated altera_remote_update "remote_update_0"
+Info: remote_update_core: Generating top-level entity altera_remote_update_core.
+Info: remote_update_core: "remote_update_0" instantiated altera_remote_update_core "remote_update_core"
+Info: rsu: Done "rsu" with 3 modules, 3 files
+Info: qsys-generate succeeded.
+Info: Finished: Create HDL design files for synthesis

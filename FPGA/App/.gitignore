@@ -2,8 +2,9 @@
 /db
 /incremental_db
 /greybox_tmp
-/output_files
-!/output_files/convert.cof
+/output_files/*
+!/output_files/*.cof
+!/output_files/*.sof
 *.tcl~
 *.log
 /software/*/obj

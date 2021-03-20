@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="simulation/submodules/altera_remote_update_core.v"
+   type="VERILOG"
+   library="remote_update_core" />
+ <file
+   path="simulation/submodules/rsu_remote_update_0.v"
+   type="VERILOG"
+   library="remote_update_0" />
+ <file path="simulation/rsu.v" type="VERILOG" />
+ <topLevel name="rsu" />
+ <deviceFamily name="cyclone10lp" />
+</simPackage>

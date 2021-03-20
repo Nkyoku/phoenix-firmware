@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy
+ date="2021.03.21.00:02:44"
+ outputDirectory="C:/work/Robocup/phoenix-firmware/FPGA/Boot/hdl/rsu/">
+ <perimeter>
+  <parameter
+     name="AUTO_GENERATION_ID"
+     type="Integer"
+     defaultValue="0"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_UNIQUE_ID"
+     type="String"
+     defaultValue=""
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_FAMILY"
+     type="String"
+     defaultValue="Cyclone 10 LP"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE"
+     type="String"
+     defaultValue="10CL025YU256C8G"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_SPEEDGRADE"
+     type="String"
+     defaultValue="8"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLOCK_CLOCK_RATE"
+     type="Long"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLOCK_CLOCK_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLOCK_RESET_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <interface name="busy" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="busy" direction="output" role="busy" width="1" />
+  </interface>
+  <interface name="clock" kind="clock" start="0">
+   <property name="clockRate" value="0" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="clock" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="data_in" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="data_in" direction="input" role="data_in" width="24" />
+  </interface>
+  <interface name="data_out" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="data_out" direction="output" role="data_out" width="29" />
+  </interface>
+  <interface name="param" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="param" direction="input" role="param" width="3" />
+  </interface>
+  <interface name="read_param" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="read_param" direction="input" role="read_param" width="1" />
+  </interface>
+  <interface name="read_source" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="read_source" direction="input" role="read_source" width="2" />
+  </interface>
+  <interface name="reconfig" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="reconfig" direction="input" role="reconfig" width="1" />
+  </interface>
+  <interface name="reset" kind="reset" start="0">
+   <property name="associatedClock" value="clock" />
+   <property name="synchronousEdges" value="DEASSERT" />
+   <port name="reset" direction="input" role="reset" width="1" />
+  </interface>
+  <interface name="reset_timer" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="reset_timer" direction="input" role="reset_timer" width="1" />
+  </interface>
+  <interface name="write_param" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <port name="write_param" direction="input" role="write_param" width="1" />
+  </interface>
+ </perimeter>
+ <entity
+   path=""
+   parameterizationKey="rsu:1.0:AUTO_CLOCK_CLOCK_DOMAIN=-1,AUTO_CLOCK_CLOCK_RATE=-1,AUTO_CLOCK_RESET_DOMAIN=-1,AUTO_DEVICE=10CL025YU256C8G,AUTO_DEVICE_FAMILY=Cyclone 10 LP,AUTO_DEVICE_SPEEDGRADE=8,AUTO_GENERATION_ID=1616252563,AUTO_UNIQUE_ID=(altera_remote_update:20.1:AUTO_DEVICE_SPEEDGRADE=8,CBX_AUTO_BLACKBOX=ALL,DEVICE=10CL025YU256C8G,DEVICE_FAMILY=Cyclone 10 LP,GUI_config_device=EPCQ16,check_app_pof=false,check_avalon_interface=false,config_device_addr_width=24,in_data_width=24,is_epcq=true,m_support_write_config_check=true,operation_mode=REMOTE,out_data_width=24(altera_clock_bridge:20.1:DERIVED_CLOCK_RATE=0,EXPLICIT_CLOCK_RATE=0,NUM_CLOCK_OUTPUTS=1)(altera_reset_bridge:20.1:ACTIVE_LOW_RESET=0,AUTO_CLK_CLOCK_RATE=0,NUM_RESET_OUTPUTS=1,SYNCHRONOUS_EDGES=deassert,USE_RESET_REQUEST=0)(altera_remote_update_core:20.1:CBX_AUTO_BLACKBOX=ALL,DEVICE=10CL025YU256C8G,DEVICE_FAMILY=Cyclone 10 LP,GUI_config_device=EPCQ16,check_app_pof=false,config_device_addr_width=24,in_data_width=24,is_epcq=true,m_support_write_config_check=true,operation_mode=REMOTE,out_data_width=29)(clock:20.1:)(clock:20.1:)(reset:20.1:))"
+   instancePathKey="rsu"
+   kind="rsu"
+   version="1.0"
+   name="rsu">
+  <parameter name="AUTO_CLOCK_CLOCK_RATE" value="-1" />
+  <parameter name="AUTO_CLOCK_CLOCK_DOMAIN" value="-1" />
+  <parameter name="AUTO_CLOCK_RESET_DOMAIN" value="-1" />
+  <parameter name="AUTO_GENERATION_ID" value="1616252563" />
+  <parameter name="AUTO_DEVICE" value="10CL025YU256C8G" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone 10 LP" />
+  <parameter name="AUTO_UNIQUE_ID" value="" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="8" />
+  <generatedFiles>
+   <file
+       path="C:/work/Robocup/phoenix-firmware/FPGA/Boot/hdl/rsu/synthesis/rsu.v"
+       type="VERILOG" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="C:/work/Robocup/phoenix-firmware/FPGA/Boot/hdl/rsu/synthesis/submodules/rsu_remote_update_0.v"
+       type="VERILOG" />
+   <file
+       path="C:/work/Robocup/phoenix-firmware/FPGA/Boot/hdl/rsu/synthesis/submodules/altera_remote_update_core.v"
+       type="VERILOG"
+       attributes="" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file path="C:/work/Robocup/phoenix-firmware/FPGA/Boot/hdl/rsu.qsys" />
+  </sourceFiles>
+  <childSourceFiles>
+   <file
+       path="C:/opt/intelfpga_lite/20.1/ip/altera/altera_remote_update/altera_remote_update_hw.tcl" />
+   <file
+       path="C:/opt/intelfpga_lite/20.1/ip/altera/altera_remote_update/altera_remote_update_core_hw.tcl" />
+  </childSourceFiles>
+  <messages>
+   <message level="Debug" culprit="rsu">queue size: 0 starting:rsu "rsu"</message>
+   <message level="Progress" culprit="min"></message>
+   <message level="Progress" culprit="max"></message>
+   <message level="Progress" culprit="current"></message>
+   <message level="Debug">Transform: CustomInstructionTransform</message>
+   <message level="Debug">No custom instruction connections, skipping transform </message>
+   <message level="Debug" culprit="merlin_custom_instruction_transform"><![CDATA[After transform: <b>1</b> modules, <b>0</b> connections]]></message>
+   <message level="Debug">Transform: MMTransform</message>
+   <message level="Debug">Transform: InterruptMapperTransform</message>
+   <message level="Debug">Transform: InterruptSyncTransform</message>
+   <message level="Debug">Transform: InterruptFanoutTransform</message>
+   <message level="Debug">Transform: AvalonStreamingTransform</message>
+   <message level="Debug">Transform: ResetAdaptation</message>
+   <message level="Debug" culprit="rsu"><![CDATA["<b>rsu</b>" reuses <b>altera_remote_update</b> "<b>submodules/rsu_remote_update_0</b>"]]></message>
+   <message level="Debug" culprit="rsu">queue size: 0 starting:altera_remote_update "submodules/rsu_remote_update_0"</message>
+   <message level="Progress" culprit="min"></message>
+   <message level="Progress" culprit="max"></message>
+   <message level="Progress" culprit="current"></message>
+   <message level="Debug">Transform: CustomInstructionTransform</message>
+   <message level="Debug">No custom instruction connections, skipping transform </message>
+   <message level="Debug" culprit="merlin_custom_instruction_transform"><![CDATA[After transform: <b>3</b> modules, <b>3</b> connections]]></message>
+   <message level="Debug">Transform: MMTransform</message>
+   <message level="Debug">Transform: InterruptMapperTransform</message>
+   <message level="Debug">Transform: InterruptSyncTransform</message>
+   <message level="Debug">Transform: InterruptFanoutTransform</message>
+   <message level="Debug">Transform: AvalonStreamingTransform</message>
+   <message level="Debug">Transform: ResetAdaptation</message>
+   <message level="Debug" culprit="remote_update_0"><![CDATA["<b>remote_update_0</b>" reuses <b>altera_remote_update_core</b> "<b>submodules/altera_remote_update_core</b>"]]></message>
+   <message level="Info" culprit="remote_update_0"><![CDATA["<b>rsu</b>" instantiated <b>altera_remote_update</b> "<b>remote_update_0</b>"]]></message>
+   <message level="Debug" culprit="rsu">queue size: 0 starting:altera_remote_update_core "submodules/altera_remote_update_core"</message>
+   <message level="Info" culprit="remote_update_core">Generating top-level entity altera_remote_update_core.</message>
+   <message level="Info" culprit="remote_update_core"><![CDATA["<b>remote_update_0</b>" instantiated <b>altera_remote_update_core</b> "<b>remote_update_core</b>"]]></message>
+  </messages>
+ </entity>
+ <entity
+   path="submodules/"
+   parameterizationKey="altera_remote_update:20.1:AUTO_DEVICE_SPEEDGRADE=8,CBX_AUTO_BLACKBOX=ALL,DEVICE=10CL025YU256C8G,DEVICE_FAMILY=Cyclone 10 LP,GUI_config_device=EPCQ16,check_app_pof=false,check_avalon_interface=false,config_device_addr_width=24,in_data_width=24,is_epcq=true,m_support_write_config_check=true,operation_mode=REMOTE,out_data_width=24(altera_clock_bridge:20.1:DERIVED_CLOCK_RATE=0,EXPLICIT_CLOCK_RATE=0,NUM_CLOCK_OUTPUTS=1)(altera_reset_bridge:20.1:ACTIVE_LOW_RESET=0,AUTO_CLK_CLOCK_RATE=0,NUM_RESET_OUTPUTS=1,SYNCHRONOUS_EDGES=deassert,USE_RESET_REQUEST=0)(altera_remote_update_core:20.1:CBX_AUTO_BLACKBOX=ALL,DEVICE=10CL025YU256C8G,DEVICE_FAMILY=Cyclone 10 LP,GUI_config_device=EPCQ16,check_app_pof=false,config_device_addr_width=24,in_data_width=24,is_epcq=true,m_support_write_config_check=true,operation_mode=REMOTE,out_data_width=29)(clock:20.1:)(clock:20.1:)(reset:20.1:)"
+   instancePathKey="rsu:.:remote_update_0"
+   kind="altera_remote_update"
+   version="20.1"
+   name="rsu_remote_update_0">
+  <parameter name="GUI_config_device" value="EPCQ16" />
+  <parameter name="check_avalon_interface" value="false" />
+  <parameter name="in_data_width" value="24" />
+  <parameter name="out_data_width" value="24" />
+  <parameter name="check_app_pof" value="false" />
+  <parameter name="DEVICE_FAMILY" value="Cyclone 10 LP" />
+  <parameter name="DEVICE" value="10CL025YU256C8G" />
+  <parameter name="operation_mode" value="REMOTE" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="8" />
+  <parameter name="config_device_addr_width" value="24" />
+  <parameter name="m_support_write_config_check" value="true" />
+  <parameter name="is_epcq" value="true" />
+  <parameter name="CBX_AUTO_BLACKBOX" value="ALL" />
+  <generatedFiles>
+   <file
+       path="C:/work/Robocup/phoenix-firmware/FPGA/Boot/hdl/rsu/synthesis/submodules/rsu_remote_update_0.v"
+       type="VERILOG" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="C:/work/Robocup/phoenix-firmware/FPGA/Boot/hdl/rsu/synthesis/submodules/altera_remote_update_core.v"
+       type="VERILOG"
+       attributes="" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="C:/opt/intelfpga_lite/20.1/ip/altera/altera_remote_update/altera_remote_update_hw.tcl" />
+  </sourceFiles>
+  <childSourceFiles>
+   <file
+       path="C:/opt/intelfpga_lite/20.1/ip/altera/altera_remote_update/altera_remote_update_core_hw.tcl" />
+  </childSourceFiles>
+  <instantiator instantiator="rsu" as="remote_update_0" />
+  <messages>
+   <message level="Debug" culprit="rsu">queue size: 0 starting:altera_remote_update "submodules/rsu_remote_update_0"</message>
+   <message level="Progress" culprit="min"></message>
+   <message level="Progress" culprit="max"></message>
+   <message level="Progress" culprit="current"></message>
+   <message level="Debug">Transform: CustomInstructionTransform</message>
+   <message level="Debug">No custom instruction connections, skipping transform </message>
+   <message level="Debug" culprit="merlin_custom_instruction_transform"><![CDATA[After transform: <b>3</b> modules, <b>3</b> connections]]></message>
+   <message level="Debug">Transform: MMTransform</message>
+   <message level="Debug">Transform: InterruptMapperTransform</message>
+   <message level="Debug">Transform: InterruptSyncTransform</message>
+   <message level="Debug">Transform: InterruptFanoutTransform</message>
+   <message level="Debug">Transform: AvalonStreamingTransform</message>
+   <message level="Debug">Transform: ResetAdaptation</message>
+   <message level="Debug" culprit="remote_update_0"><![CDATA["<b>remote_update_0</b>" reuses <b>altera_remote_update_core</b> "<b>submodules/altera_remote_update_core</b>"]]></message>
+   <message level="Info" culprit="remote_update_0"><![CDATA["<b>rsu</b>" instantiated <b>altera_remote_update</b> "<b>remote_update_0</b>"]]></message>
+   <message level="Debug" culprit="rsu">queue size: 0 starting:altera_remote_update_core "submodules/altera_remote_update_core"</message>
+   <message level="Info" culprit="remote_update_core">Generating top-level entity altera_remote_update_core.</message>
+   <message level="Info" culprit="remote_update_core"><![CDATA["<b>remote_update_0</b>" instantiated <b>altera_remote_update_core</b> "<b>remote_update_core</b>"]]></message>
+  </messages>
+ </entity>
+ <entity
+   path="submodules/"
+   parameterizationKey="altera_remote_update_core:20.1:CBX_AUTO_BLACKBOX=ALL,DEVICE=10CL025YU256C8G,DEVICE_FAMILY=Cyclone 10 LP,GUI_config_device=EPCQ16,check_app_pof=false,config_device_addr_width=24,in_data_width=24,is_epcq=true,m_support_write_config_check=true,operation_mode=REMOTE,out_data_width=29"
+   instancePathKey="rsu:.:remote_update_0:.:remote_update_core"
+   kind="altera_remote_update_core"
+   version="20.1"
+   name="altera_remote_update_core">
+  <parameter name="GUI_config_device" value="EPCQ16" />
+  <parameter name="in_data_width" value="24" />
+  <parameter name="out_data_width" value="29" />
+  <parameter name="check_app_pof" value="false" />
+  <parameter name="DEVICE_FAMILY" value="Cyclone 10 LP" />
+  <parameter name="DEVICE" value="10CL025YU256C8G" />
+  <parameter name="operation_mode" value="REMOTE" />
+  <parameter name="config_device_addr_width" value="24" />
+  <parameter name="m_support_write_config_check" value="true" />
+  <parameter name="is_epcq" value="true" />
+  <parameter name="CBX_AUTO_BLACKBOX" value="ALL" />
+  <generatedFiles>
+   <file
+       path="C:/work/Robocup/phoenix-firmware/FPGA/Boot/hdl/rsu/synthesis/submodules/altera_remote_update_core.v"
+       type="VERILOG"
+       attributes="" />
+  </generatedFiles>
+  <childGeneratedFiles/>
+  <sourceFiles>
+   <file
+       path="C:/opt/intelfpga_lite/20.1/ip/altera/altera_remote_update/altera_remote_update_core_hw.tcl" />
+  </sourceFiles>
+  <childSourceFiles/>
+  <instantiator instantiator="rsu_remote_update_0" as="remote_update_core" />
+  <messages>
+   <message level="Debug" culprit="rsu">queue size: 0 starting:altera_remote_update_core "submodules/altera_remote_update_core"</message>
+   <message level="Info" culprit="remote_update_core">Generating top-level entity altera_remote_update_core.</message>
+   <message level="Info" culprit="remote_update_core"><![CDATA["<b>remote_update_0</b>" instantiated <b>altera_remote_update_core</b> "<b>remote_update_core</b>"]]></message>
+  </messages>
+ </entity>
+</deploy>
