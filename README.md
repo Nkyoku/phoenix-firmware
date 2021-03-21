@@ -32,6 +32,13 @@
     Nios IIのファームウェア
     - output_files  
     生成ファイル
+  - Factory
+    - PhoenixFPGA.qpf  
+    FactoryイメージのQuartus Primeプロジェクト
+    - hdl  
+    FactoryイメージのHDLファイル類
+    - output_files  
+    Factoryイメージの生成ファイル
 - Jetson/ros2/src
   - phoenix  
   基板上に存在するデバイスを制御するノード類を収めたパッケージ
