@@ -41,7 +41,7 @@ ament_target_dependencies(stream rclcpp sensor_msgs phoenix_msgs)
 #rclcpp_components_register_nodes(stream "phoenix::StreamPublisherNode")
 
 # command (standalone)
-add_executable(command src/command_main.cpp src/gpio.cpp src/spi.cpp src/avalon_st.cpp src/avalon_mm.cpp)
+add_executable(command src/command_main.cpp src/gpio.cpp src/spi.cpp src/avalon_st.cpp src/avalon_mm.cpp src/epcq.cpp)
 ament_target_dependencies(command rclcpp std_msgs phoenix_msgs)
 
 if(BUILD_TESTING)

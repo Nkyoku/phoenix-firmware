@@ -29,6 +29,7 @@ rosidl_generate_interfaces(
   srv/ClearError.srv
   srv/SetSpeed.srv
   srv/ProgramNios.srv
+  srv/ProgramFpga.srv
 )
 
 if(BUILD_TESTING)

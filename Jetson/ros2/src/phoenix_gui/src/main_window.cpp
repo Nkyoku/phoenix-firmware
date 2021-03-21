@@ -81,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(_Ui->saveLogButton, &QPushButton::clicked, this, &MainWindow::startLogging);
     connect(_Ui->stopLogButton, &QPushButton::clicked, this, &MainWindow::stopLogging);
     connect(_Ui->programNiosButton, &QPushButton::clicked, this, &MainWindow::programNios);
+    connect(_Ui->programFpgaButton, &QPushButton::clicked, this, &MainWindow::programFpga);
 
     // リストを更新する
     reloadNamespaceList();
@@ -309,6 +310,7 @@ void MainWindow::connectToNodes(const QString &namespace_name) {
         _Subscribers.image = _NodeThread->node()->create_subscription<sensor_msgs::msg::Image>(
             "/video_source/raw", qos, [this](const std::shared_ptr<sensor_msgs::msg::Image> msg) { _ImageViewer->setImage(msg); emit updateRequest(); });
 
+        // 指令値を設定するサービスを見つける
         QString set_speed_service_name = namespace_name + "/set_speed";
         _Clients.set_speed = _NodeThread->node()->create_client<phoenix_msgs::srv::SetSpeed>(set_speed_service_name.toStdString());
         if (_Clients.set_speed->wait_for_service(std::chrono::milliseconds(1000)) == false) {
@@ -316,6 +318,7 @@ void MainWindow::connectToNodes(const QString &namespace_name) {
             _Ui->enableControllerCheckBox->setChecked(false);
         }
 
+        // NiosII書き換えサービスを見つける
         QString program_nios_service_name = namespace_name + "/program_nios";
         _Clients.program_nios = _NodeThread->node()->create_client<phoenix_msgs::srv::ProgramNios>(program_nios_service_name.toStdString());
         if (_Clients.program_nios->wait_for_service(std::chrono::milliseconds(1000)) == false) {
@@ -323,6 +326,16 @@ void MainWindow::connectToNodes(const QString &namespace_name) {
             _Ui->programNiosButton->setEnabled(false);
         } else {
             _Ui->programNiosButton->setEnabled(true);
+        }
+
+        // FPGA書き換えサービスを見つける
+        QString program_fpga_service_name = namespace_name + "/program_fpga";
+        _Clients.program_fpga = _NodeThread->node()->create_client<phoenix_msgs::srv::ProgramFpga>(program_fpga_service_name.toStdString());
+        if (_Clients.program_fpga->wait_for_service(std::chrono::milliseconds(1000)) == false) {
+            _Clients.program_fpga.reset();
+            _Ui->programFpgaButton->setEnabled(false);
+        } else {
+            _Ui->programFpgaButton->setEnabled(true);
         }
 
         // スレッドを実行
@@ -391,7 +404,7 @@ void MainWindow::updateTelemertyTreeItems(void) {
         for (int index = 0; index < 3; index++) {
             _TreeItems.control.machine_velocity[index]->setText(COL, QString::number(msg->machine_velocity[index], 'f', 3));
         }
-         _TreeItems.control.slip_flags->setText(COL, QString::number(msg->slip_flags, 'f', 3));
+        _TreeItems.control.slip_flags->setText(COL, QString::number(msg->slip_flags, 'f', 3));
     }
 }
 
@@ -523,7 +536,9 @@ void MainWindow::quitNodeThread(void) {
         // Clientsを破棄する
         _Clients.set_speed.reset();
         _Clients.program_nios.reset();
+        _Clients.program_fpga.reset();
         _Ui->programNiosButton->setEnabled(false);
+        _Ui->programFpgaButton->setEnabled(false);
 
         // スレッドを終了する
         // deleteはdeleteLater()スロットにより行われるのでここでする必要はない
@@ -562,9 +577,9 @@ void MainWindow::programNios(void) {
     if (path.isEmpty()) {
         return;
     }
-    auto request = std::make_shared<phoenix_msgs::srv::ProgramNios::Request>();
 
     // Hexファイルを読み込む
+    auto request = std::make_shared<phoenix_msgs::srv::ProgramNios::Request>();
     ihex_recordset_t *recored_set = ihex_rs_from_file(path.toStdString().c_str());
     size_t copied_bytes = 0;
     uint_t i = 0;
@@ -576,14 +591,14 @@ void MainWindow::programNios(void) {
         if (err || record == 0) break;
         uint32_t address = offset + record->ihr_address;
         uint32_t length = record->ihr_length;
-        if ((length % 4) != 0){
+        if ((length % 4) != 0) {
             err = 1;
             break;
         }
         if ((0 <= address * 4) && ((address * 4 + length) <= request->program.size())) {
-            const uint32_t *src = reinterpret_cast<const uint32_t*>(record->ihr_data);
-            uint32_t *dst = reinterpret_cast<uint32_t*>(request->program.data() + address * 4);
-            for(size_t index = 0; index < (length / 4); index++){
+            const uint32_t *src = reinterpret_cast<const uint32_t *>(record->ihr_data);
+            uint32_t *dst = reinterpret_cast<uint32_t *>(request->program.data() + address * 4);
+            for (size_t index = 0; index < (length / 4); index++) {
                 uint32_t data = *src++;
                 *dst++ = ((data >> 24) & 0xFFu) | ((data >> 8) & 0xFF00u) | ((data << 8) & 0xFF0000u) | (data << 24);
             }
@@ -606,6 +621,41 @@ void MainWindow::programNios(void) {
         QMessageBox::warning(this, "Program NIOS", "An error occured while programming memory");
     } else {
         QMessageBox::information(this, "Program NIOS", "Finished");
+    }
+}
+
+void MainWindow::programFpga(void) {
+    QString path = QFileDialog::getOpenFileName(this, "Open RPD File", "", "Raw Programming Data File (*.rpd)");
+    if (path.isEmpty()) {
+        return;
+    }
+
+    // RPDファイルを読み込む
+    auto request = std::make_shared<phoenix_msgs::srv::ProgramFpga::Request>();
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::warning(this, "Program FPGA", "Failed to load file");
+        return;
+    }
+    QByteArray binary = file.readAll();
+    file.close();
+    if (request->bitstream.size() < (size_t)binary.size()) {
+        QMessageBox::warning(this, "Program FPGA", QString("Size of the RPD file must be less than %1 bytes").arg(request->bitstream.size()));
+        return;
+    }
+    memcpy(request->bitstream.data(), binary.constData(), binary.size());
+    memset(request->bitstream.data() + binary.size(), 0xFF, request->bitstream.size() - (size_t)binary.size());
+
+    // ビットストリームを転送する
+    auto result = _Clients.program_fpga->async_send_request(request);
+    result.wait();
+    auto response = result.get();
+    if (!response) {
+        QMessageBox::warning(this, "Program FPGA", "Service didn't respond");
+    } else if (!response->succeeded) {
+        QMessageBox::warning(this, "Program FPGA", "An error occured while programming bitstream");
+    } else {
+        QMessageBox::information(this, "Program FPGA", "Finished");
     }
 }
 

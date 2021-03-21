@@ -249,9 +249,11 @@ module PhoenixFPGA (
             end
             STATE_WAIT_DEASSERT : begin
                 if (FPGA_MODE == 1'b0) begin
+                    bypass_spi <= 1'b1;
                     state <= STATE_WAIT_DEASSERT;
                 end
                 else begin
+                    bypass_spi <= 1'b0;
                     state <= STATE_WRITE_ADDRESS;
                 end
             end

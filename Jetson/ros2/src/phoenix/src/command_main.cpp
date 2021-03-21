@@ -2,6 +2,7 @@
 #include "spi.hpp"
 #include "avalon_st.hpp"
 #include "avalon_mm.hpp"
+#include "epcq.hpp"
 #include <mutex>
 #include <chrono>
 #include <thread>
@@ -11,6 +12,7 @@
 #include <phoenix_msgs/srv/clear_error.hpp>
 #include <phoenix_msgs/srv/set_speed.hpp>
 #include <phoenix_msgs/srv/program_nios.hpp>
+#include <phoenix_msgs/srv/program_fpga.hpp>
 #include "../include/phoenix/shared_memory.hpp"
 
 namespace phoenix {
@@ -42,11 +44,29 @@ static constexpr uint32_t NIOS_SHARED_RAM_BASE = 0x0u;
 /// Nios IIの命令メモリーのベースアドレス
 static constexpr uint32_t NIOS_INSTRUCTION_RAM_BASE = 0xA5A50000u;
 
+/// FPGAのアプリケーションビットストリームのベースアドレス
+static constexpr uint32_t FPGA_APPLICATION_BASE = 0x100000u;
+
+/// FPGAのアプリケーションビットストリームのサイズ
+static constexpr uint32_t FPGA_APPLICATION_SIZE = 0x100000u;
+
 /// FPGA_MODEピン
 static constexpr auto FPGA_MODE = Gpio::JetsonNanoModulePinGpio12;
 
 /// FPGA_CONFIG_Nピン
 static constexpr auto FPGA_CONFIG_N = Gpio::JetsonNanoModulePinGpio11;
+
+// FPGA_APPLICATION_BASEはセクターサイズの倍数である必要がある
+static_assert((FPGA_APPLICATION_BASE % Epcq::SECTOR_SIZE) == 0, "FPGA_APPLICATION_BASE must be multiple of Epcq::SECTOR_SIZE");
+
+// FPGA_APPLICATION_SIZEはセクターサイズの倍数である必要がある
+static_assert((FPGA_APPLICATION_SIZE % Epcq::SECTOR_SIZE) == 0, "FPGA_APPLICATION_SIZE must be multiple of Epcq::SECTOR_SIZE");
+
+// セクターサイズはページサイズの倍数である必要がある
+static_assert((Epcq::SECTOR_SIZE % Epcq::PAGE_SIZE) == 0, "Epcq::SECTOR_SIZE must be multiple of Epcq::PAGE_SIZE");
+
+/// ビット順序を反転するテーブル
+static constexpr uint8_t BIT_REVERSAL_TABLE[256] = {0, 128, 64, 192, 32, 160, 96, 224, 16, 144, 80, 208, 48, 176, 112, 240, 8, 136, 72, 200, 40, 168, 104, 232, 24, 152, 88, 216, 56, 184, 120, 248, 4, 132, 68, 196, 36, 164, 100, 228, 20, 148, 84, 212, 52, 180, 116, 244, 12, 140, 76, 204, 44, 172, 108, 236, 28, 156, 92, 220, 60, 188, 124, 252, 2, 130, 66, 194, 34, 162, 98, 226, 18, 146, 82, 210, 50, 178, 114, 242, 10, 138, 74, 202, 42, 170, 106, 234, 26, 154, 90, 218, 58, 186, 122, 250, 6, 134, 70, 198, 38, 166, 102, 230, 22, 150, 86, 214, 54, 182, 118, 246, 14, 142, 78, 206, 46, 174, 110, 238, 30, 158, 94, 222, 62, 190, 126, 254, 1, 129, 65, 193, 33, 161, 97, 225, 17, 145, 81, 209, 49, 177, 113, 241, 9, 137, 73, 201, 41, 169, 105, 233, 25, 153, 89, 217, 57, 185, 121, 249, 5, 133, 69, 197, 37, 165, 101, 229, 21, 149, 85, 213, 53, 181, 117, 245, 13, 141, 77, 205, 45, 173, 109, 237, 29, 157, 93, 221, 61, 189, 125, 253, 3, 131, 67, 195, 35, 163, 99, 227, 19, 147, 83, 211, 51, 179, 115, 243, 11, 139, 75, 203, 43, 171, 107, 235, 27, 155, 91, 219, 59, 187, 123, 251, 7, 135, 71, 199, 39, 167, 103, 231, 23, 151, 87, 215, 55, 183, 119, 247, 15, 143, 79, 207, 47, 175, 111, 239, 31, 159, 95, 223, 63, 191, 127, 255};
 
 /**
  * SPIで制御コマンドを送るノード
@@ -64,18 +84,19 @@ public:
         memset(&_SharedMemory, 0, sizeof(_SharedMemory));
 
         // SPIデバイスを開く
-        auto spi = std::shared_ptr<Spi>(new Spi);
-        if (spi->Open(phoenix::SpiDeviceName, phoenix::SpiFrequency) == false) {
+        _Spi = std::shared_ptr<Spi>(new Spi);
+        if (_Spi->Open(phoenix::SpiDeviceName, phoenix::SpiFrequency) == false) {
             throw std::runtime_error("Failed to open SPI device");
         }
-        spi->SetMode(phoenix::SpiMode);
-        _AvalonMm = std::shared_ptr<AvalonMm>(new AvalonMm(spi));
+        _Spi->SetMode(phoenix::SpiMode);
+        _AvalonMm = std::shared_ptr<AvalonMm>(new AvalonMm(_Spi));
 
         // サービスを登録する
         rclcpp::QoS qos(rclcpp::QoSInitialization(RMW_QOS_POLICY_HISTORY_KEEP_LAST, QOS_DEPTH));
         _ClearErrorService = create_service<phoenix_msgs::srv::ClearError>("clear_error", std::bind(&CommandServerNode::ClearErrorCallback, this, _1, _2, _3));
         _SetSpeedService = create_service<phoenix_msgs::srv::SetSpeed>("set_speed", std::bind(&CommandServerNode::SetSpeedCallback, this, _1, _2, _3));
         _ProgramNiosService = create_service<phoenix_msgs::srv::ProgramNios>("program_nios", std::bind(&CommandServerNode::ProgramNiosCallback, this, _1, _2, _3));
+        _ProgramFpgaService = create_service<phoenix_msgs::srv::ProgramFpga>("program_fpga", std::bind(&CommandServerNode::ProgramFpgaCallback, this, _1, _2, _3));
 
         // パラメータを宣言する
         declare_parameter<double>(PARAM_SPEED_KP, 5.0);
@@ -161,6 +182,7 @@ private:
     void ProgramNiosCallback(const std::shared_ptr<rmw_request_id_t> request_header, const std::shared_ptr<phoenix_msgs::srv::ProgramNios::Request> request, const std::shared_ptr<phoenix_msgs::srv::ProgramNios::Response> response) {
         (void)request_header;
 
+        // GPIOを開く
         Gpio mode_pin(FPGA_MODE);
         Gpio config_pin(FPGA_CONFIG_N);
         if (!mode_pin.IsOpened() || !config_pin.IsOpened()) {
@@ -182,7 +204,7 @@ private:
         do {
             size_t length = std::min(request->program.size() - written_bytes, BYTES_PER_TRANSFER);
             if (!_AvalonMm->Write(NIOS_INSTRUCTION_RAM_BASE + written_bytes, request->program.data() + written_bytes, length)) {
-                fprintf(stderr, "ProgramNios failed at _AvalonMm->Write(%zu, [%zu], %zu)\n", NIOS_INSTRUCTION_RAM_BASE + written_bytes, written_bytes, length);
+                fprintf(stderr, "ProgramNios was failed at _AvalonMm->Write(%zu, [%zu], %zu)\n", NIOS_INSTRUCTION_RAM_BASE + written_bytes, written_bytes, length);
                 succeeded = false;
                 break;
             }
@@ -196,12 +218,12 @@ private:
                 uint8_t buffer[BYTES_PER_TRANSFER];
                 size_t length = std::min(request->program.size() - read_bytes, BYTES_PER_TRANSFER);
                 if (!_AvalonMm->Read(NIOS_INSTRUCTION_RAM_BASE + read_bytes, buffer, length)) {
-                    fprintf(stderr, "ProgramNios failed at _AvalonMm->Read(%zu, [0], %zu)\n", NIOS_INSTRUCTION_RAM_BASE + read_bytes, length);
+                    fprintf(stderr, "ProgramNios was failed at _AvalonMm->Read(%zu, [0], %zu)\n", NIOS_INSTRUCTION_RAM_BASE + read_bytes, length);
                     succeeded = false;
                     break;
                 }
                 if (memcmp(buffer, request->program.data() + read_bytes, length) != 0) {
-                    fprintf(stderr, "ProgramNios failed at memcmp([0], [%zu], %zu)\n", read_bytes, length);
+                    fprintf(stderr, "ProgramNios was failed at memcmp([0], [%zu], %zu)\n", read_bytes, length);
                     succeeded = false;
                     break;
                 }
@@ -216,18 +238,144 @@ private:
         }
 
         if (succeeded) {
-            // FPGA_MODEからHを出力してNios IIのリセットを解除する
-            mode_pin.SetOutputValue(true);
+            // FPGA_MODEを解放してNios IIのリセットを解除する
+            mode_pin.SetOutputEnabled(false);
         } else {
             // FPGA_CONFIG_NからLを出力してFPGAをリセットする
             config_pin.SetOutputEnabled(true);
             config_pin.SetOutputValue(false);
 
-            // FPGA_MODEをHに戻す
-            mode_pin.SetOutputValue(true);
+            // FPGA_MODEを解放する
+            mode_pin.SetOutputEnabled(false);
 
             // FPGAをリコンフィギュレーションする
-            config_pin.SetOutputValue(true);
+            config_pin.SetOutputEnabled(false);
+        }
+
+        response->succeeded = succeeded;
+    }
+
+    /**
+     * ProgramFpgaサービスを処理する
+     */
+    void ProgramFpgaCallback(const std::shared_ptr<rmw_request_id_t> request_header, const std::shared_ptr<phoenix_msgs::srv::ProgramFpga::Request> request, const std::shared_ptr<phoenix_msgs::srv::ProgramFpga::Response> response) {
+        (void)request_header;
+
+        // GPIOを開く
+        Gpio mode_pin(FPGA_MODE);
+        Gpio config_pin(FPGA_CONFIG_N);
+        if (!mode_pin.IsOpened() || !config_pin.IsOpened()) {
+            response->succeeded = false;
+            return;
+        }
+
+        // FPGA_CONFIG_NからLを出力してFPGAをリセットする
+        config_pin.SetOutputEnabled(true);
+        config_pin.SetOutputValue(false);
+
+        // FPGA_MODEをLowにしておく
+        // FPGAのリコンフィギュレーション後にファクトリーモードのまま維持できる
+        mode_pin.SetOutputEnabled(true);
+        mode_pin.SetOutputValue(false);
+
+        // FPGA_CONFIG_Nを解放してFPGAをリコンフィギュレーションする
+        config_pin.SetOutputEnabled(false);
+
+        // 250ms待つ
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+        // 書き込むデータのビット順序を反転する
+        for (uint32_t address = FPGA_APPLICATION_BASE; address < (FPGA_APPLICATION_BASE + FPGA_APPLICATION_SIZE); address++) {
+            request->bitstream[address] = BIT_REVERSAL_TABLE[request->bitstream[address]];
+        }
+
+        // フラッシュメモリーを操作する
+        _Spi->SetMode(0);
+        Epcq epcq(_Spi);
+        bool succeeded = false;
+        do {
+            // シリコンIDを読み取る
+            uint8_t sillicon_id;
+            if (!epcq.ReadSilliconId(&sillicon_id)) {
+                fprintf(stderr, "ProgramFpga was failed at epcq.ReadSilliconId()\n");
+                break;
+            }
+            if ((sillicon_id == 0xFF) || (sillicon_id == 0x4A)) {
+                fprintf(stderr, "ProgramFpga was failed because the sillicon ID is 0x%02X\n", sillicon_id);
+                break;
+            }
+            fprintf(stderr, "Sillicon ID is 0x%02X\n", sillicon_id);
+
+            // セクターを消去する
+            uint32_t address;
+            for (address = FPGA_APPLICATION_BASE; address < (FPGA_APPLICATION_BASE + FPGA_APPLICATION_SIZE); address += Epcq::SECTOR_SIZE) {
+                if (!epcq.EraseSector(address)) {
+                    fprintf(stderr, "ProgramFpga was failed at epcq.EraseSector(0x%06X)\n", address);
+                    break;
+                }
+            }
+            if (address < (FPGA_APPLICATION_BASE + FPGA_APPLICATION_SIZE)) {
+                break;
+            }
+
+            // ページに書き込む
+            for (address = FPGA_APPLICATION_BASE; address < (FPGA_APPLICATION_BASE + FPGA_APPLICATION_SIZE); address += Epcq::PAGE_SIZE) {
+                const uint8_t *data = &request->bitstream[address];
+                bool empty = true;
+                for (uint32_t index = 0; index < Epcq::PAGE_SIZE; index++) {
+                    if (data[index] != 0xFF) {
+                        empty = false;
+                        break;
+                    }
+                }
+                if (!empty) {
+                    if (!epcq.WritePage(address, data)) {
+                        fprintf(stderr, "ProgramFpga was failed at epcq.WritePage(0x%06X)\n", address);
+                        break;
+                    }
+                }
+            }
+            if (address < (FPGA_APPLICATION_BASE + FPGA_APPLICATION_SIZE)) {
+                break;
+            }
+
+            // ベリファイする
+            static constexpr uint32_t VERIFY_SIZE = 1024;
+            static_assert((FPGA_APPLICATION_SIZE % VERIFY_SIZE) == 0, "VERIFY_SIZE must be divisor of FPGA_APPLICATION_SIZE");
+            for (address = FPGA_APPLICATION_BASE; address < (FPGA_APPLICATION_BASE + FPGA_APPLICATION_SIZE); address += VERIFY_SIZE) {
+                const uint8_t *written_data = &request->bitstream[address];
+                bool empty = true;
+                for (uint32_t index = 0; index < VERIFY_SIZE; index++) {
+                    if (written_data[index] != 0xFF) {
+                        empty = false;
+                        break;
+                    }
+                }
+                if (!empty) {
+                    uint8_t read_data[VERIFY_SIZE];
+                    if (!epcq.Read(address, read_data, VERIFY_SIZE)) {
+                        fprintf(stderr, "ProgramFpga was failed at epcq.Read(0x%06X, %u)\n", address, VERIFY_SIZE);
+                        break;
+                    }
+                    if (memcmp(written_data, read_data, VERIFY_SIZE) != 0) {
+                        fprintf(stderr, "ProgramFpga was failed because verification error at 0x%06X\n", address);
+                        break;
+                    }
+                }
+            }
+            if (address < (FPGA_APPLICATION_BASE + FPGA_APPLICATION_SIZE)) {
+                break;
+            }
+
+            // 操作は正常に終了した
+            succeeded = true;
+        } while (false);
+        _Spi->SetMode(phoenix::SpiMode);
+
+        if (succeeded) {
+            // FPGA_MODEを解放してアプリケーションを起動する
+            mode_pin.SetOutputEnabled(false);
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
         }
 
         response->succeeded = succeeded;
@@ -250,6 +398,9 @@ private:
         }
     }
 
+    /// SPI
+    std::shared_ptr<Spi> _Spi;
+
     /// Avalon-MMマスター
     std::shared_ptr<AvalonMm> _AvalonMm;
 
@@ -259,8 +410,11 @@ private:
     /// SetSpeedサービス
     rclcpp::Service<phoenix_msgs::srv::SetSpeed>::SharedPtr _SetSpeedService;
 
-    /// SetSpeedサービス
+    /// ProgramNiosサービス
     rclcpp::Service<phoenix_msgs::srv::ProgramNios>::SharedPtr _ProgramNiosService;
+
+    /// ProgramFpgaサービス
+    rclcpp::Service<phoenix_msgs::srv::ProgramFpga>::SharedPtr _ProgramFpgaService;
 
     /// 共有メモリー
     SharedMemory_t _SharedMemory;
