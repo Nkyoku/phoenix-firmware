@@ -177,8 +177,7 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
 
     // IMU、モータードライバ、制御データなどを読みJetsonへ送信する
     DataHolder::FetchRegistersOnPreControlLoop();
-    StreamTransmitter::TransmitMotion(DataHolder::GetMotionData());
-    StreamTransmitter::TransmitControl(DataHolder::GetControlData(), performance_counter);
+    StreamTransmitter::TransmitMotion(DataHolder::GetMotionData(), DataHolder::GetControlData(), performance_counter);
 
     // ADC2のタイムアウトカウンタを減算しすでに0だったらフォルトを発生する
     int adc2_timeout = _Adc2Timeout;

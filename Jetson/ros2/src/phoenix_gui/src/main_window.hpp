@@ -12,7 +12,6 @@
 #include <phoenix_msgs/msg/stream_data_status.hpp>
 #include <phoenix_msgs/msg/stream_data_adc2.hpp>
 #include <phoenix_msgs/msg/stream_data_motion.hpp>
-#include <phoenix_msgs/msg/stream_data_control.hpp>
 #include <phoenix_msgs/srv/clear_error.hpp>
 #include <phoenix_msgs/srv/set_speed.hpp>
 #include <phoenix_msgs/srv/program_nios.hpp>
@@ -133,7 +132,6 @@ private:
         rclcpp::Subscription<phoenix_msgs::msg::StreamDataStatus>::SharedPtr status;
         rclcpp::Subscription<phoenix_msgs::msg::StreamDataAdc2>::SharedPtr adc2;
         rclcpp::Subscription<phoenix_msgs::msg::StreamDataMotion>::SharedPtr motion;
-        rclcpp::Subscription<phoenix_msgs::msg::StreamDataControl>::SharedPtr control;
         rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image;
     } _Subscribers;
 
@@ -143,7 +141,6 @@ private:
         std::shared_ptr<phoenix_msgs::msg::StreamDataStatus> status;
         std::shared_ptr<phoenix_msgs::msg::StreamDataAdc2> adc2;
         std::shared_ptr<phoenix_msgs::msg::StreamDataMotion> motion;
-        std::shared_ptr<phoenix_msgs::msg::StreamDataControl> control;
     } _LastMessages;
 
     struct Clients_t{

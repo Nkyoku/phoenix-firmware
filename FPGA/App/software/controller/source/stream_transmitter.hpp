@@ -31,15 +31,11 @@ public:
 
     /**
      * モーションデータを送信する
-     * @param motion_data 送るデータ
-     */
-    static void TransmitMotion(const MotionData_t &motion_data);
-
-    /**
-     * 制御データを送信する
+     * @param motion_data モーションデータ
+     * @param control_data 制御データ
      * @param performance_counter パフォーマンスカウンタの値
      */
-    static void TransmitControl(const ControlData_t &control_data, int performance_counter);
+    static void TransmitMotion(const MotionData_t &motion_data, const ControlData_t &control_data, int performance_counter);
 
 private:
     /// mSGDMAのハンドル

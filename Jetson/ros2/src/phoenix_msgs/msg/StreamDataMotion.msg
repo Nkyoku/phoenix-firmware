@@ -1,5 +1,11 @@
 float32[3] accelerometer
 float32[3] gyroscope
-float32[4] wheel_velocity
-float32[4] wheel_current_d
-float32[4] wheel_current_q
+float32[4] wheel_velocity_meas
+float32[4] wheel_current_meas_d
+float32[4] wheel_current_meas_q
+float32[4] wheel_velocity_ref
+float32[4] wheel_current_ref
+float32[4] wheel_current_limit
+float32[3] machine_velocity
+uint16 slip_flags
+uint16 performance_counter

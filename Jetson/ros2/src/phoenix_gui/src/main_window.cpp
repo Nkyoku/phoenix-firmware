@@ -257,35 +257,34 @@ void MainWindow::connectToNodes(const QString &namespace_name) {
                     QChar sep(',');
                     std::shared_ptr<sensor_msgs::msg::BatteryState> battery_msg = _LastMessages.battery;
                     std::shared_ptr<phoenix_msgs::msg::StreamDataAdc2> adc2_msg = _LastMessages.adc2;
-                    std::shared_ptr<phoenix_msgs::msg::StreamDataControl> control_msg = _LastMessages.control;
                     float battery_voltage = battery_msg ? battery_msg->voltage : 0.0f;
                     float battery_current = battery_msg ? -battery_msg->current : 0.0f;
                     float dc48v_voltage = adc2_msg ? adc2_msg->dc48v_voltage : 0.0f;
                     stream << (0.001 * _LogFrameNumber) << sep;
-                    stream << msg->wheel_velocity[0] << sep;
-                    stream << msg->wheel_velocity[1] << sep;
-                    stream << msg->wheel_velocity[2] << sep;
-                    stream << msg->wheel_velocity[3] << sep;
-                    stream << msg->wheel_current_q[0] << sep;
-                    stream << msg->wheel_current_q[1] << sep;
-                    stream << msg->wheel_current_q[2] << sep;
-                    stream << msg->wheel_current_q[3] << sep;
-                    stream << control_msg->wheel_velocity_ref[0] << sep;
-                    stream << control_msg->wheel_velocity_ref[1] << sep;
-                    stream << control_msg->wheel_velocity_ref[2] << sep;
-                    stream << control_msg->wheel_velocity_ref[3] << sep;
-                    stream << control_msg->wheel_current_ref[0] << sep;
-                    stream << control_msg->wheel_current_ref[1] << sep;
-                    stream << control_msg->wheel_current_ref[2] << sep;
-                    stream << control_msg->wheel_current_ref[3] << sep;
-                    stream << control_msg->wheel_current_limit[0] << sep;
-                    stream << control_msg->wheel_current_limit[1] << sep;
-                    stream << control_msg->wheel_current_limit[2] << sep;
-                    stream << control_msg->wheel_current_limit[3] << sep;
-                    stream << control_msg->machine_velocity[0] << sep;
-                    stream << control_msg->machine_velocity[1] << sep;
-                    stream << control_msg->machine_velocity[2] << sep;
-                    stream << control_msg->slip_flags << sep;
+                    stream << msg->wheel_velocity_meas[0] << sep;
+                    stream << msg->wheel_velocity_meas[1] << sep;
+                    stream << msg->wheel_velocity_meas[2] << sep;
+                    stream << msg->wheel_velocity_meas[3] << sep;
+                    stream << msg->wheel_current_meas_q[0] << sep;
+                    stream << msg->wheel_current_meas_q[1] << sep;
+                    stream << msg->wheel_current_meas_q[2] << sep;
+                    stream << msg->wheel_current_meas_q[3] << sep;
+                    stream << msg->wheel_velocity_ref[0] << sep;
+                    stream << msg->wheel_velocity_ref[1] << sep;
+                    stream << msg->wheel_velocity_ref[2] << sep;
+                    stream << msg->wheel_velocity_ref[3] << sep;
+                    stream << msg->wheel_current_ref[0] << sep;
+                    stream << msg->wheel_current_ref[1] << sep;
+                    stream << msg->wheel_current_ref[2] << sep;
+                    stream << msg->wheel_current_ref[3] << sep;
+                    stream << msg->wheel_current_limit[0] << sep;
+                    stream << msg->wheel_current_limit[1] << sep;
+                    stream << msg->wheel_current_limit[2] << sep;
+                    stream << msg->wheel_current_limit[3] << sep;
+                    stream << msg->machine_velocity[0] << sep;
+                    stream << msg->machine_velocity[1] << sep;
+                    stream << msg->machine_velocity[2] << sep;
+                    stream << msg->slip_flags << sep;
                     stream << msg->accelerometer[0] << sep;
                     stream << msg->accelerometer[1] << sep;
                     stream << msg->accelerometer[2] << sep;
@@ -297,13 +296,6 @@ void MainWindow::connectToNodes(const QString &namespace_name) {
                     stream << battery_current << Qt::endl;
                     _LogFrameNumber++;
                 }
-            });
-
-        // stream_data_controlトピックを受信するSubscriptionを作成する
-        QString control_topic_name = namespace_name + "/phoenix_control";
-        _Subscribers.control = _NodeThread->node()->create_subscription<phoenix_msgs::msg::StreamDataControl>(
-            control_topic_name.toStdString(), qos, [this](const std::shared_ptr<phoenix_msgs::msg::StreamDataControl> msg) {
-                std::atomic_store(&_LastMessages.control, msg);
             });
 
         // imageトピックを受信するSubscriptionを作成する
@@ -387,15 +379,10 @@ void MainWindow::updateTelemertyTreeItems(void) {
             _TreeItems.motion.gyroscope[index]->setText(COL, QString::number(msg->gyroscope[index], 'f', 3));
         }
         for (int index = 0; index < 4; index++) {
-            _TreeItems.motion.wheel_velocity[index]->setText(COL, QString::number(msg->wheel_velocity[index], 'f', 3));
-            _TreeItems.motion.wheel_current_d[index]->setText(COL, QString::number(msg->wheel_current_d[index], 'f', 3));
-            _TreeItems.motion.wheel_current_q[index]->setText(COL, QString::number(msg->wheel_current_q[index], 'f', 3));
+            _TreeItems.motion.wheel_velocity[index]->setText(COL, QString::number(msg->wheel_velocity_meas[index], 'f', 3));
+            _TreeItems.motion.wheel_current_d[index]->setText(COL, QString::number(msg->wheel_current_meas_d[index], 'f', 3));
+            _TreeItems.motion.wheel_current_q[index]->setText(COL, QString::number(msg->wheel_current_meas_q[index], 'f', 3));
         }
-    }
-    if (_LastMessages.control) {
-        //auto msg = std::atomic_exchange(&_LastMessages.control, std::shared_ptr<phoenix_msgs::msg::StreamDataControl>());
-        auto &msg = _LastMessages.control;
-        _TreeItems.control.perf_counter->setText(COL, QString::number(msg->performance_counter));
         for (int index = 0; index < 4; index++) {
             _TreeItems.control.wheel_velocity_ref[index]->setText(COL, QString::number(msg->wheel_velocity_ref[index], 'f', 3));
             _TreeItems.control.wheel_current_ref[index]->setText(COL, QString::number(msg->wheel_current_ref[index], 'f', 3));
@@ -405,6 +392,7 @@ void MainWindow::updateTelemertyTreeItems(void) {
             _TreeItems.control.machine_velocity[index]->setText(COL, QString::number(msg->machine_velocity[index], 'f', 3));
         }
         _TreeItems.control.slip_flags->setText(COL, QString::number(msg->slip_flags, 'f', 3));
+        _TreeItems.control.perf_counter->setText(COL, QString::number(msg->performance_counter));
     }
 }
 
@@ -530,7 +518,6 @@ void MainWindow::quitNodeThread(void) {
         _Subscribers.status.reset();
         _Subscribers.adc2.reset();
         _Subscribers.motion.reset();
-        _Subscribers.control.reset();
         _Subscribers.image.reset();
 
         // Clientsを破棄する
