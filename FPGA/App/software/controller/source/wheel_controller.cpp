@@ -95,15 +95,18 @@ static const float * const FORCE_MATRIX_TABLE[16] = {
 };
 
 void WheelController::StartControl(void) {
-    static constexpr int CURRENT_CONTROL_GAIN_P = 3500; // 電流制御の比例ゲイン
-    static constexpr int CURRENT_CONTROL_GAIN_I = 500; // 電流制御の積分ゲイン
-    VectorController::SetGainP(CURRENT_CONTROL_GAIN_P);
-    VectorController::SetGainI(CURRENT_CONTROL_GAIN_I);
+    InitializeRegisters();
     VectorController::ClearFault();
-    VectorController::SetCurrentReferenceQ(1, 0);
-    VectorController::SetCurrentReferenceQ(2, 0);
-    VectorController::SetCurrentReferenceQ(3, 0);
-    VectorController::SetCurrentReferenceQ(4, 0);
+    InitializeState();
+
+}
+
+void WheelController::StopControl(void) {
+    VectorController::SetFault();
+    InitializeRegisters();
+}
+
+void WheelController::InitializeState(void) {
     memset(_SpeedReference, 0, sizeof(_SpeedReference));
     memset(_LastSpeedError, 0, sizeof(_LastSpeedError));
     memset(_CurrentReference, 0, sizeof(_CurrentReference));
@@ -114,15 +117,16 @@ void WheelController::StartControl(void) {
     _SlipFlags = 0;
 }
 
-void WheelController::StopControl(void) {
-    VectorController::SetFault();
-    VectorController::ClearAllBrakeEnabled();
+void WheelController::InitializeRegisters(void) {
+    static constexpr int CURRENT_CONTROL_GAIN_P = 3500; // 電流制御の比例ゲイン
+    static constexpr int CURRENT_CONTROL_GAIN_I = 500; // 電流制御の積分ゲイン
+    VectorController::SetGainP(CURRENT_CONTROL_GAIN_P);
+    VectorController::SetGainI(CURRENT_CONTROL_GAIN_I);
     VectorController::SetCurrentReferenceQ(1, 0);
     VectorController::SetCurrentReferenceQ(2, 0);
     VectorController::SetCurrentReferenceQ(3, 0);
     VectorController::SetCurrentReferenceQ(4, 0);
-    VectorController::SetGainP(0);
-    VectorController::SetGainI(0);
+    VectorController::ClearAllBrakeEnabled();
 }
 
 void WheelController::Update(bool new_parameters, bool sensor_only) {
@@ -181,25 +185,9 @@ void WheelController::Update(bool new_parameters, bool sensor_only) {
         _SlipFlags = slipped_wheels;
     }
 
-    // フォルト状態だったらモーター制御をしない
-    if (VectorController::IsFault()) {
-        if (new_parameters == true) {
-            // 新しい指令値を受信したら次のループから制御を開始する
-            StartControl();
-
-            // 制御の内部情報を初期化する
-            _MachineVelocityReference.Vx = 0.0f;
-            _MachineVelocityReference.Vy = 0.0f;
-            _MachineVelocityReference.Omega = 0.0f;
-        }
-        return;
-    }
-
-    // 指令値を取得する
-    auto &parameters = SharedMemory::GetParameters();
-
     // 速度指令値が異常でないことを確認する
     // 速度が速すぎるかNaNならspeed_ok==falseとなる
+    auto &parameters = SharedMemory::GetParameters();
     bool speed_ok = false;
     if (fabsf(parameters.speed_x) <= MAX_TRANSLATION_REFERENCE) {
         if (fabsf(parameters.speed_y) <= MAX_TRANSLATION_REFERENCE) {
@@ -209,13 +197,13 @@ void WheelController::Update(bool new_parameters, bool sensor_only) {
         }
     }
 
-    bool brake_enabled[4];
-    brake_enabled[0] = VectorController::IsBrakeEnabled(1);
-    brake_enabled[1] = VectorController::IsBrakeEnabled(2);
-    brake_enabled[2] = VectorController::IsBrakeEnabled(3);
-    brake_enabled[3] = VectorController::IsBrakeEnabled(4);
+    if (speed_ok && !sensor_only && !VectorController::IsFault()) {
+        bool brake_enabled[4];
+        brake_enabled[0] = VectorController::IsBrakeEnabled(1);
+        brake_enabled[1] = VectorController::IsBrakeEnabled(2);
+        brake_enabled[2] = VectorController::IsBrakeEnabled(3);
+        brake_enabled[3] = VectorController::IsBrakeEnabled(4);
 
-    if (speed_ok && !sensor_only) {
         // 指令値と指令値の変化を制限する
         {
             // 指令値を実現可能な速度に制限する
@@ -280,7 +268,7 @@ void WheelController::Update(bool new_parameters, bool sensor_only) {
             for (int index = 0; index < 4; index++) {
                 float force = force_matrix[3 * index] * error.Vx + force_matrix[3 * index + 1] * error.Vy + force_matrix[3 * index + 2] * error.Omega;
                 float current = _CurrentReferenceOfMachine[index] * decay;
-                if (_SlipFlags & (1 << index)){
+                if (_SlipFlags & (1 << index)) {
                     current *= 0.9f;
                 }
                 current += compensation_gain_i * force + compensation_gain_p * (force - _LastCompensationForce[index]);
@@ -362,41 +350,39 @@ void WheelController::Update(bool new_parameters, bool sensor_only) {
             }
             _RegenerationEnergy[index] = brake_enabled[index] ? energy_with_brake : energy_without_brake;
         }
+
+        // 電流指令値を設定する
+        static constexpr float RECIPROCAL_CURRENT_SCALE = 1.0f / ADC1_CURRENT_SCALE;
+        if (brake_enabled[0])
+            VectorController::SetBrakeEnabled(1);
+        if (brake_enabled[1])
+            VectorController::SetBrakeEnabled(2);
+        if (brake_enabled[2])
+            VectorController::SetBrakeEnabled(3);
+        if (brake_enabled[3])
+            VectorController::SetBrakeEnabled(4);
+        VectorController::SetCurrentReferenceQ(1, static_cast<int>(_CurrentReference[0] * RECIPROCAL_CURRENT_SCALE));
+        VectorController::SetCurrentReferenceQ(2, static_cast<int>(_CurrentReference[1] * RECIPROCAL_CURRENT_SCALE));
+        VectorController::SetCurrentReferenceQ(3, static_cast<int>(_CurrentReference[2] * RECIPROCAL_CURRENT_SCALE));
+        VectorController::SetCurrentReferenceQ(4, static_cast<int>(_CurrentReference[3] * RECIPROCAL_CURRENT_SCALE));
+        if (!brake_enabled[0])
+            VectorController::ClearBrakeEnabled(1);
+        if (!brake_enabled[1])
+            VectorController::ClearBrakeEnabled(2);
+        if (!brake_enabled[2])
+            VectorController::ClearBrakeEnabled(3);
+        if (!brake_enabled[3])
+            VectorController::ClearBrakeEnabled(4);
+    }
+    else if (new_parameters && !sensor_only) {
+        // 新しい指令値を受信したので次のループから制御を開始する
+        StartControl();
     }
     else {
-        for (int index = 0; index < 4; index++) {
-            _CurrentReference[index] = 0.0f;
-            _CurrentReferenceOfWheel[index] = 0.0f;
-            _CurrentReferenceOfMachine[index] = 0.0f;
-            _LastSpeedError[index] = 0.0f;
-            _LastCompensationForce[index] = 0.0f;
-            _RegenerationEnergy[index] = 0.0f;
-            brake_enabled[index] = false;
-        }
+        VectorController::SetFault();
+        InitializeRegisters();
+        InitializeState();
     }
-
-    // 電流指令値を設定する
-    static constexpr float RECIPROCAL_CURRENT_SCALE = 1.0f / ADC1_CURRENT_SCALE;
-    if (brake_enabled[0])
-        VectorController::SetBrakeEnabled(1);
-    if (brake_enabled[1])
-        VectorController::SetBrakeEnabled(2);
-    if (brake_enabled[2])
-        VectorController::SetBrakeEnabled(3);
-    if (brake_enabled[3])
-        VectorController::SetBrakeEnabled(4);
-    VectorController::SetCurrentReferenceQ(1, static_cast<int>(_CurrentReference[0] * RECIPROCAL_CURRENT_SCALE));
-    VectorController::SetCurrentReferenceQ(2, static_cast<int>(_CurrentReference[1] * RECIPROCAL_CURRENT_SCALE));
-    VectorController::SetCurrentReferenceQ(3, static_cast<int>(_CurrentReference[2] * RECIPROCAL_CURRENT_SCALE));
-    VectorController::SetCurrentReferenceQ(4, static_cast<int>(_CurrentReference[3] * RECIPROCAL_CURRENT_SCALE));
-    if (!brake_enabled[0])
-        VectorController::ClearBrakeEnabled(1);
-    if (!brake_enabled[1])
-        VectorController::ClearBrakeEnabled(2);
-    if (!brake_enabled[2])
-        VectorController::ClearBrakeEnabled(3);
-    if (!brake_enabled[3])
-        VectorController::ClearBrakeEnabled(4);
 }
 
 float WheelController::SteadyCurrent(const MachineVelocity_t &machine) {
@@ -415,7 +401,7 @@ void WheelController::EstimateMachineVelocity(const WheelVelocity_t &wheel, cons
     static float machine_velocity_sigma_vx = 0.0f;
     static float machine_velocity_sigma_vy = 0.0f;
 
-    // スリップ分の車輪速度を検出する
+// スリップ分の車輪速度を検出する
     static constexpr float PEAK_HOLD_DECAY = 0.99f;
     static constexpr float SLIP_VELOCITY_MAX = 10.0f;
     static constexpr float SLIP_VELOCITY_BASE = 0.01f;
@@ -427,20 +413,20 @@ void WheelController::EstimateMachineVelocity(const WheelVelocity_t &wheel, cons
     slip_velocity_peak_hold = peak_slip_velocity;
     float sigma_vx_vy_2 = (peak_slip_velocity * peak_slip_velocity + SLIP_VELOCITY_BASE) * SLIP_VELOCITY_SIGMA_2;
 
-    // 信念分布を更新する
+// 信念分布を更新する
     static constexpr float ACCELEROMETER_SIGMA_2 = 0.1f;
     float SIGMA_hat_11 = machine_velocity_sigma_vx + (ACCELEROMETER_SIGMA_2 / IMU_OUTPUT_RATE / IMU_OUTPUT_RATE);
     float SIGMA_hat_22 = machine_velocity_sigma_vy + (ACCELEROMETER_SIGMA_2 / IMU_OUTPUT_RATE / IMU_OUTPUT_RATE);
 
-    // カルマンゲインを計算する
+// カルマンゲインを計算する
     float K_11 = SIGMA_hat_11 / (sigma_vx_vy_2 + SIGMA_hat_11);
     float K_22 = SIGMA_hat_22 / (sigma_vx_vy_2 + SIGMA_hat_22);
 
-    // 観測値を元に信念分布の分散を更新する
+// 観測値を元に信念分布の分散を更新する
     machine_velocity_sigma_vx = (1.0f - K_11) * SIGMA_hat_11;
     machine_velocity_sigma_vy = (1.0f - K_22) * SIGMA_hat_22;
 
-    // 観測値を元に信念分布の平均を更新する
+// 観測値を元に信念分布の平均を更新する
     float rotation = imu.GyroZ * (1.0f / IMU_OUTPUT_RATE);
     _MachineVelocity.Omega = imu.GyroZ;
     float mu_1 = _MachineVelocity.Vx + _MachineVelocity.Vy * rotation; // 本来は三角関数が必要だがcos(x)=1, sin(x)=xと近似している

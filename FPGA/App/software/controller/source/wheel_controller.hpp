@@ -83,6 +83,16 @@ public:
 
 private:
     /**
+     * 制御情報をクリアする
+     */
+    static void InitializeState(void);
+
+    /**
+     * レジスタを初期化する
+     */
+    static void InitializeRegisters(void);
+
+    /**
      * 機体速度から車輪速度を求める
      * @param machine 機体速度
      * @return 車輪速度

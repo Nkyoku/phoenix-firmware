@@ -70,17 +70,6 @@ void CentralizedMonitor::Adc2Callback(void) {
 
     // 測定値を送信する
     StreamTransmitter::TransmitAdc2(adc2_data);
-
-    // Lチカ
-    static int cnt = 0;
-    ++cnt;
-    if (cnt == 5) {
-        Led::SetMotor1Enabled(true);
-    }
-    else if (10 <= cnt) {
-        cnt = 0;
-        Led::SetMotor1Enabled(false);
-    }
 }
 
 void CentralizedMonitor::ClearErrorFlags(void) {
@@ -229,23 +218,53 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
         _ParameterTimeout = 0;
     }
 
+    // Lチカ
+    // 全般的な異常がある -> 全てのLEDを点滅
+    // モーターに異常がある -> 該当するLEDを点滅
+    // モーター制御をしていない -> 異常が無ければ全てのLEDを消灯
+    // モーター制御をしている -> LEDを点灯
+    static int cnt = 0;
+    uint32_t error_flags = _ErrorFlags;
+    uint32_t fault_flags = _FaultFlags;
+    bool general_fault = (error_flags & (ErrorCauseDc48vUnderVoltage | ErrorCauseDc48vOverVoltage)) || (fault_flags & (FaultCauseAdc2Timeout | FaultCauseImuTimeout));
+    if (++cnt == 50) {
+        if (general_fault) {
+            Led::SetAllOff();
+        }
+        else if (!VectorController::IsFault() && !MotorController::IsFault()) {
+            Led::SetAllOn();
+        }
+        else {
+            Led::SetAllOff();
+        }
+    }
+    else if (100 <= cnt) {
+        cnt = 0;
+        if (general_fault) {
+            Led::SetAllOn();
+        }
+        else {
+            // 各モーターに異常が発生していれば該当するモーターのLEDを点灯する
+            bool no_fault = !VectorController::IsFault() && !MotorController::IsFault();
+            Led::SetMotor1Enabled(no_fault || (error_flags & (ErrorCauseMotor1OverCurrent | ErrorCauseMotor1HallSensor))
+                || (fault_flags & (FaultCauseMotor1OverTemperature | FaultCauseMotor1OverCurrent | FaultCauseMotor1LoadSwitch)));
+            Led::SetMotor2Enabled(no_fault || (error_flags & (ErrorCauseMotor2OverCurrent | ErrorCauseMotor2HallSensor))
+                || (fault_flags & (FaultCauseMotor2OverTemperature | FaultCauseMotor2OverCurrent | FaultCauseMotor2LoadSwitch)));
+            Led::SetMotor3Enabled(no_fault || (error_flags & (ErrorCauseMotor3OverCurrent | ErrorCauseMotor3HallSensor))
+                || (fault_flags & (FaultCauseMotor3OverTemperature | FaultCauseMotor3OverCurrent | FaultCauseMotor3LoadSwitch)));
+            Led::SetMotor4Enabled(no_fault || (error_flags & (ErrorCauseMotor4OverCurrent | ErrorCauseMotor4HallSensor))
+                || (fault_flags & (FaultCauseMotor4OverTemperature | FaultCauseMotor4OverCurrent | FaultCauseMotor4LoadSwitch)));
+            Led::SetMotor5Enabled(no_fault || (error_flags & (ErrorCauseMotor5OverCurrent | ErrorCauseMotor5HallSensor))
+                || (fault_flags & (FaultCauseMotor5OverTemperature | FaultCauseMotor5OverCurrent | FaultCauseMotor5LoadSwitch)));
+        }
+    }
+
     // パフォーマンスカウンタのセクション1の測定を終了する
     // 測定値は次の処理の始めに送信される
     PERF_END(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
     PERF_STOP_MEASURING(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
     uint64_t counter_64 = perf_get_section_time(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
     performance_counter = (counter_64 & 0xFFFFFFFFFFFF0000ULL) ? 65535 : static_cast<int>(counter_64);
-
-    // Lチカ
-    static int cnt = 0;
-    ++cnt;
-    if (cnt == 50) {
-        Led::SetMotor5Enabled(true);
-    }
-    else if (100 <= cnt) {
-        cnt = 0;
-        Led::SetMotor5Enabled(false);
-    }
 
     // ステータスフラグを送信する
     StreamTransmitter::TransmitStatus();

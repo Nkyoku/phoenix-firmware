@@ -45,7 +45,7 @@ module pwm_driver #(
     wire [2:0] comm_input = sensor_hall_uvw ^ {3{comm_direction}};
     logic [2:0] comm_phase_enable;
     logic [2:0] comm_phase_polarity;
-    assign status_hall_fault_n = (comm_phase_enable != 3'b000) & (comm_phase_polarity != 3'b111);
+    assign status_hall_fault_n = (sensor_hall_uvw != 3'b000) & (sensor_hall_uvw != 3'b111);
     always @(posedge clk, posedge reset) begin
         if (reset == 1'b1) begin
             comm_phase_enable <= 3'b000;
