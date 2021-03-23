@@ -38,9 +38,6 @@ private:
     /// 減速時の電圧ランプレート制限 [V/s]
     static constexpr float DECELERATION_RAMP_RATE_LIMIT = 100.0f;
 
-    /// 電流制限値[mA]
-    static constexpr int CURRENT_LIMIT = 716;
-
-    /// 過電流閾値[mA]
-    static constexpr int OVER_CURRENT_THRESHOLD = CURRENT_LIMIT * 2;
+    /// 過電流閾値 [A]
+    static constexpr float OVER_CURRENT_THRESHOLD = 1.0f;
 };

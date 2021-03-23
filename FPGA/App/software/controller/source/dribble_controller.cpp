@@ -1,10 +1,11 @@
 #include <math.h> // math.h内のfmaxf,fminfを後でカスタム命令版に置き換えるため最初にincludeする
 #include "dribble_controller.hpp"
 #include "board.hpp"
-#include <driver/adc2.hpp>
-#include <peripheral/motor_controller.hpp>
+#include "data_holder.hpp"
 #include "centralized_monitor.hpp"
 #include "shared_memory_manager.hpp"
+#include <peripheral/motor_controller.hpp>
+#include <status_flags.hpp>
 
 void DribbleController::StartControl(void) {
     MotorController::SetPower(0);
@@ -19,6 +20,13 @@ void DribbleController::StopControl(void) {
 
 void DribbleController::Update(bool new_parameters, bool brake_enabled) {
     if (!MotorController::IsFault()) {
+        // 過電流を判定する
+        if (OVER_CURRENT_THRESHOLD < DataHolder::GetAdc2Data().DribbleCurrent){
+            CentralizedMonitor::SetErrorFlags(ErrorCauseMotor5OverCurrent);
+            return;
+        }
+
+        // 指令値を取得する
         float ref_power;
         if (!brake_enabled) {
             MotorController::ClearBrakeEnabled();
@@ -33,6 +41,8 @@ void DribbleController::Update(bool new_parameters, bool brake_enabled) {
             MotorController::SetBrakeEnabled();
             ref_power = 0.0f;
         }
+
+        // 回転速度が急激に変化しないように変化率を制限する
         float prev_power = MotorController::GetPower() * (1.0f / MotorController::FULL_SCALE_OF_POWER);
         static constexpr float ACCELERATION_RAMP_RATE_LIMIT_PER_PERIOD = ACCELERATION_RAMP_RATE_LIMIT / IMU_OUTPUT_RATE / 48.0f;
         static constexpr float DECELERATION_RAMP_RATE_LIMIT_PER_PERIOD = DECELERATION_RAMP_RATE_LIMIT / IMU_OUTPUT_RATE / 48.0f;

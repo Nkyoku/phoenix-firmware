@@ -1,5 +1,7 @@
 #include "wheel_controller.hpp"
 #include <peripheral/vector_controller.hpp>
+#include <status_flags.hpp>
+#include "centralized_monitor.hpp"
 #include "shared_memory_manager.hpp"
 
 /// すべての車輪がグリップしているときに使用される力分解行列
@@ -104,6 +106,7 @@ void WheelController::StartControl(void) {
 void WheelController::StopControl(void) {
     VectorController::SetFault();
     InitializeRegisters();
+    InitializeState();
 }
 
 void WheelController::InitializeState(void) {
@@ -203,6 +206,28 @@ void WheelController::Update(bool new_parameters, bool sensor_only) {
         brake_enabled[1] = VectorController::IsBrakeEnabled(2);
         brake_enabled[2] = VectorController::IsBrakeEnabled(3);
         brake_enabled[3] = VectorController::IsBrakeEnabled(4);
+
+        // 過電流を判定する
+        auto norm = [](float x, float y) {
+            return sqrtf(x * x + y * y);
+        };
+        uint32_t error_flags = 0;
+        if (!brake_enabled[0] && (OVER_CURRENT_THRESHOLD < norm(motion.Wheels[0].CurrentD, motion.Wheels[0].CurrentQ))) {
+            error_flags |= ErrorCauseMotor1OverCurrent;
+        }
+        if (!brake_enabled[1] && (OVER_CURRENT_THRESHOLD < norm(motion.Wheels[1].CurrentD, motion.Wheels[1].CurrentQ))) {
+            error_flags |= ErrorCauseMotor2OverCurrent;
+        }
+        if (!brake_enabled[2] && (OVER_CURRENT_THRESHOLD < norm(motion.Wheels[2].CurrentD, motion.Wheels[2].CurrentQ))) {
+            error_flags |= ErrorCauseMotor3OverCurrent;
+        }
+        if (!brake_enabled[3] && (OVER_CURRENT_THRESHOLD < norm(motion.Wheels[3].CurrentD, motion.Wheels[3].CurrentQ))) {
+            error_flags |= ErrorCauseMotor4OverCurrent;
+        }
+        if (error_flags != 0) {
+            CentralizedMonitor::SetErrorFlags(error_flags);
+            return;
+        }
 
         // 指令値と指令値の変化を制限する
         {
@@ -401,7 +426,7 @@ void WheelController::EstimateMachineVelocity(const WheelVelocity_t &wheel, cons
     static float machine_velocity_sigma_vx = 0.0f;
     static float machine_velocity_sigma_vy = 0.0f;
 
-// スリップ分の車輪速度を検出する
+    // スリップ分の車輪速度を検出する
     static constexpr float PEAK_HOLD_DECAY = 0.99f;
     static constexpr float SLIP_VELOCITY_MAX = 10.0f;
     static constexpr float SLIP_VELOCITY_BASE = 0.01f;
@@ -413,20 +438,20 @@ void WheelController::EstimateMachineVelocity(const WheelVelocity_t &wheel, cons
     slip_velocity_peak_hold = peak_slip_velocity;
     float sigma_vx_vy_2 = (peak_slip_velocity * peak_slip_velocity + SLIP_VELOCITY_BASE) * SLIP_VELOCITY_SIGMA_2;
 
-// 信念分布を更新する
+    // 信念分布を更新する
     static constexpr float ACCELEROMETER_SIGMA_2 = 0.1f;
     float SIGMA_hat_11 = machine_velocity_sigma_vx + (ACCELEROMETER_SIGMA_2 / IMU_OUTPUT_RATE / IMU_OUTPUT_RATE);
     float SIGMA_hat_22 = machine_velocity_sigma_vy + (ACCELEROMETER_SIGMA_2 / IMU_OUTPUT_RATE / IMU_OUTPUT_RATE);
 
-// カルマンゲインを計算する
+    // カルマンゲインを計算する
     float K_11 = SIGMA_hat_11 / (sigma_vx_vy_2 + SIGMA_hat_11);
     float K_22 = SIGMA_hat_22 / (sigma_vx_vy_2 + SIGMA_hat_22);
 
-// 観測値を元に信念分布の分散を更新する
+    // 観測値を元に信念分布の分散を更新する
     machine_velocity_sigma_vx = (1.0f - K_11) * SIGMA_hat_11;
     machine_velocity_sigma_vy = (1.0f - K_22) * SIGMA_hat_22;
 
-// 観測値を元に信念分布の平均を更新する
+    // 観測値を元に信念分布の平均を更新する
     float rotation = imu.GyroZ * (1.0f / IMU_OUTPUT_RATE);
     _MachineVelocity.Omega = imu.GyroZ;
     float mu_1 = _MachineVelocity.Vx + _MachineVelocity.Vy * rotation; // 本来は三角関数が必要だがcos(x)=1, sin(x)=xと近似している

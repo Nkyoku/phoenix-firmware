@@ -2,7 +2,7 @@
 
 #include <math.h> // math.h内のfmaxf,fminfを後でカスタム命令版に置き換えるため最初にincludeする
 #include <system.h>
-#include <board.hpp>
+#include "board.hpp"
 #include "filter.hpp"
 #include "data_holder.hpp"
 
@@ -218,4 +218,7 @@ private:
 
     /// ブレーキを無効にする回生エネルギーの閾値
     static constexpr float BRAKE_DISABLE_THRESHOLD = -0.005f;
+
+    /// 過電流閾値[A]
+    static constexpr float OVER_CURRENT_THRESHOLD = 5.0f;
 };
