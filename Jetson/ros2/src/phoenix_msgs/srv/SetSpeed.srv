@@ -1,6 +1,0 @@
-float32 speed_x
-float32 speed_y
-float32 speed_omega
-float32 dribble_power
----
-bool succeeded
