@@ -5,8 +5,6 @@
 詳細は[Wiki](https://github.com/Nkyoku/phoenix-firmware/wiki)を参照
 
 ## 開発環境
-- Jetson Nano Developer Kit SD Card Image 32.4.4
-- ROS2 Eloquent Elusor
 - Quartus Prime Lite Edition 20.1.1
 - IP-NIOS (FPGAのコンパイルにNios II/fのライセンスが必要)
 
@@ -39,14 +37,6 @@
     FactoryイメージのHDLファイル類
     - output_files  
     Factoryイメージの生成ファイル
-- Jetson/ros2/src
-  - phoenix  
-  基板上に存在するデバイスを制御するノード類を収めたパッケージ
-  - phoenix_msgs  
-  phoenixパッケージのノードが用いるトピックやサービスのメッセージ
-  - phoenix_gui  
-  phoenixパッケージのノードから受信したデータを表示したり  
-  コントローラでロボットを操縦するパッケージ
 - SLG46826G
   - PhoenixGP.gp6  
   電源シーケンサとして使っているGreenPAKのプロジェクト
