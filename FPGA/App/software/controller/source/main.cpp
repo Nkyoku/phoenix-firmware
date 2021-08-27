@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <peripheral/motor_controller.hpp>
 #include <peripheral/vector_controller.hpp>
 #include <driver/adc2.hpp>
@@ -29,7 +28,7 @@ static inline void initialize_peripheral(void) {
     SharedMemory::Initialize();
     StreamTransmitter::Initialize();
     CentralizedMonitor::Initialize();
-    WheelController::Initialize();
+    WheelController::initialize();
     DribbleController::Initialize();
 }
 

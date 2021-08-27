@@ -93,9 +93,9 @@ C_SRCS :=
 CXX_SRCS += source/driver/adc2.cpp
 CXX_SRCS += source/driver/imu.cpp
 CXX_SRCS += source/main.cpp
+CXX_SRCS += source/wheel_controller.cpp
 CXX_SRCS += source/centralized_monitor.cpp
 CXX_SRCS += source/dribble_controller.cpp
-CXX_SRCS += source/wheel_controller.cpp
 CXX_SRCS += source/stream_transmitter.cpp
 CXX_SRCS += source/peripheral/msgdma.cpp
 CXX_SRCS += source/data_holder.cpp
@@ -116,12 +116,12 @@ CREATE_ELF_DERIVED_FILES := 0
 CREATE_LINKER_MAP := 1
 
 # Common arguments for ALT_CFLAGSs
-APP_CFLAGS_DEFINED_SYMBOLS :=
+APP_CFLAGS_DEFINED_SYMBOLS := -DEIGEN_NO_IO -DEIGEN_NO_MALLOC -DEIGEN_NO_DEBUG
 APP_CFLAGS_UNDEFINED_SYMBOLS :=
 APP_CFLAGS_OPTIMIZATION := -Os
 APP_CFLAGS_DEBUG_LEVEL := -g
 APP_CFLAGS_WARNINGS := -Wall
-APP_CFLAGS_USER_FLAGS := -ffunction-sections -fdata-sections -g -fno-exceptions
+APP_CFLAGS_USER_FLAGS := -ffunction-sections -fdata-sections -g -fno-exceptions -fno-rtti
 
 APP_ASFLAGS_USER :=
 APP_LDFLAGS_USER := -Wl,--gc-sections
@@ -138,6 +138,7 @@ BSP_ROOT_DIR := ../controller_bsp/
 # List of application specific include directories, library directories and library names
 APP_INCLUDE_DIRS += source
 APP_INCLUDE_DIRS += include
+APP_INCLUDE_DIRS += eigen
 APP_LIBRARY_DIRS :=
 APP_LIBRARY_NAMES :=
 

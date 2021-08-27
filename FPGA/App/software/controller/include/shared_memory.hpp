@@ -56,24 +56,9 @@ struct SharedMemory_t {
         float dribble_power;
 
         /**
-         * 速度制御の比例ゲイン
+         * 速度制御のゲイン
          */
-        float speed_gain_p;
-
-        /**
-         * 速度制御の積分ゲイン
-         */
-        float speed_gain_i;
-
-        /**
-         * 姿勢補正制御の比例ゲイン
-         */
-        float compensation_gain_p;
-
-        /**
-         * 姿勢補正制御の積分ゲイン
-         */
-        float compensation_gain_i;
+        float speed_gain_p[4], speed_gain_i[4];
 
         /**
          * チェックサムを計算する

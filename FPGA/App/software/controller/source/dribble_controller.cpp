@@ -21,7 +21,7 @@ void DribbleController::StopControl(void) {
 void DribbleController::Update(bool new_parameters, bool brake_enabled) {
     if (!MotorController::IsFault()) {
         // 過電流を判定する
-        if (OVER_CURRENT_THRESHOLD < DataHolder::GetAdc2Data().DribbleCurrent){
+        if (OVER_CURRENT_THRESHOLD < DataHolder::adc2Data().dribble_current){
             CentralizedMonitor::SetErrorFlags(ErrorCauseMotor5OverCurrent);
             return;
         }

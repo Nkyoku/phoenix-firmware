@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Mar 14, 2021 11:53:06 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1615733586356</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>Aug 24, 2021 11:23:41 PM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1629815021915</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>C:\work\Robocup\phoenix-firmware\FPGA\App\software\controller_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\controller.sopcinfo</SopcDesignFile>
@@ -722,7 +722,7 @@
                 <SettingName>hal.enable_exit</SettingName>
                 <Identifier>ALT_NO_EXIT</Identifier>
                 <Type>Boolean</Type>
-                <Value>0</Value>
+                <Value>1</Value>
                 <DefaultValue>1</DefaultValue>
                 <DestinationFile>public_mk_define</DestinationFile>
                 <Description>Add exit() support. This option increases code footprint if your "main()" routine does "return" or call "exit()". If false, adds -DALT_NO_EXIT to ALT_CPPFLAGS in public.mk, and reduces footprint</Description>
@@ -746,7 +746,7 @@
                 <SettingName>hal.enable_clean_exit</SettingName>
                 <Identifier>ALT_NO_CLEAN_EXIT</Identifier>
                 <Type>Boolean</Type>
-                <Value>0</Value>
+                <Value>1</Value>
                 <DefaultValue>1</DefaultValue>
                 <DestinationFile>public_mk_define</DestinationFile>
                 <Description>When your application exits, close file descriptors, call C++ destructors, etc. Code footprint can be reduced by disabling clean exit. If disabled, adds -DALT_NO_CLEAN_EXIT to ALT_CPPFLAGS -D'exit(a)=_exit(a)' in public.mk.</Description>

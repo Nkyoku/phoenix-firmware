@@ -1,46 +1,34 @@
 #pragma once
 
 #include <stdint.h>
+#include <Eigen/Dense>
 
 /// ADC2で測定したデータ
 struct Adc2Data_t {
-    float Dc48vVoltage;
-    float DribbleVoltage;
-    float DribbleCurrent;
+    float dc48v_voltage;
+    float dribble_voltage;
+    float dribble_current;
 };
 
-/// 機体の動きに関するデータ
+/// 車体の動きに関するデータ
 struct MotionData_t {
-    struct Imu_t {
-        union {
-            struct {
-                float AccelX, AccelY, AccelZ;
-            };
-            float Accel[3];
-        };
-        union {
-            struct {
-                float GyroX, GyroY, GyroZ;
-            };
-            float Gyro[3];
-        };
-    } Imu;
-    struct Wheel_t {
-        float Velocity;
-        float CurrentD;
-        float CurrentQ;
-    } Wheels[4];
+    Eigen::Vector3f accelerometer;
+    Eigen::Vector3f gyroscope;
+    Eigen::Vector3f gravity;
+    Eigen::Vector4f wheel_velocity;
+    Eigen::Vector4f wheel_current_d;
+    Eigen::Vector4f wheel_current_q;
+    Eigen::Vector3f body_acceleration;
+    Eigen::Vector3f body_velocity;
 };
 
 /// 制御に関するデータ
 struct ControlData_t {
-    struct Wheel_t {
-        float VelocityRef;
-        float CurrentRef;
-        float CurrentLimit;
-    } Wheels[4];
-    float MachineVelocity[3];
-    uint32_t SlipFlags;
+    Eigen::Vector4f current_ref;
+    Eigen::Vector4f body_ref_accel_unlimit;
+    Eigen::Vector4f body_ref_accel;
+    float rotation_torque;
+    float omega_weight;
 };
 
 /**
@@ -50,46 +38,51 @@ struct ControlData_t {
 class DataHolder {
 public:
     /**
-     * 制御ループの先頭でレジスタを読む
+     * 制御ループの前でレジスタを読む
      */
-    static void FetchRegistersOnPreControlLoop(void);
+    static void fetchOnPreControlLoop(void);
+
+    /**
+     * 制御ループの後でレジスタを読む
+     */
+    static void fetchOnPostControlLoop(void);
 
     /**
      * ADC2の変換結果を読む
      */
-    static void FetchAdc2Result(void);
+    static void fetchAdc2Result(void);
 
     /**
      * Adc2Dataを取得する
      * @return Adc2Dataへの参照
      */
-    static const Adc2Data_t& GetAdc2Data(void) {
-        return _Adc2Data;
+    static const Adc2Data_t& adc2Data(void) {
+        return _adc2_data;
     }
 
     /**
      * MotionDataを取得する
      * @return　MotionDataへの参照
      */
-    static const MotionData_t& GetMotionData(void) {
-        return _MotionData;
+    static const MotionData_t& motionData(void) {
+        return _motion_data;
     }
 
     /**
      * ControlDataを取得する
      * @return　ControlDataへの参照
      */
-    static const ControlData_t& GetControlData(void) {
-        return _ControlData;
+    static const ControlData_t& controlData(void) {
+        return _control_data;
     }
 
 private:
     /// ADC2で測定したデータ
-    static Adc2Data_t _Adc2Data;
+    static Adc2Data_t _adc2_data;
 
     /// 機体の動きに関するデータ
-    static MotionData_t _MotionData;
+    static MotionData_t _motion_data;
 
     /// 制御に関するデータ
-    static ControlData_t _ControlData;
+    static ControlData_t _control_data;
 };

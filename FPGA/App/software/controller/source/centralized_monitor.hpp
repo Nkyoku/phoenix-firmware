@@ -124,7 +124,7 @@ private:
     static constexpr int ADC2_TIMEOUT_THRESHOLD = 50;
 
     /// 指令値が更新されなくなってから自動停止するまでの時間
-    static constexpr int PARAMETER_TIMEOUT = 1000;
+    static constexpr int PARAMETER_TIMEOUT = 500;
 
     /// DC48Vの下限電圧[mV]
     static constexpr float DC48V_UNDER_VOLTAGE_THRESHOLD = 40.0f;

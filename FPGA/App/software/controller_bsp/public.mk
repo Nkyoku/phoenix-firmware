@@ -187,14 +187,12 @@ ELF_PATCH_FLAG  += --timestamp 1615649612
 # When your application exits, close file descriptors, call C++ destructors, 
 # etc. Code footprint can be reduced by disabling clean exit. If disabled, adds 
 # -DALT_NO_CLEAN_EXIT to ALT_CPPFLAGS -D'exit(a)=_exit(a)' in public.mk. none 
-# setting hal.enable_clean_exit is false
-ALT_CPPFLAGS += -DALT_NO_CLEAN_EXIT -D'exit(a)=_exit(a)'
+# setting hal.enable_clean_exit is true
 
 # Add exit() support. This option increases code footprint if your "main()" 
 # routine does "return" or call "exit()". If false, adds -DALT_NO_EXIT to 
 # ALT_CPPFLAGS in public.mk, and reduces footprint none 
-# setting hal.enable_exit is false
-ALT_CPPFLAGS += -DALT_NO_EXIT
+# setting hal.enable_exit is true
 
 # Causes code to be compiled with gprof profiling enabled and the application 
 # ELF to be linked with the GPROF library. If true, adds -DALT_PROVIDE_GMON to 

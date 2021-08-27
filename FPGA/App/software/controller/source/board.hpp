@@ -1,11 +1,5 @@
 #pragma once
 
-#include <system.h>
-#include <stdint.h>
-
-/// 半精度浮動小数点数をuint16_tに格納するために型宣言する
-using __fp16 = uint16_t;
-
 /// ADC1の出力値と電流との換算係数 [A/LSB]
 static constexpr float ADC1_CURRENT_SCALE = 1.0f / 1977.5390625f;
 
@@ -45,6 +39,9 @@ static constexpr float MOTOR_RESISTANCE = 6.89f;
 /// 車輪が一回転したときのエンコーダのパルス数
 static constexpr float ENCODER_PPR = 4096;
 
+/// 車輪とモーターの慣性モーメント [kgm^2]
+static constexpr float WHEEL_INERTIA = 4.0E-5f;
+
 /// 機体の質量 [kg]
 static constexpr float MACHINE_WEIGHT = 1.7f;
 
@@ -56,13 +53,3 @@ static constexpr float CENTER_OF_GRAVITY_HEIGHT = 0.1f;
 
 /// 48Vバス電圧 [V]
 static constexpr float DC48V_VOLTAGE = 48.0f;
-
-/**
- * 単精度浮動小数点数を半精度浮動小数点数に変換する
- * カスタム命令により高速に変換できる
- * @param src 単精度浮動小数点数
- * @return 半精度浮動小数点数 (上位16bitは0)
- */
-static inline int Fp32ToFp16(float src) {
-    return __builtin_custom_inf(ALT_CI_FLOAT32TO16_0_N, src);
-}

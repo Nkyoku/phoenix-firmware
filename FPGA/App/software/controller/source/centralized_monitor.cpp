@@ -59,12 +59,12 @@ void CentralizedMonitor::Adc2Callback(void) {
     _Adc2Timeout = ADC2_TIMEOUT_THRESHOLD;
 
     // 低電圧、過電圧を判定しエラーフラグに反映する
-    DataHolder::FetchAdc2Result();
-    auto &adc2_data = DataHolder::GetAdc2Data();
-    if (adc2_data.Dc48vVoltage < DC48V_UNDER_VOLTAGE_THRESHOLD) {
-        //SetErrorFlags(ErrorCauseDc48vUnderVoltage);
+    DataHolder::fetchAdc2Result();
+    auto &adc2_data = DataHolder::adc2Data();
+    if (adc2_data.dc48v_voltage < DC48V_UNDER_VOLTAGE_THRESHOLD) {
+        SetErrorFlags(ErrorCauseDc48vUnderVoltage);
     }
-    else if (DC48V_OVER_VOLTAGE_THRESHOLD < adc2_data.Dc48vVoltage) {
+    else if (DC48V_OVER_VOLTAGE_THRESHOLD < adc2_data.dc48v_voltage) {
         SetErrorFlags(ErrorCauseDc48vOverVoltage);
     }
 
@@ -130,7 +130,7 @@ void CentralizedMonitor::SetErrorFlags(uint32_t error_flags) {
     }
 #endif
     if (new_error_flags != 0) {
-        WheelController::StopControl();
+        WheelController::stopControl();
         DribbleController::StopControl();
     }
 }
@@ -152,7 +152,7 @@ void CentralizedMonitor::SetFaultFlags(uint32_t fault_flags) {
     }
 #endif
     if (new_fault_flags != 0) {
-        WheelController::StopControl();
+        WheelController::stopControl();
         DribbleController::StopControl();
     }
 }
@@ -164,10 +164,9 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
     PERF_START_MEASURING(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE));
     PERF_BEGIN(reinterpret_cast<void*>(PERFORMANCE_COUNTER_0_BASE), 1);
 
-    // IMU、モータードライバ、制御データなどを読みJetsonへ送信する
-    DataHolder::FetchRegistersOnPreControlLoop();
-    StreamTransmitter::TransmitMotion(DataHolder::GetMotionData(), DataHolder::GetControlData(), performance_counter);
-
+    // センサーデータを読み出す
+    DataHolder::fetchOnPreControlLoop();
+    
     // ADC2のタイムアウトカウンタを減算しすでに0だったらフォルトを発生する
     int adc2_timeout = _Adc2Timeout;
     if (0 <= --adc2_timeout) {
@@ -189,7 +188,7 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
         bool stop_motors = _ParameterTimeout <= 0;
 
         // 車輪モーターの指令値を更新する
-        WheelController::Update(new_parameters, stop_motors);
+        WheelController::update(new_parameters, stop_motors);
 
         // ドリブルモーターの指令値を更新する
         DribbleController::Update(new_parameters, stop_motors);
@@ -205,7 +204,7 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
         SharedMemory::ClearParameters();
 
         // 車輪モーターのセンサーデータ等を更新する
-        WheelController::Update(false, true);
+        WheelController::update(false, true);
 
         // Jetsonからエラーフラグのクリアが指示されていればクリアを試みる
         if (SharedMemory::IsRequestedClearingErrorFlags() == true) {
@@ -217,6 +216,10 @@ void CentralizedMonitor::DoPeriodicCommonWork(void) {
 
         _ParameterTimeout = 0;
     }
+
+    // 制御データを読み出してJetsonへデータを送信する
+    DataHolder::fetchOnPostControlLoop();
+    StreamTransmitter::TransmitMotion(DataHolder::motionData(), DataHolder::controlData(), performance_counter);
 
     // Lチカ
     // 全般的な異常がある -> 全てのLEDを点滅

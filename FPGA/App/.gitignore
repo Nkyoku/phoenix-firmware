@@ -12,3 +12,6 @@
 /software/controller/*.map
 /software/controller/*.objdump
 /software/controller/*.elf
+/software/controller/.vscode/settings.json
+/software/controller/NiosII
+/software/controller_bsp/newlib-build-tmp
