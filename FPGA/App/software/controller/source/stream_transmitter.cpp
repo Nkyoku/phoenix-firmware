@@ -4,30 +4,30 @@
 #include <stream_data.hpp>
 #include <peripheral/msgdma.hpp>
 
-static StreamDataStatus_t StreamDataStatus;
+static StreamDataStatus StreamDataStatus;
 static constexpr MsgdmaTransmitDescriptor StreamDataDesciptorStatus(StreamDataStatus, StreamIdStatus);
 
-static StreamDataAdc2_t StreamDataAdc2;
+static StreamDataAdc2 StreamDataAdc2;
 static constexpr MsgdmaTransmitDescriptor StreamDataDesciptorAdc2(StreamDataAdc2, StreamIdAdc2);
 
-static StreamDataMotion_t StreamDataMotion;
+static StreamDataMotion StreamDataMotion;
 static constexpr MsgdmaTransmitDescriptor StreamDataDesciptorMotion(StreamDataMotion, StreamIdMotion);
 
-void StreamTransmitter::TransmitStatus(void) {
+void StreamTransmitter::transmitStatus(void) {
     // データキャッシュが有効になっている場合に備えてデータの格納には__builtin_st〇io()という系列のビルトイン関数を使用する
-    __builtin_stwio(&StreamDataStatus.error_flags, CentralizedMonitor::GetErrorFlags());
-    __builtin_stwio(&StreamDataStatus.fault_flags, CentralizedMonitor::GetFaultFlags());
-    StreamDataDesciptorStatus.TransmitAsync(_Device);
+    __builtin_stwio(&StreamDataStatus.error_flags, CentralizedMonitor::getErrorFlags());
+    __builtin_stwio(&StreamDataStatus.fault_flags, CentralizedMonitor::getFaultFlags());
+    StreamDataDesciptorStatus.transmitAsync(_device);
 }
 
-void StreamTransmitter::TransmitAdc2(const Adc2Data_t &adc2_data) {
+void StreamTransmitter::transmitAdc2(const Adc2Data_t &adc2_data) {
     __builtin_sthio(&StreamDataAdc2.dc48v_voltage, fpu::to_fp16(adc2_data.dc48v_voltage));
     __builtin_sthio(&StreamDataAdc2.dribble_voltage, fpu::to_fp16(adc2_data.dribble_voltage));
     __builtin_sthio(&StreamDataAdc2.dribble_current, fpu::to_fp16(adc2_data.dribble_current));
-    StreamDataDesciptorAdc2.TransmitAsync(_Device);
+    StreamDataDesciptorAdc2.transmitAsync(_device);
 }
 
-void StreamTransmitter::TransmitMotion(const MotionData_t &motion_data, const ControlData_t &control_data, int performance_counter) {
+void StreamTransmitter::transmitMotion(const MotionData_t &motion_data, const ControlData_t &control_data, int performance_counter) {
     __builtin_sthio(&StreamDataMotion.accelerometer[0], fpu::to_fp16(motion_data.accelerometer(0)));
     __builtin_sthio(&StreamDataMotion.accelerometer[1], fpu::to_fp16(motion_data.accelerometer(1)));
     __builtin_sthio(&StreamDataMotion.accelerometer[2], fpu::to_fp16(motion_data.accelerometer(2)));
@@ -70,7 +70,7 @@ void StreamTransmitter::TransmitMotion(const MotionData_t &motion_data, const Co
     __builtin_sthio(&StreamDataMotion.rotation_torque, fpu::to_fp16(control_data.rotation_torque));
     __builtin_sthio(&StreamDataMotion.omega_weight, fpu::to_fp16(control_data.omega_weight));
     __builtin_sthio(&StreamDataMotion.performance_counter, static_cast<uint16_t>(performance_counter));
-    StreamDataDesciptorMotion.TransmitAsync(_Device);
+    StreamDataDesciptorMotion.transmitAsync(_device);
 }
 
-alt_msgdma_dev *StreamTransmitter::_Device;
+alt_msgdma_dev *StreamTransmitter::_device;

@@ -7,33 +7,33 @@
 /**
  * 共有メモリーの構造を定義する構造体 (最大1024バイト)
  */
-struct SharedMemory_t {
+struct SharedMemory {
     /**
      * エラーフラグのビットマップ
      * この値を0xFFFFFFFFにセットするとエラーの解除が試みられる
      */
-    uint32_t ErrorFlags;
+    uint32_t error_flags;
 
     /**
      * フォルトフラグのビットマップ
      */
-    uint32_t FaultFlags;
+    uint32_t fault_flags;
 
     /**
      * 先頭のチェックサム
-     * HeadChecksumとTailChecksumが等しくそれらの値が正しいときにのみParametersは有効として扱われる
+     * head_checksumとtail_checksumが等しくそれらの値が正しいときにのみParametersは有効として扱われる
      * ROS2の命名規則に則りROS2で使うフィールド名は小文字になっている
      */
-    uint32_t HeadChecksum;
+    uint32_t head_checksum;
 
     /**
      * JetsonからNios IIへ制御パラメータを伝達する構造体
      */
-    struct Parameters_t {
+    struct Parameters {
         /**
          * フレーム番号。更新するたびに1ずつ増やす
          */
-        uint32_t FrameNumber;
+        uint32_t frame_number;
 
         /**
          * 車体左右の並進移動速度指令[m/s]
@@ -62,25 +62,25 @@ struct SharedMemory_t {
 
         /**
          * チェックサムを計算する
-         * この関数はParameters_tが4の倍数バイトの大きさであることを前提にしている
+         * この関数はParametersが4の倍数バイトの大きさであることを前提にしている
          * @return チェックサム
          */
-        uint32_t CalculateChecksum(void) const {
+        uint32_t calculateChecksum(void) const {
             auto p = reinterpret_cast<const uint32_t*>(this);
-            int count = sizeof(Parameters_t) / sizeof(uint32_t);
+            int count = sizeof(Parameters) / sizeof(uint32_t);
             uint32_t result = 0xA5A5A5A5;
             while (0 <= --count) {
                 result += *p++;
             }
             return result;
         }
-    } Parameters;
+    } parameters;
 
     /**
      * 末尾のチェックサム
-     * HeadChecksumとTailChecksumが等しいときにのみParametersは有効として扱われる
+     * head_checksumとtail_checksumが等しいときにのみParametersは有効として扱われる
      */
-    uint32_t TailChecksum;
+    uint32_t tail_checksum;
 };
 
 #pragma pack(pop)

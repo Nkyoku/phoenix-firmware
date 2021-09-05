@@ -69,12 +69,12 @@ static Eigen::Vector4f velocityVectorDecomposition(const Eigen::Vector4f &body_v
 
 void WheelController::startControl(void) {
     initializeRegisters();
-    VectorController::ClearFault();
+    VectorController::clearFault();
     initializeState();
 }
 
 void WheelController::stopControl(void) {
-    VectorController::SetFault();
+    VectorController::setFault();
     initializeRegisters();
     initializeState();
 }
@@ -94,13 +94,13 @@ void WheelController::initializeState(void) {
 void WheelController::initializeRegisters(void) {
     static constexpr int CURRENT_CONTROL_GAIN_P = 3500; // 電流制御の比例ゲイン
     static constexpr int CURRENT_CONTROL_GAIN_I = 500;  // 電流制御の積分ゲイン
-    VectorController::SetGainP(CURRENT_CONTROL_GAIN_P);
-    VectorController::SetGainI(CURRENT_CONTROL_GAIN_I);
-    VectorController::SetCurrentReferenceQ(1, 0);
-    VectorController::SetCurrentReferenceQ(2, 0);
-    VectorController::SetCurrentReferenceQ(3, 0);
-    VectorController::SetCurrentReferenceQ(4, 0);
-    VectorController::ClearAllBrakeEnabled();
+    VectorController::setGainP(CURRENT_CONTROL_GAIN_P);
+    VectorController::setGainI(CURRENT_CONTROL_GAIN_I);
+    VectorController::setCurrentReferenceQ(1, 0);
+    VectorController::setCurrentReferenceQ(2, 0);
+    VectorController::setCurrentReferenceQ(3, 0);
+    VectorController::setCurrentReferenceQ(4, 0);
+    VectorController::clearAllBrakeEnabled();
 }
 
 void WheelController::update(bool new_parameters, bool sensor_only) {
@@ -110,14 +110,13 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     // 車体のトルクを推定する
     _torque_observer.update(motion.wheel_velocity, motion.wheel_current_q);
 
-    // 車輪速度をLPFでフィルタリングする
-    // 機体速度の推定とトルク推定に使用する
+    // 車輪速度を取得し車体速度に換算する
     Vector4f wheel_velocity = motion.wheel_velocity;
     Vector4f odom_body = velocityVectorComposition(wheel_velocity);
 
     // 速度指令値が異常でないことを確認する
     // 速度が速すぎるかNaNならspeed_ok==falseとなる
-    auto &parameters = SharedMemory::GetParameters();
+    auto &parameters = SharedMemoryManager::getParameters();
     bool speed_ok = false;
     if (fabsf(parameters.speed_x) <= MAX_TRANSLATION_REFERENCE) {
         if (fabsf(parameters.speed_y) <= MAX_TRANSLATION_REFERENCE) {
@@ -133,12 +132,12 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     _velocity_filter.update(bodyAcceleration(), motion.gyroscope, odom_body, _omega_weight);
 
     // 以下で制御を行う
-    if (speed_ok && !sensor_only && !VectorController::IsFault()) {
+    if (speed_ok && !sensor_only && !VectorController::isFault()) {
         bool brake_enabled[4];
-        brake_enabled[0] = VectorController::IsBrakeEnabled(1);
-        brake_enabled[1] = VectorController::IsBrakeEnabled(2);
-        brake_enabled[2] = VectorController::IsBrakeEnabled(3);
-        brake_enabled[3] = VectorController::IsBrakeEnabled(4);
+        brake_enabled[0] = VectorController::isBrakeEnabled(1);
+        brake_enabled[1] = VectorController::isBrakeEnabled(2);
+        brake_enabled[2] = VectorController::isBrakeEnabled(3);
+        brake_enabled[3] = VectorController::isBrakeEnabled(4);
 
         // 過電流を判定する
         auto norm = [](float x, float y) {
@@ -158,7 +157,7 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
             error_flags |= ErrorCauseMotor4OverCurrent;
         }
         if (error_flags != 0) {
-            CentralizedMonitor::SetErrorFlags(error_flags);
+            CentralizedMonitor::setErrorFlags(error_flags);
             return;
         }
 
@@ -201,32 +200,32 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
         // 電流指令値を設定する
         static constexpr float RECIPROCAL_CURRENT_SCALE = 1.0f / ADC1_CURRENT_SCALE;
         if (brake_enabled[0])
-            VectorController::SetBrakeEnabled(1);
+            VectorController::setBrakeEnabled(1);
         if (brake_enabled[1])
-            VectorController::SetBrakeEnabled(2);
+            VectorController::setBrakeEnabled(2);
         if (brake_enabled[2])
-            VectorController::SetBrakeEnabled(3);
+            VectorController::setBrakeEnabled(3);
         if (brake_enabled[3])
-            VectorController::SetBrakeEnabled(4);
-        VectorController::SetCurrentReferenceQ(1, static_cast<int>(_ref_wheel_current(0) * RECIPROCAL_CURRENT_SCALE));
-        VectorController::SetCurrentReferenceQ(2, static_cast<int>(_ref_wheel_current(1) * RECIPROCAL_CURRENT_SCALE));
-        VectorController::SetCurrentReferenceQ(3, static_cast<int>(_ref_wheel_current(2) * RECIPROCAL_CURRENT_SCALE));
-        VectorController::SetCurrentReferenceQ(4, static_cast<int>(_ref_wheel_current(3) * RECIPROCAL_CURRENT_SCALE));
+            VectorController::setBrakeEnabled(4);
+        VectorController::setCurrentReferenceQ(1, static_cast<int>(_ref_wheel_current(0) * RECIPROCAL_CURRENT_SCALE));
+        VectorController::setCurrentReferenceQ(2, static_cast<int>(_ref_wheel_current(1) * RECIPROCAL_CURRENT_SCALE));
+        VectorController::setCurrentReferenceQ(3, static_cast<int>(_ref_wheel_current(2) * RECIPROCAL_CURRENT_SCALE));
+        VectorController::setCurrentReferenceQ(4, static_cast<int>(_ref_wheel_current(3) * RECIPROCAL_CURRENT_SCALE));
         if (!brake_enabled[0])
-            VectorController::ClearBrakeEnabled(1);
+            VectorController::clearBrakeEnabled(1);
         if (!brake_enabled[1])
-            VectorController::ClearBrakeEnabled(2);
+            VectorController::clearBrakeEnabled(2);
         if (!brake_enabled[2])
-            VectorController::ClearBrakeEnabled(3);
+            VectorController::clearBrakeEnabled(3);
         if (!brake_enabled[3])
-            VectorController::ClearBrakeEnabled(4);
+            VectorController::clearBrakeEnabled(4);
     }
     else if (new_parameters && !sensor_only) {
         // 新しい指令値を受信したので次のループから制御を開始する
         startControl();
     }
     else {
-        VectorController::SetFault();
+        VectorController::setFault();
         initializeRegisters();
         initializeState();
     }

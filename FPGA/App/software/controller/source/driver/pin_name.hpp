@@ -1,10 +1,10 @@
 #pragma once
 
-enum Pio0Bit_t {
+enum Pio0Bit {
     Pio0Pulse1kHz = 1u << 0
 };
 
-enum Pio1Bit_t {
+enum Pio1Bit {
     Pio1Motor5HallW = 1u << 30,
     Pio1Motor5HallV = 1u << 29,
     Pio1Motor5HallU = 1u << 28,
@@ -38,7 +38,7 @@ enum Pio1Bit_t {
     Pio1FpgaMode = 1u << 0
 };
 
-enum Pio2Bit_t {
+enum Pio2Bit {
     Pio2Motor5SwitchEnable = 1u << 9,
     Pio2Motor4SwitchEnable = 1u << 8,
     Pio2Motor3SwitchEnable = 1u << 7,

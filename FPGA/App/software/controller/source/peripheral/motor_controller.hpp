@@ -3,43 +3,43 @@
 #include <stdint.h>
 #include <system.h>
 
-class MotorControllerStatus {
+struct MotorControllerStatus {
     friend class MotorController;
 
 public:
-    uint16_t Status;
+    uint16_t status;
 
-    int AnyFault(void) {
-        return ~Status & 0x7;
+    int anyFault(void) {
+        return ~status & 0x7;
     }
 
-    int OverTemperatureFault(void) {
-        return (~Status & 0x4) >> 2;
+    int overTemperatureFault(void) {
+        return (~status & 0x4) >> 2;
     }
 
-    int OverTemperatureFaultN(void) {
-        return (Status & 0x4) >> 2;
+    int overTemperatureFaultN(void) {
+        return (status & 0x4) >> 2;
     }
 
-    int OverCurrentFault(void) {
-        return (~Status & 0x2) >> 1;
+    int overCurrentFault(void) {
+        return (~status & 0x2) >> 1;
     }
 
-    int OverCurrentFaultN(void) {
-        return (Status & 0x2) >> 1;
+    int overCurrentFaultN(void) {
+        return (status & 0x2) >> 1;
     }
 
-    int HallSensorFault(void) {
-        return ~Status & 0x1;
+    int hallSensorFault(void) {
+        return ~status & 0x1;
     }
 
-    int HallSensorFaultN(void) {
-        return Status & 0x1;
+    int hallSensorFaultN(void) {
+        return status & 0x1;
     }
 
 private:
-    MotorControllerStatus(int status) {
-        Status = status;
+    MotorControllerStatus(int status_) {
+        status = status_;
     }
 };
 
@@ -61,47 +61,47 @@ public:
     /// POWERレジスタに設定可能な最大値の絶対値
     static constexpr int MAXIMUM_POWER = 2985;
 
-    static MotorControllerStatus GetStatus(void) {
+    static MotorControllerStatus getStatus(void) {
         return MotorControllerStatus(__builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->STATUS));
     }
 
-    static MotorControllerStatus GetInterruptFlag(void) {
+    static MotorControllerStatus getInterruptFlag(void) {
         return MotorControllerStatus(__builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->INTFLAG));
     }
 
-    static void SetFault(void) {
+    static void setFault(void) {
         __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x1);
     }
 
-    static void ClearFault(void) {
+    static void clearFault(void) {
         __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x2);
     }
 
-    static void ResetFault(void) {
+    static void resetFault(void) {
         __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x3);
     }
 
-    static bool IsFault(void) {
+    static bool isFault(void) {
         return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->FAULT) & 0x1;
     }
 
-    static void SetBrakeEnabled(void) {
+    static void setBrakeEnabled(void) {
         __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x4);
     }
 
-    static void ClearBrakeEnabled(void) {
+    static void clearBrakeEnabled(void) {
         __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->FAULT, 0x8);
     }
 
-    static bool IsBrakeEnabled(void) {
+    static bool isBrakeEnabled(void) {
         return __builtin_ldhuio(&reinterpret_cast<Register_t*>(BASE)->FAULT) & 0x4;
     }
 
-    static int GetPower(void) {
+    static int getPower(void) {
         return __builtin_ldhio(&reinterpret_cast<Register_t*>(BASE)->POWER);
     }
 
-    static void SetPower(int value) {
+    static void setPower(int value) {
         __builtin_sthio(&reinterpret_cast<Register_t*>(BASE)->POWER, value);
     }
 };

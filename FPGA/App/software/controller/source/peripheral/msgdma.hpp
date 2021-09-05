@@ -14,10 +14,10 @@ public:
      */
     template<class T>
     constexpr MsgdmaTransmitDescriptor(const T &data, int channel) :
-        _ReadAddress(&data),
-        _WriteAddress(nullptr),
-        _TransferLength(sizeof(T)),
-        _Control(ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GO_MASK
+        _read_address(&data),
+        _write_address(nullptr),
+        _transfer_length(sizeof(T)),
+        _control(ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GO_MASK
             | ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GENERATE_SOP_MASK
             | ALTERA_MSGDMA_DESCRIPTOR_CONTROL_GENERATE_EOP_MASK
             | static_cast<alt_u32>(channel << ALTERA_MSGDMA_DESCRIPTOR_CONTROL_TRANSMIT_CHANNEL_OFFSET)) {}
@@ -28,11 +28,11 @@ public:
      * @param device mSGDMAのハンドル
      * @return　転送の開始に成功したらtrueを返す
      */
-    bool TransmitAsync(alt_msgdma_dev *device) const;
+    bool transmitAsync(alt_msgdma_dev *device) const;
 
 private:
-    const void *_ReadAddress;
-    void *_WriteAddress;
-    alt_u32 _TransferLength;
-    alt_u32 _Control;
+    const void *_read_address;
+    void *_write_address;
+    alt_u32 _transfer_length;
+    alt_u32 _control;
 };

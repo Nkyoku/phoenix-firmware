@@ -3,14 +3,14 @@
 #include <stdint.h>
 #include <system.h>
 
-struct ImuResult_t {
-	int16_t TempData;
-	int16_t AccelDataX;
-	int16_t AccelDataY;
-	int16_t AccelDataZ;
-	int16_t GyroDataX;
-	int16_t GyroDataY;
-	int16_t GyroDataZ;
+struct ImuResult {
+	int16_t temp_data;
+	int16_t accel_data_x;
+	int16_t accel_data_y;
+	int16_t accel_data_z;
+	int16_t gyro_data_x;
+	int16_t gyro_data_y;
+	int16_t gyro_data_z;
 };
 
 class Imu {
@@ -21,22 +21,22 @@ private:
 
 public:
     // IMUを初期化する
-	static bool Initialize(void);
+	static bool initialize(void);
     
     // 測定データを読み出す
-	static void ReadData(ImuResult_t *data);
+	static void readData(ImuResult *data);
     
     // 測定データが有効な値か取得する
-    static bool IsValid(void){
-        return _Valid;
+    static bool isValid(void){
+        return _valid;
     }
     
 private:
-	static void SetBank(uint32_t bank);
-	static uint8_t ReadRegister(uint32_t address);
-	static void WriteRegister(uint32_t address, uint8_t value);
-	static void ReadRegisters(uint32_t address, uint32_t length, void *data);
+	static void setBank(uint32_t bank);
+	static uint8_t readRegister(uint32_t address);
+	static void writeRegister(uint32_t address, uint8_t value);
+	static void readRegisters(uint32_t address, uint32_t length, void *data);
 
-	static uint8_t _Bank;
-    static bool _Valid;
+	static uint8_t _bank;
+    static bool _valid;
 };

@@ -120,53 +120,53 @@ enum : uint32_t {
     ICM42688_BANK4_OFFSET_USER8 = 0x47F,
 };
 
-bool Imu::Initialize(void) {
+bool Imu::initialize(void) {
     IMU_SPIM_SetPassthrough(IMU_SPIM_BASE, true);
-    _Bank = -1;
+    _bank = -1;
 
     // リセットする
-    WriteRegister(ICM42688_BANK0_DEVICE_CONFIG, 0x01);
+    writeRegister(ICM42688_BANK0_DEVICE_CONFIG, 0x01);
     usleep(1000);
 
     // ICM42688-Pの存在を確かめる
-    if (ReadRegister(ICM42688_BANK0_WHO_AM_I) != 0x47) {
+    if (readRegister(ICM42688_BANK0_WHO_AM_I) != 0x47) {
         return false;
     }
 
     // レジスタを初期化する
-    WriteRegister(ICM42688_BANK1_INTF_CONFIG5, 0x04);  // PIN9_FUNCTION <= CLKIN
-    WriteRegister(ICM42688_BANK0_INTF_CONFIG0, 0x13);  // SENSOR_DATA_ENDIAN <= Big Endian, UI_SIFS_CFG <= Disable I2C
-    WriteRegister(ICM42688_BANK0_INTF_CONFIG1, 0x95);  // RTC_MODE <= RTC clock input is required
-    WriteRegister(ICM42688_BANK0_PWR_MGMT0, 0x0F);     // GYRO_MODE <= LN Mode, ACCEL_MODE <= LN Mode
+    writeRegister(ICM42688_BANK1_INTF_CONFIG5, 0x04);  // PIN9_FUNCTION <= CLKIN
+    writeRegister(ICM42688_BANK0_INTF_CONFIG0, 0x13);  // SENSOR_DATA_ENDIAN <= Big Endian, UI_SIFS_CFG <= Disable I2C
+    writeRegister(ICM42688_BANK0_INTF_CONFIG1, 0x95);  // RTC_MODE <= RTC clock input is required
+    writeRegister(ICM42688_BANK0_PWR_MGMT0, 0x0F);     // GYRO_MODE <= LN Mode, ACCEL_MODE <= LN Mode
     usleep(200);
-    WriteRegister(ICM42688_BANK0_GYRO_CONFIG1, 0xF6);  // TEMP_FILT_BW <= (DLPF BW = 5Hz; DLPF Latency = 32ms), GYRO_UI_FILT_ORD = 1 (2nd Order)
-    WriteRegister(ICM42688_BANK0_GYRO_ACCEL_CONFIG0, 0x77); // ACCEL_UI_FILT_BW <= 7 (Fc = 21.3Hz), GYRO_UI_FILT_BW <= 7 (Fc = 21.3Hz)
-    WriteRegister(ICM42688_BANK0_INT_CONFIG, 0x02);   // INT1_MODE <= Pulsed mode, INT1_DRIVE_CIRCUIT <= Push pull, INT1_POLARITY <= Active low
-    WriteRegister(ICM42688_BANK0_INT_CONFIG1, 0x00);  // INT_ASYNC_RESET <= 0
-    //WriteRegister(ICM42688_BANK0_INT_CONFIG0, 0x20); // UI_DRDY_INT_CLEAR <= Clear on Sensor Register Read
-    WriteRegister(ICM42688_BANK0_INT_SOURCE0, 0x08);  // UI_DRDY_INT1_EN <= UI data ready interrupt routed to INT1
+    writeRegister(ICM42688_BANK0_GYRO_CONFIG1, 0xF6);  // TEMP_FILT_BW <= (DLPF BW = 5Hz; DLPF Latency = 32ms), GYRO_UI_FILT_ORD = 1 (2nd Order)
+    writeRegister(ICM42688_BANK0_GYRO_ACCEL_CONFIG0, 0x77); // ACCEL_UI_FILT_BW <= 7 (Fc = 21.3Hz), GYRO_UI_FILT_BW <= 7 (Fc = 21.3Hz)
+    writeRegister(ICM42688_BANK0_INT_CONFIG, 0x02);   // INT1_MODE <= Pulsed mode, INT1_DRIVE_CIRCUIT <= Push pull, INT1_POLARITY <= Active low
+    writeRegister(ICM42688_BANK0_INT_CONFIG1, 0x00);  // INT_ASYNC_RESET <= 0
+    //writeRegister(ICM42688_BANK0_INT_CONFIG0, 0x20); // UI_DRDY_INT_CLEAR <= Clear on Sensor Register Read
+    writeRegister(ICM42688_BANK0_INT_SOURCE0, 0x08);  // UI_DRDY_INT1_EN <= UI data ready interrupt routed to INT1
 
     // IMU_SPIMによる自動アクセスを有効化する
     IMU_SPIM_SetPassthrough(IMU_SPIM_BASE, false);
-    _Valid = true;
+    _valid = true;
 
     return true;
 }
 
-void Imu::ReadData(ImuResult_t *data) {
-    data->TempData = IMU_SPIM_GetTempData(IMU_SPIM_BASE);
-    data->AccelDataX = IMU_SPIM_GetAccelDataX(IMU_SPIM_BASE);
-    data->AccelDataY = IMU_SPIM_GetAccelDataY(IMU_SPIM_BASE);
-    data->AccelDataZ = IMU_SPIM_GetAccelDataZ(IMU_SPIM_BASE);
-    data->GyroDataX = IMU_SPIM_GetGyroDataX(IMU_SPIM_BASE);
-    data->GyroDataY = IMU_SPIM_GetGyroDataY(IMU_SPIM_BASE);
-    data->GyroDataZ = IMU_SPIM_GetGyroDataZ(IMU_SPIM_BASE);
-    //ReadRegisters(ICM42688_BANK0_TEMP_DATA1, sizeof(ImuResult_t), data);
+void Imu::readData(ImuResult *data) {
+    data->temp_data = IMU_SPIM_GetTempData(IMU_SPIM_BASE);
+    data->accel_data_x = IMU_SPIM_GetAccelDataX(IMU_SPIM_BASE);
+    data->accel_data_y = IMU_SPIM_GetAccelDataY(IMU_SPIM_BASE);
+    data->accel_data_z = IMU_SPIM_GetAccelDataZ(IMU_SPIM_BASE);
+    data->gyro_data_x = IMU_SPIM_GetGyroDataX(IMU_SPIM_BASE);
+    data->gyro_data_y = IMU_SPIM_GetGyroDataY(IMU_SPIM_BASE);
+    data->gyro_data_z = IMU_SPIM_GetGyroDataZ(IMU_SPIM_BASE);
+    //readRegisters(ICM42688_BANK0_TEMP_DATA1, sizeof(ImuResult), data);
 }
 
-void Imu::SetBank(uint32_t bank) {
-    if (bank != _Bank) {
-        _Bank = bank;
+void Imu::setBank(uint32_t bank) {
+    if (bank != _bank) {
+        _bank = bank;
         uint8_t buffer[2];
         buffer[0] = ICM42688_REG_BANK_SEL;
         buffer[1] = bank;
@@ -174,28 +174,28 @@ void Imu::SetBank(uint32_t bank) {
     }
 }
 
-uint8_t Imu::ReadRegister(uint32_t address) {
-    SetBank((address >> 8) & 0x7);
+uint8_t Imu::readRegister(uint32_t address) {
+    setBank((address >> 8) & 0x7);
     uint8_t buffer[1];
     buffer[0] = 0x80 | (address & 0x7F);
     alt_avalon_spi_command(SPI_BASE, SPI_SLAVE, sizeof(buffer), buffer, sizeof(buffer), buffer, 0);
     return buffer[0];
 }
 
-void Imu::WriteRegister(uint32_t address, uint8_t value) {
-    SetBank((address >> 8) & 0x7);
+void Imu::writeRegister(uint32_t address, uint8_t value) {
+    setBank((address >> 8) & 0x7);
     uint8_t buffer[2];
     buffer[0] = address & 0x7F;
     buffer[1] = value;
     alt_avalon_spi_command(SPI_BASE, SPI_SLAVE, sizeof(buffer), buffer, 0, nullptr, 0);
 }
 
-void Imu::ReadRegisters(uint32_t address, uint32_t length, void *data) {
-    SetBank((address >> 8) & 0x7);
+void Imu::readRegisters(uint32_t address, uint32_t length, void *data) {
+    setBank((address >> 8) & 0x7);
     uint8_t buffer[1];
     buffer[0] = 0x80 | (address & 0x7F);
     alt_avalon_spi_command(SPI_BASE, SPI_SLAVE, sizeof(buffer), buffer, length, reinterpret_cast<alt_u8 *>(data), 0);
 }
 
-uint8_t Imu::_Bank = 0;
-bool Imu::_Valid = false;
+uint8_t Imu::_bank = 0;
+bool Imu::_valid = false;

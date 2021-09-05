@@ -8,16 +8,16 @@
 class CriticalSection {
 public:
     CriticalSection(void) {
-        _Context = alt_irq_disable_all();
+        _context = alt_irq_disable_all();
         __builtin_sync();
     }
     
     ~CriticalSection() {
-        alt_irq_enable_all(_Context);
+        alt_irq_enable_all(_context);
     }
 
 private:
     CriticalSection(const CriticalSection&);
 
-    alt_irq_context _Context;    
+    alt_irq_context _context;    
 };

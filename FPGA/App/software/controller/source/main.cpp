@@ -23,18 +23,18 @@
 // mc_5        IRQ8, RIL=3, RRS=3
 
 static inline void initialize_peripheral(void) {
-    Imu::Initialize();
-    Adc2::Initialize();
-    SharedMemory::Initialize();
-    StreamTransmitter::Initialize();
-    CentralizedMonitor::Initialize();
+    Imu::initialize();
+    Adc2::initialize();
+    SharedMemoryManager::initialize();
+    StreamTransmitter::initialize();
+    CentralizedMonitor::initialize();
     WheelController::initialize();
-    DribbleController::Initialize();
+    DribbleController::initialize();
 }
 
 static inline void start_peripheral(void) {
-    Adc2::Start();
-    CentralizedMonitor::Start();
+    Adc2::start();
+    CentralizedMonitor::start();
 }
 
 int main(void) {

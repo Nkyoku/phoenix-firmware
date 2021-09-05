@@ -7,7 +7,7 @@
 // モーターの状態を示すLEDを制御するクラス
 class Led {
 public:
-    static void SetMotor1Enabled(bool enabled) {
+    static void setMotor1Enabled(bool enabled) {
         if (enabled == false) {
             IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(PIO_2_BASE, Pio2Motor1Led);
         }
@@ -16,7 +16,7 @@ public:
         }
     }
 
-    static void SetMotor2Enabled(bool enabled) {
+    static void setMotor2Enabled(bool enabled) {
         if (enabled == false) {
             IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(PIO_2_BASE, Pio2Motor2Led);
         }
@@ -25,7 +25,7 @@ public:
         }
     }
 
-    static void SetMotor3Enabled(bool enabled) {
+    static void setMotor3Enabled(bool enabled) {
         if (enabled == false) {
             IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(PIO_2_BASE, Pio2Motor3Led);
         }
@@ -34,7 +34,7 @@ public:
         }
     }
 
-    static void SetMotor4Enabled(bool enabled) {
+    static void setMotor4Enabled(bool enabled) {
         if (enabled == false) {
             IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(PIO_2_BASE, Pio2Motor4Led);
         }
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    static void SetMotor5Enabled(bool enabled) {
+    static void setMotor5Enabled(bool enabled) {
         if (enabled == false) {
             IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(PIO_2_BASE, Pio2Motor5Led);
         }
@@ -52,11 +52,11 @@ public:
         }
     }
 
-    static void SetAllOff(void) {
+    static void setAllOff(void) {
         IOWR_ALTERA_AVALON_PIO_CLEAR_BITS(PIO_2_BASE, Pio2Motor5Led | Pio2Motor4Led | Pio2Motor3Led | Pio2Motor2Led | Pio2Motor1Led);
     }
 
-    static void SetAllOn(void) {
+    static void setAllOn(void) {
         IOWR_ALTERA_AVALON_PIO_SET_BITS(PIO_2_BASE, Pio2Motor5Led | Pio2Motor4Led | Pio2Motor3Led | Pio2Motor2Led | Pio2Motor1Led);
     }
 };

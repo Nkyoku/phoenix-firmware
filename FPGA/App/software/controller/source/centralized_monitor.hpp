@@ -10,78 +10,78 @@ public:
     /**
      * 初期化する
      */
-    static void Initialize(void);
+    static void initialize(void);
 
     /**
      * 開始する
      */
-    static void Start(void);
+    static void start(void);
 
     /**
      * エラーフラグを取得する
      * @return エラーフラグのビットマップ
      */
-    static uint32_t GetErrorFlags(void) {
-        return _ErrorFlags;
+    static uint32_t getErrorFlags(void) {
+        return _error_flags;
     }
 
     /**
      * フォルトフラグを取得する
      * @return フォルトフラグのビットマップ
      */
-    static uint32_t GetFaultFlags(void) {
-        return _FaultFlags;
+    static uint32_t getFaultFlags(void) {
+        return _fault_flags;
     }
 
     /**
      * 何らかの問題が発生しているか取得する
      * @return 問題が起きている場合にtrueを返す
      */
-    static bool IsAnyProblemOccured(void){
-        return (_ErrorFlags != 0) || (_FaultFlags != 0);
+    static bool isAnyProblemOccured(void) {
+        return (_error_flags != 0) || (_fault_flags != 0);
     }
 
     /**
-     * ADC2の測定完了時にAdc2::Handler()から呼ばれるコールバック
+     * ADC2の測定完了時にAdc2::handler()から呼ばれるコールバック
      */
-    static void Adc2Callback(void);
+    static void adc2Callback(void);
 
     /**
      * エラーフラグのクリアを試みる
      */
-    static void ClearErrorFlags(void);
+    static void clearErrorFlags(void);
 
     /**
      * エラーフラグをセットする
      * @param error_flags セットするエラーフラグのビットマップ
      */
-    static void SetErrorFlags(uint32_t error_flags);
+    static void setErrorFlags(uint32_t error_flags);
 
     /**
      * フォルトフラグをセットする
      * @param fault_flags セットするフォルトフラグのビットマップ
      */
-    static void SetFaultFlags(uint32_t fault_flags);
+    static void setFaultFlags(uint32_t fault_flags);
 
 private:
     /**
-     * Pio0Handler()あるいはTimerHandler()の共通処理を行う
+     * pio0Handler()あるいはtimerHandler()の共通処理を行う
      */
-    static void DoPeriodicCommonWork(void);
+    static void doPeriodicCommonWork(void);
 
     /**
      * timer_0の割り込みハンドラ
      * IMUからの割り込み信号が2ms以内に来なかったときに停止処理を行う
      * @param context
      */
-    static void TimerHandler(void *context);
+    static void timerHandler(void *context);
 
     /**
      * pio_0の割り込みハンドラ
      * IMUからデータを受信した後にモーター制御や通信を行う
      * @param context
      */
-    static void Pio0Handler(void *context);
+    static void pio0Handler(void *context);
 
     /**
      * pio_1の割り込みハンドラ
@@ -89,46 +89,34 @@ private:
      * メモ:レベル割り込みなので他の割り込みの処理中に短いパルスが入ったときに取りこぼすおそれがある
      * @param context
      */
-    static void Pio1Handler(void *context);
+    static void pio1Handler(void *context);
 
     /**
      * vector_controller_master_0の割り込みハンドラ
      * @param context
      */
-    static void VectorControllerHandler(void *context);
+    static void vectorControllerHandler(void *context);
 
     /**
      * motor_controller_5の割り込みハンドラ
      * @param context
      */
-    static void MotorControllerHandler(void *context);
+    static void motorControllerHandler(void *context);
 
     /**
      * モーター関連の割り込みフラグをリセットする
      */
-    static void ResetMotorInterruptFlags(void);
+    static void resetMotorInterruptFlags(void);
 
     /// エラーフラグのビットマップ
-    static volatile uint32_t _ErrorFlags;
+    static volatile uint32_t _error_flags;
 
     /// フォルトフラグのビットマップ
-    static volatile uint32_t _FaultFlags;
+    static volatile uint32_t _fault_flags;
 
     /// ADC2のタイムアウトカウンタ
-    static int _Adc2Timeout;
+    static int _adc2_timeout;
 
     /// 指令値のタイムアウトカウンタ
-    static int _ParameterTimeout;
-
-    /// ADC2のタイムアウトカウンタの初期値
-    static constexpr int ADC2_TIMEOUT_THRESHOLD = 50;
-
-    /// 指令値が更新されなくなってから自動停止するまでの時間
-    static constexpr int PARAMETER_TIMEOUT = 500;
-
-    /// DC48Vの下限電圧[mV]
-    static constexpr float DC48V_UNDER_VOLTAGE_THRESHOLD = 40.0f;
-
-    /// DC48Vの上限電圧[mV]
-    static constexpr float DC48V_OVER_VOLTAGE_THRESHOLD = 52.5f;
+    static int _parameter_timeout;
 };

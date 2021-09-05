@@ -1,38 +1,38 @@
 #include "shared_memory_manager.hpp"
 
-bool SharedMemory::UpdateParameters(void){
+bool SharedMemoryManager::updateParameters(void){
     // 共有メモリーからパラメータを一時的にコピーする
-    SharedMemory_t *shared_memory = GetNonCachedSharedMemory();
-    uint32_t tail_checksum = shared_memory->TailChecksum;
-    SharedMemory_t::Parameters_t parameters;
-    memcpy(&parameters, &shared_memory->Parameters, sizeof(parameters));
-    uint32_t head_checksum = shared_memory->HeadChecksum;
+    SharedMemory *shared_memory = getNonCachedSharedMemory();
+    uint32_t tail_checksum = shared_memory->tail_checksum;
+    SharedMemory::Parameters parameters;
+    memcpy(&parameters, &shared_memory->parameters, sizeof(parameters));
+    uint32_t head_checksum = shared_memory->head_checksum;
 
     //　パラメータのフレーム番号が変わっていなければ変更なしと判断する
-    if (parameters.FrameNumber == _Parameters.FrameNumber){
+    if (parameters.frame_number == _parameters.frame_number){
         return false;
     }
 
     // パラメータの先頭と末尾のチェックサム、パラメータ自体から計算したチェックサムを比較し、すべてが等しくなければエラーと判断する
-    if ((head_checksum != tail_checksum) || (head_checksum != parameters.CalculateChecksum())){
+    if ((head_checksum != tail_checksum) || (head_checksum != parameters.calculateChecksum())){
         return false;
     }
 
     // パラメータをローカルメモリーにコピーする
-    memcpy(&_Parameters, &parameters, sizeof(_Parameters));
+    memcpy(&_parameters, &parameters, sizeof(_parameters));
     return true;
 }
 
-void SharedMemory::ClearParameters(void){
+void SharedMemoryManager::clearParameters(void){
     // ローカルメモリーのパラメータをクリアする
-    memset(&_Parameters, 0, sizeof(_Parameters));
+    memset(&_parameters, 0, sizeof(_parameters));
 
     // 共有メモリーをクリアする
-    SharedMemory_t *shared_memory = GetNonCachedSharedMemory();
-    shared_memory->HeadChecksum = 0;
-    shared_memory->Parameters.FrameNumber = 0;
-    shared_memory->TailChecksum = 0;
+    SharedMemory *shared_memory = getNonCachedSharedMemory();
+    shared_memory->head_checksum = 0;
+    shared_memory->parameters.frame_number = 0;
+    shared_memory->tail_checksum = 0;
 }
 
-SharedMemory_t SharedMemory::_SharedMemory __attribute__((section(".shared")));
-SharedMemory_t::Parameters_t SharedMemory::_Parameters;
+SharedMemory SharedMemoryManager::_shared_memory __attribute__((section(".shared")));
+SharedMemory::Parameters SharedMemoryManager::_parameters;

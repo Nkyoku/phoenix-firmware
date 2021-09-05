@@ -47,9 +47,3 @@ static constexpr float MACHINE_WEIGHT = 1.7f;
 
 /// 機体の慣性モーメント [kgm^2]
 static constexpr float MACHINE_INERTIA = 0.007f;
-
-/// 重心の高さ [m]
-static constexpr float CENTER_OF_GRAVITY_HEIGHT = 0.1f;
-
-/// 48Vバス電圧 [V]
-static constexpr float DC48V_VOLTAGE = 48.0f;

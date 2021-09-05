@@ -39,69 +39,69 @@ public:
     };
 
     // 初期化を行う
-    static bool Initialize(void);
+    static bool initialize(void);
 
     // 動作を開始する
     // 割り込みが開始される
-    static void Start(void);
+    static void start(void);
 
     // 48V電源の出力電圧を取得する[V]
-    static float GetDc48v(void) {
-        return _Result[0];
+    static float getDc48v(void) {
+        return _result[0];
     }
 
     // ドリブルモーターの電流を取得する[A]
-    static float GetDribbleCurrent(void) {
-        return _Result[1];
+    static float getDribbleCurrent(void) {
+        return _result[1];
     }
 
     // 測定値が有効な値かどうか取得する
-    // ただしこの関数がtrueを返してもGetDribbleCurrent()の値は正しくなく0を返す可能性がある
-    static bool IsValid(void) {
-        return _Valid;
+    // ただしこの関数がtrueを返してもgetDribbleCurrent()の値は正しくなく0を返す可能性がある
+    static bool isValid(void) {
+        return _valid;
     }
 
 private:
     // 指定したシーケンス番号の変換を非同期的に開始する
     // シーケンス番号が最大値に達した場合、内部的に0に戻される
-    static void StartConversionAsync(int sequence);
+    static void startConversionAsync(int sequence);
 
     // CONFIGURATIONレジスタの読み出しを非同期的に開始する
-    static void PollStatusAsync(void) {
+    static void pollStatusAsync(void) {
         I2CM_ReadRegister2Byte(I2C_BASE, ADS1015_CONFIGURATION);
     }
 
     // CONVERSION_DATAレジスタの読み出しを非同期的に開始する
-    static void ReadResultAsync(void) {
+    static void readResultAsync(void) {
         I2CM_ReadRegister2Byte(I2C_BASE, ADS1015_CONVERSION_DATA);
     }
 
     // バスリセットを非同期的に開始する
-    static void StartBusResetAsync(void) {
+    static void startBusResetAsync(void) {
         I2CM_BusReset(I2C_BASE);
     }
 
     // 非同期アクセスの完了を待つ
-    static void AwaitComplete(void) {
+    static void awaitComplete(void) {
         while (I2CM_IsBusy(I2C_BASE)) {
         }
     }
 
     // 非同期的にシングルショット変換を開始する
-    static void ConvertAsync(MUX_t mux, FSR_t fsr) {
+    static void convertAsync(MUX_t mux, FSR_t fsr) {
         uint16_t config = 0x8103 | (mux << 12) | (fsr << 9); // 128 SPS
         int txdata = (config >> 8) | (config << 8);
         I2CM_WriteRegister2Byte(I2C_BASE, ADS1015_CONFIGURATION, txdata);
     }
 
     // 同期的にレジスタを読み出す
-    static bool ReadRegister(int address, uint16_t *value);
+    static bool readRegister(int address, uint16_t *value);
 
     // 同期的にレジスタへ書き込む
-    static bool WriteRegister(int address, uint16_t value);
+    static bool writeRegister(int address, uint16_t value);
 
     // 割り込みハンドラ
-    static void Handler(void *context);
+    static void handler(void *context);
 
     enum STATE_t {
         STATE_WriteConfig = 0,
@@ -109,8 +109,8 @@ private:
         STATE_ReadResult,
         STATE_BusReset
     };
-    static STATE_t _State;
-    static int _Sequence;
-    static float _Result[NUMBER_OF_SEQUENCE];
-    static bool _Valid;
+    static STATE_t _state;
+    static int _sequence;
+    static float _result[NUMBER_OF_SEQUENCE];
+    static bool _valid;
 };
