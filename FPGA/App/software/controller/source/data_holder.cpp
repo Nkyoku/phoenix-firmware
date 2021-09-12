@@ -36,9 +36,6 @@ void DataHolder::fetchOnPostControlLoop(void) {
     _control_data.current_ref(1) = VectorController::getCurrentReferenceQ(2) * ADC1_CURRENT_SCALE;
     _control_data.current_ref(2) = VectorController::getCurrentReferenceQ(3) * ADC1_CURRENT_SCALE;
     _control_data.current_ref(3) = VectorController::getCurrentReferenceQ(4) * ADC1_CURRENT_SCALE;
-    _control_data.rotation_torque = WheelController::absBodyTorque();
-    _control_data.omega_weight = WheelController::omegaWeight();
-    _control_data.body_ref_accel_unlimit = WheelController::referenceAccelerationUnlimited();
     _control_data.body_ref_accel = WheelController::referenceAcceleration();
 }
 

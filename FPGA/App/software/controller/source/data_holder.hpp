@@ -25,10 +25,7 @@ struct MotionData_t {
 /// 制御に関するデータ
 struct ControlData_t {
     Eigen::Vector4f current_ref;
-    Eigen::Vector4f body_ref_accel_unlimit;
     Eigen::Vector4f body_ref_accel;
-    float rotation_torque;
-    float omega_weight;
 };
 
 /**

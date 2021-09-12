@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 #include "filter/gravity_filter.hpp"
 #include "filter/velocity_filter.hpp"
-#include "filter/torque_observer.hpp"
+#include "filter/driving_force_observer.hpp"
 
 /**
  * 車輪制御を行う
@@ -71,15 +71,11 @@ public:
     }
 
     /**
-     * @brief 車体のトルクの推定値を取得する
-     * @return トルク [Nm]
+     * @brief 車輪の駆動力の推定値を取得する
+     * @return 駆動力 [N]
      */
-    static float absBodyTorque(void) {
-        return _torque_observer.absTorque();
-    }
-
-    static float omegaWeight(void) {
-        return _omega_weight;
+    static float drivingForce(int index) {
+        return _driving_force_observer[index].drivingForce();
     }
 
     static Eigen::Vector4f referenceAccelerationUnlimited(void) {
@@ -102,14 +98,6 @@ private:
     static void initializeRegisters(void);
 
     /**
-     * @brief 車体角速度の推定重みを計算する。
-     * 重みの計算結果は_omega_weightに格納される。
-     * @param ref_body_omega 車体角速度の指令値 [rad/s]
-     * @param odom_body_omega エンコーダのみから求めた車体角速度 [rad/s]
-     */
-    static void calculateOmegaWeight(float ref_body_omega, float odom_body_omega);
-
-    /**
      * @brief 加速度を制限する。
      * 加速度は_ref_body_accel_unlimitから入力し、_ref_body_accelと_ref_wheel_currentへ出力する。
      * @param max_accel X,Y方向への最大加速度 [m/s^2]
@@ -122,15 +110,11 @@ private:
     /// IMUとエンコーダから車体速度を求めるカルマンフィルタ
     static VelocityFilter _velocity_filter;
 
-    /// モーターが車体の回転に与えるトルクを推定する駆動力オブザーバ
-    static TorqueObserver _torque_observer;
+    /// モーターが車体に与える駆動力を推定する駆動力オブザーバ
+    static DrivingForceObserver _driving_force_observer[4];
 
-    /// 車体角速度の推定重み
-    /// 0ならIMUのみ、1なら車輪速度からのみ求める
-    static float _omega_weight;
-
-    /// 前回の制御ループでの車体速度誤差
-    static Eigen::Vector4f _last_body_velocity_error;
+    /// 前回の制御ループでの速度誤差
+    static Eigen::Vector4f _last_velocity_error;
 
     /// 車体加速度の指令値(制限前の値)
     static Eigen::Vector4f _ref_body_accel_unlimit;

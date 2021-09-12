@@ -5,6 +5,8 @@
 #include "centralized_monitor.hpp"
 #include "shared_memory_manager.hpp"
 
+#define USE_SIMPLE_CONTROL 0
+
 using namespace Eigen;
 
 /// 並進速度指令値の最大値[m/s]
@@ -34,6 +36,9 @@ static constexpr float BRAKE_DISABLE_THRESHOLD = -0.005f;
 
 /// 過電流閾値[A]
 static constexpr float OVER_CURRENT_THRESHOLD = 5.0f;
+
+/// モーターの摩擦力に打ち勝つのに要する電流 [A]
+static constexpr float FRICTION_CURRENT = 0.1f;
 
 /**
  * @brief 車輪速度ベクトルを車体速度ベクトルに変換する
@@ -67,6 +72,19 @@ static Eigen::Vector4f velocityVectorDecomposition(const Eigen::Vector4f &body_v
     return wheel_velocity;
 }
 
+/**
+ * @brief 車輪の駆動力ベクトルを車体の加速度ベクトルに変換する
+ * @param wheel_force 車輪の駆動力ベクトル [N]
+ * @return 車体の加速度ベクトル dx^2/dt^2 [m/s^2], dy^2/dt^2 [m/s^2], dω/dt [rad/s^2]
+ */
+static Eigen::Vector3f forceVectorComposition(const Eigen::Vector4f &wheel_force, float mass, float inertia) {
+    Eigen::Vector3f body_acceleration;
+    body_acceleration(0) = (wheel_force(1) - wheel_force(0) + wheel_force(2) - wheel_force(3)) * ((WHEEL_POS_Y / sqrt(WHEEL_POS_R_2)) / mass);
+    body_acceleration(1) = (wheel_force(0) + wheel_force(1) - wheel_force(2) - wheel_force(3)) * ((WHEEL_POS_X / sqrt(WHEEL_POS_R_2)) / mass);
+    body_acceleration(2) = (wheel_force(0) + wheel_force(1) + wheel_force(2) + wheel_force(3)) * (sqrt(WHEEL_POS_R_2) / inertia);
+    return body_acceleration;
+}
+
 void WheelController::startControl(void) {
     initializeRegisters();
     VectorController::clearFault();
@@ -82,9 +100,11 @@ void WheelController::stopControl(void) {
 void WheelController::initializeState(void) {
     _gravity_filter.reset();
     _velocity_filter.reset();
-    _torque_observer.reset();
-    _omega_weight = 0.0f;
-    _last_body_velocity_error = Vector4f::Zero();
+    _driving_force_observer[0].reset();
+    _driving_force_observer[1].reset();
+    _driving_force_observer[2].reset();
+    _driving_force_observer[3].reset();
+    _last_velocity_error = Vector4f::Zero();
     _ref_body_accel_unlimit = Vector4f::Zero();
     _ref_body_accel = Vector4f::Zero();
     _ref_wheel_current = Vector4f::Zero();
@@ -107,12 +127,21 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     // センサーデータを取得する
     auto &motion = DataHolder::motionData();
 
-    // 車体のトルクを推定する
-    _torque_observer.update(motion.wheel_velocity, motion.wheel_current_q);
+    // 駆動力を推定する
+    for (int index = 0; index < 4; index++) {
+        _driving_force_observer[index].update(motion.wheel_velocity(index), motion.wheel_current_q(index), FRICTION_CURRENT);
+    }
+    Vector4f wheel_force = {
+        _driving_force_observer[0].drivingForce(),
+        _driving_force_observer[1].drivingForce(),
+        _driving_force_observer[2].drivingForce(),
+        _driving_force_observer[3].drivingForce(),
+    };
+    Vector3f body_acceleration_by_wheels = forceVectorComposition(wheel_force, MACHINE_WEIGHT, MACHINE_INERTIA);
 
     // 車輪速度を取得し車体速度に換算する
     Vector4f wheel_velocity = motion.wheel_velocity;
-    Vector4f odom_body = velocityVectorComposition(wheel_velocity);
+    Vector4f body_velocity_by_wheels = velocityVectorComposition(wheel_velocity);
 
     // 速度指令値が異常でないことを確認する
     // 速度が速すぎるかNaNならspeed_ok==falseとなる
@@ -127,9 +156,8 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     }
 
     // 車体速度を推定する
-    calculateOmegaWeight(speed_ok ? parameters.speed_omega : 0.0f, odom_body(2));
     _gravity_filter.update(motion.accelerometer, motion.gyroscope);
-    _velocity_filter.update(bodyAcceleration(), motion.gyroscope, odom_body, _omega_weight);
+    _velocity_filter.update(bodyAcceleration(), motion.gyroscope, body_velocity_by_wheels, body_acceleration_by_wheels);
 
     // 以下で制御を行う
     if (speed_ok && !sensor_only && !VectorController::isFault()) {
@@ -161,21 +189,34 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
             return;
         }
 
-        // 車体速度制御を行い車体加速度の指令値を求める
+        // 車体速度制御を行う
         Vector4f ref_body_velocity = {parameters.speed_x, parameters.speed_y, parameters.speed_omega, 0.0f};
-        Vector4f body_velocity = {bodyVelocity()(0), bodyVelocity()(1), bodyVelocity()(2), odom_body(3)};
+#if USE_SIMPLE_CONTROL
+        Vector4f ref_wheel_velocity = velocityVectorDecomposition(ref_body_velocity);
+        for (int index = 0; index < 4; index++) {
+            float error = ref_wheel_velocity(index) - wheel_velocity(index);
+            static const float p_gain = 5.0f;
+            static const float i_gain = 0.05f;
+            float current = _ref_wheel_current(index) + p_gain * (error - _last_velocity_error(index)) + i_gain * error;
+            _ref_wheel_current(index) = fpu::clamp(current, -TOTAL_CURRENT_LIMIT / 4, TOTAL_CURRENT_LIMIT / 4);
+            _last_velocity_error(index) = error;
+        }
+#else
+        // 車体加速度の指令値を求める
+        Vector4f body_velocity = {bodyVelocity()(0), bodyVelocity()(1), bodyVelocity()(2), body_velocity_by_wheels(3)};
         for (int index = 0; index < 4; index++) {
             float error = ref_body_velocity(index) - body_velocity(index);
             float p_gain = parameters.speed_gain_p[index];
             float i_gain = parameters.speed_gain_i[index];
-            _ref_body_accel_unlimit(index) = _ref_body_accel(index) + p_gain * (error - _last_body_velocity_error(index)) + i_gain * error;
-            _last_body_velocity_error(index) = error;
+            _ref_body_accel_unlimit(index) = _ref_body_accel(index) + p_gain * (error - _last_velocity_error(index)) + i_gain * error;
+            _last_velocity_error(index) = error;
         }
 
         // 加速度を制限する
         // 角速度誤差が大きいほどX,Yの最大加速度を小さくする
         float max_accel = fpu::max(1.0f, fpu::min(10.0f, 10.0f - fabsf(ref_body_velocity(2) - motion.gyroscope(2)) * 10.0f));
         limitAcceleration(max_accel);
+#endif
 
         // 回生エネルギーを計算し電気ブレーキを掛ける
         for (int index = 0; index < 4; index++) {
@@ -231,22 +272,6 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     }
 }
 
-void WheelController::calculateOmegaWeight(float ref_body_omega, float odom_body_omega) {
-    static constexpr float BODY_TORQUE_DEADZONE = 0.1f;
-    static constexpr float BODY_TORQUE_LIMIT = 0.1f;
-    static constexpr float BODY_TORQUE_WEIGHT = 0.01f;
-    static constexpr float OMEGA_ERROR_THRESHOLD = 1.0f;
-    static constexpr float OVER_THRESHOLD_OMEGA_ERROR_WEIGHT = 0.001f;
-
-    float omega_error = fabsf(ref_body_omega - odom_body_omega);
-    float weight = _omega_weight;
-    weight += BODY_TORQUE_WEIGHT * fpu::clamp(_torque_observer.absTorque() - BODY_TORQUE_DEADZONE, 0.0f, BODY_TORQUE_LIMIT);
-    if (OMEGA_ERROR_THRESHOLD < omega_error) {
-        weight -= OVER_THRESHOLD_OMEGA_ERROR_WEIGHT;
-    }
-    _omega_weight = fpu::clamp(weight, 0.0f, 1.0f);
-}
-
 static const Vector4f LIMIT_ACCEL_K{
     WHEEL_RADIUS / MOTOR_TORQUE_CONSTANT * MACHINE_WEIGHT * sqrt(WHEEL_POS_R_2) / WHEEL_POS_Y / 4,
     WHEEL_RADIUS / MOTOR_TORQUE_CONSTANT *MACHINE_WEIGHT *sqrt(WHEEL_POS_R_2) / WHEEL_POS_X / 4,
@@ -291,9 +316,8 @@ void WheelController::limitAcceleration(float max_accel) {
 
 GravityFilter WheelController::_gravity_filter;
 VelocityFilter WheelController::_velocity_filter;
-TorqueObserver WheelController::_torque_observer;
-float WheelController::_omega_weight;
-Eigen::Vector4f WheelController::_last_body_velocity_error;
+DrivingForceObserver WheelController::_driving_force_observer[4];
+Eigen::Vector4f WheelController::_last_velocity_error;
 Eigen::Vector4f WheelController::_ref_body_accel_unlimit;
 Eigen::Vector4f WheelController::_ref_body_accel;
 Eigen::Vector4f WheelController::_ref_wheel_current;

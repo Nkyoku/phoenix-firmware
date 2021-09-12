@@ -43,7 +43,7 @@ static constexpr float ENCODER_PPR = 4096;
 static constexpr float WHEEL_INERTIA = 4.0E-5f;
 
 /// 機体の質量 [kg]
-static constexpr float MACHINE_WEIGHT = 1.7f;
+static constexpr float MACHINE_WEIGHT = 2.0f;
 
 /// 機体の慣性モーメント [kgm^2]
 static constexpr float MACHINE_INERTIA = 0.007f;

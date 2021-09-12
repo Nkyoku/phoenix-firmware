@@ -29,9 +29,6 @@ struct StreamDataMotion {
     __fp16 wheel_current_meas_d[4];
     __fp16 wheel_current_meas_q[4];
     __fp16 wheel_current_ref[4];
-    __fp16 body_ref_accel_unlimit[4];
     __fp16 body_ref_accel[4];
-    __fp16 rotation_torque;
-    __fp16 omega_weight;
     uint16_t performance_counter;
 };
