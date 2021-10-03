@@ -60,6 +60,9 @@ module controller_nios_0_cpu_test_bench (
                                            d_byteenable,
                                            d_read,
                                            d_write,
+                                           dtcm0_address,
+                                           dtcm0_byteenable,
+                                           dtcm0_write,
                                            eic_port_data,
                                            eic_port_data_rha,
                                            eic_port_data_ril,
@@ -128,6 +131,9 @@ module controller_nios_0_cpu_test_bench (
   input   [  3: 0] d_byteenable;
   input            d_read;
   input            d_write;
+  input   [ 15: 0] dtcm0_address;
+  input   [  3: 0] dtcm0_byteenable;
+  input            dtcm0_write;
   input   [ 44: 0] eic_port_data;
   input   [ 31: 0] eic_port_data_rha;
   input   [  5: 0] eic_port_data_ril;
@@ -1002,6 +1008,45 @@ wire             test_has_ended;
           if (^(d_read) === 1'bx)
             begin
               $write("%0d ns: ERROR: controller_nios_0_cpu_test_bench/d_read is 'x'\n", $time);
+              $stop;
+            end
+    end
+
+
+  always @(posedge clk)
+    begin
+      if (reset_n)
+          if (^(dtcm0_write) === 1'bx)
+            begin
+              $write("%0d ns: ERROR: controller_nios_0_cpu_test_bench/dtcm0_write is 'x'\n", $time);
+              $stop;
+            end
+    end
+
+
+  always @(posedge clk or negedge reset_n)
+    begin
+      if (reset_n == 0)
+        begin
+        end
+      else if (dtcm0_write)
+          if (^(dtcm0_address) === 1'bx)
+            begin
+              $write("%0d ns: ERROR: controller_nios_0_cpu_test_bench/dtcm0_address is 'x'\n", $time);
+              $stop;
+            end
+    end
+
+
+  always @(posedge clk or negedge reset_n)
+    begin
+      if (reset_n == 0)
+        begin
+        end
+      else if (dtcm0_write)
+          if (^(dtcm0_byteenable) === 1'bx)
+            begin
+              $write("%0d ns: ERROR: controller_nios_0_cpu_test_bench/dtcm0_byteenable is 'x'\n", $time);
               $stop;
             end
     end

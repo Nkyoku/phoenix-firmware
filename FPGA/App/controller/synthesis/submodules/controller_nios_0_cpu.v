@@ -3038,10 +3038,12 @@ module controller_nios_0_cpu (
                                 debug_mem_slave_read,
                                 debug_mem_slave_write,
                                 debug_mem_slave_writedata,
+                                dtcm0_readdata,
                                 eic_port_data,
                                 eic_port_valid,
                                 i_readdata,
                                 i_waitrequest,
+                                itcm0_readdata,
                                 reset_n,
                                 reset_req,
 
@@ -3075,7 +3077,6 @@ module controller_nios_0_cpu (
                                 E_ci_combo_readrb,
                                 E_ci_combo_status,
                                 E_ci_combo_writerc,
-                                M_valid_ignoring_refetch,
                                 W_tb_eic_rha,
                                 W_tb_eic_ril,
                                 W_tb_eic_rnmi,
@@ -3090,8 +3091,17 @@ module controller_nios_0_cpu (
                                 debug_mem_slave_readdata,
                                 debug_mem_slave_waitrequest,
                                 debug_reset_request,
+                                dtcm0_address,
+                                dtcm0_byteenable,
+                                dtcm0_clken,
+                                dtcm0_read,
+                                dtcm0_write,
+                                dtcm0_writedata,
                                 i_address,
-                                i_read
+                                i_read,
+                                itcm0_address,
+                                itcm0_clken,
+                                itcm0_read
                              )
 ;
 
@@ -3124,7 +3134,6 @@ module controller_nios_0_cpu (
   output           E_ci_combo_readrb;
   output           E_ci_combo_status;
   output           E_ci_combo_writerc;
-  output           M_valid_ignoring_refetch;
   output  [ 31: 0] W_tb_eic_rha;
   output  [  5: 0] W_tb_eic_ril;
   output           W_tb_eic_rnmi;
@@ -3139,8 +3148,17 @@ module controller_nios_0_cpu (
   output  [ 31: 0] debug_mem_slave_readdata;
   output           debug_mem_slave_waitrequest;
   output           debug_reset_request;
+  output  [ 15: 0] dtcm0_address;
+  output  [  3: 0] dtcm0_byteenable;
+  output           dtcm0_clken;
+  output           dtcm0_read;
+  output           dtcm0_write;
+  output  [ 31: 0] dtcm0_writedata;
   output  [ 15: 0] i_address;
   output           i_read;
+  output  [ 14: 0] itcm0_address;
+  output           itcm0_clken;
+  output           itcm0_read;
   input            A_ci_multi_done;
   input   [ 31: 0] A_ci_multi_result;
   input   [ 31: 0] E_ci_combo_result;
@@ -3153,10 +3171,12 @@ module controller_nios_0_cpu (
   input            debug_mem_slave_read;
   input            debug_mem_slave_write;
   input   [ 31: 0] debug_mem_slave_writedata;
+  input   [ 31: 0] dtcm0_readdata;
   input   [ 44: 0] eic_port_data;
   input            eic_port_valid;
   input   [ 31: 0] i_readdata;
   input            i_waitrequest;
+  input   [ 31: 0] itcm0_readdata;
   input            reset_n;
   input            reset_req;
 
@@ -3346,6 +3366,12 @@ reg              A_ctrl_wrctl_inst;
 wire             A_ctrl_wrctl_inst_nxt;
 reg              A_data_master_started_stall;
 wire             A_data_master_stop_stall;
+wire    [ 15: 0] A_data_ram_ld16_data;
+reg              A_data_ram_ld_align_fill_bit;
+wire    [  7: 0] A_data_ram_ld_byte0_data;
+wire    [  7: 0] A_data_ram_ld_byte1_data;
+wire    [  7: 0] A_data_ram_ld_byte2_data;
+wire    [  7: 0] A_data_ram_ld_byte3_data;
 wire             A_dc_fill_done;
 wire             A_dc_want_fill;
 reg              A_div_done;
@@ -3358,6 +3384,7 @@ wire             A_div_valid;
 wire    [  4: 0] A_dst_regnum;
 reg     [  4: 0] A_dst_regnum_from_M;
 wire    [  1: 0] A_dst_regset;
+wire             A_dtcm0_want_wr;
 wire             A_dtcm_ld;
 wire             A_dtcm_st;
 reg     [ 15: 0] A_eic_rha;
@@ -3438,6 +3465,7 @@ reg     [ 15: 0] A_mem_baddr;
 reg     [  3: 0] A_mem_byte_en;
 reg              A_mem_stall;
 wire             A_mem_stall_nxt;
+reg              A_mem_stall_start_everyone_but_dtcm_port_hazard;
 wire             A_mem_stall_start_nxt;
 wire             A_mem_stall_stop_nxt;
 wire    [ 13: 0] A_mem_waddr;
@@ -3589,6 +3617,7 @@ wire    [ 13: 0] A_pipe_flush_waddr_nxt;
 wire             A_refetch_required;
 reg              A_sel_data_master;
 wire             A_sel_dtcm;
+reg              A_sel_tightly_coupled_data_master_0;
 wire    [ 31: 0] A_shift_rot_bmx_result;
 reg     [ 31: 0] A_shift_rot_result;
 reg     [ 31: 0] A_slow_inst_result;
@@ -4082,7 +4111,10 @@ wire    [ 31: 0] E_div_src1;
 wire    [ 31: 0] E_div_src2;
 wire             E_div_valid;
 reg     [  4: 0] E_dst_regnum;
+wire             E_dtcm0_port_hazard;
 wire             E_dtcm_ld;
+wire             E_dtcm_port_hazard;
+wire             E_dtcm_port_hazard_start_stall;
 wire             E_dtcm_st;
 wire             E_en;
 wire             E_eq;
@@ -4273,6 +4305,7 @@ wire             E_rot_sel_fill3;
 wire    [ 31: 0] E_rot_step1;
 wire             E_sel_data_master;
 wire             E_sel_dtcm;
+wire             E_sel_tightly_coupled_data_master_0;
 reg     [ 31: 0] E_src1;
 wire             E_src1_corrupt;
 wire             E_src1_eq_src2;
@@ -4481,6 +4514,7 @@ wire    [  6: 0] F_rf_rd_addr_a;
 wire    [  6: 0] F_rf_rd_addr_b;
 wire             F_sel_instruction_master;
 wire             F_sel_itcm;
+wire             F_sel_tightly_coupled_instruction_master_0;
 wire             F_stall;
 wire    [303: 0] F_vinst;
 reg     [ 31: 0] M_alu_result;
@@ -4648,6 +4682,10 @@ wire             M_ctrl_unsigned_lo_imm16_nxt;
 reg              M_ctrl_wrctl_inst;
 wire             M_ctrl_wrctl_inst_nxt;
 wire             M_data_master_start_stall;
+wire             M_data_ram_ld_align_fill_bit;
+wire             M_data_ram_ld_align_sign_bit;
+wire    [  1: 0] M_data_ram_ld_align_sign_bit_16;
+reg              M_data_ram_ld_align_sign_bit_16_hi;
 reg              M_div_negate_remainder;
 reg              M_div_negate_result;
 reg     [ 31: 0] M_div_src1;
@@ -4655,6 +4693,9 @@ reg     [ 31: 0] M_div_src2;
 wire             M_div_valid;
 reg     [  4: 0] M_dst_regnum;
 wire             M_dtcm_ld;
+reg              M_dtcm_port_hazard_pulse;
+wire             M_dtcm_port_hazard_stop_stall_unqualified;
+wire             M_dtcm_raw_hazard;
 wire             M_dtcm_st;
 wire             M_dtcm_st_non32;
 reg     [ 15: 0] M_eic_rha;
@@ -4861,6 +4902,7 @@ wire    [ 15: 0] M_pipe_flush_baddr_nxt;
 wire             M_pipe_flush_nxt;
 reg     [ 13: 0] M_pipe_flush_waddr;
 wire    [ 13: 0] M_pipe_flush_waddr_nxt;
+wire    [ 31: 0] M_ram_rd_data;
 wire    [ 31: 0] M_rdctl_data;
 wire    [ 31: 0] M_rdctl_data_inst_result;
 wire    [ 31: 0] M_rdctl_data_latest;
@@ -4885,6 +4927,7 @@ reg              M_rot_sel_fill3;
 wire    [ 31: 0] M_rot_step2;
 reg              M_sel_data_master;
 wire             M_sel_dtcm;
+reg              M_sel_tightly_coupled_data_master_0;
 wire    [ 31: 0] M_src1;
 reg              M_src1_corrupt;
 wire    [ 31: 0] M_src2;
@@ -5385,6 +5428,12 @@ reg     [ 31: 0] div_src2;
 reg              div_src2_eq_zero;
 reg              div_subtract;
 wire    [ 32: 0] div_sum;
+wire    [ 15: 0] dtcm0_address;
+wire    [  3: 0] dtcm0_byteenable;
+wire             dtcm0_clken;
+wire             dtcm0_read;
+wire             dtcm0_write;
+wire    [ 31: 0] dtcm0_writedata;
 wire    [ 31: 0] eic_port_data_rha;
 wire    [  5: 0] eic_port_data_ril;
 wire             eic_port_data_rnmi;
@@ -5402,6 +5451,9 @@ wire             i_read_nxt;
 wire             i_readdata_arrived;
 reg     [ 31: 0] i_readdata_d1;
 reg              i_readdata_d1_valid;
+wire    [ 14: 0] itcm0_address;
+wire             itcm0_clken;
+wire             itcm0_read;
 reg              latched_oci_tb_hbreak_req;
 wire             latched_oci_tb_hbreak_req_next;
 wire             mi_req;
@@ -5470,6 +5522,9 @@ reg              wait_for_one_post_bret_inst;
       .d_byteenable                  (d_byteenable),
       .d_read                        (d_read),
       .d_write                       (d_write),
+      .dtcm0_address                 (dtcm0_address),
+      .dtcm0_byteenable              (dtcm0_byteenable),
+      .dtcm0_write                   (dtcm0_write),
       .eic_port_data                 (eic_port_data),
       .eic_port_data_rha             (eic_port_data_rha),
       .eic_port_data_ril             (eic_port_data_ril),
@@ -6533,8 +6588,15 @@ reg              wait_for_one_post_bret_inst;
     end
 
 
-  assign F_sel_instruction_master = 1'b1;
-  assign F_iw = i_readdata_d1;
+  assign itcm0_address = F_pcb_nxt[14 : 0];
+  assign itcm0_read = 1'b1;
+  assign itcm0_clken = F_en;
+  assign {F_sel_instruction_master,F_sel_tightly_coupled_instruction_master_0} = ((F_pcb[15 : 0] >= 16'hb800))? 2'b10 :
+    2'b01;
+
+  assign F_iw = (F_sel_instruction_master)? i_readdata_d1 :
+    itcm0_readdata;
+
   assign D_br_cond_pred_taken = D_iw_imm16[15] | D_ctrl_br_always_pred_taken;
   assign D_br_pred_taken = D_ctrl_br & (D_ctrl_br_uncond | D_br_cond_pred_taken);
   assign D_br_pred_not_taken = D_ctrl_br_cond & !D_br_cond_pred_taken;
@@ -6748,7 +6810,9 @@ reg              wait_for_one_post_bret_inst;
   assign M_pipe_flush_nxt = E_br_mispredict | A_pipe_flush_nxt;
   assign M_pipe_flush_waddr_nxt = E_extra_pc;
   assign M_pipe_flush_baddr_nxt = {M_pipe_flush_waddr_nxt, 2'b00};
-  assign E_sel_data_master = 1'b1;
+  assign {E_sel_tightly_coupled_data_master_0,E_sel_data_master} = ((((E_mem_baddr[15 : 0] >= 16'h8000) && (E_mem_baddr[15 : 0] <= 16'h9fff))))? 2'b10 :
+    2'b01;
+
   assign E_sel_dtcm = ~E_sel_data_master;
   assign E_dtcm_ld = E_ctrl_ld & E_sel_dtcm;
   assign E_dtcm_st = E_ctrl_st & E_sel_dtcm & E_st_writes_mem;
@@ -6862,6 +6926,15 @@ reg              wait_for_one_post_bret_inst;
     end
 
 
+  always @(posedge clk or negedge reset_n)
+    begin
+      if (reset_n == 0)
+          M_sel_tightly_coupled_data_master_0 <= 0;
+      else if (M_en)
+          M_sel_tightly_coupled_data_master_0 <= E_sel_tightly_coupled_data_master_0;
+    end
+
+
   assign M_sel_dtcm = ~M_sel_data_master;
   assign M_dtcm_ld = M_ctrl_ld & M_sel_dtcm;
   assign M_dtcm_st = M_ctrl_st & M_sel_dtcm & M_st_writes_mem;
@@ -6896,11 +6969,13 @@ reg              wait_for_one_post_bret_inst;
 
   assign M_mem_waddr = M_mem_baddr[15 : 2];
   assign M_mem_waddr_phy = M_mem_baddr[15 : 2];
+  assign M_ram_rd_data = dtcm0_readdata;
   assign M_fwd_reg_data = M_alu_result;
   assign M_rdctl_data_latest = M_rdctl_data;
   assign M_rdctl_data_inst_result = M_ctrl_intr_inst ? W_status_reg : M_rdctl_data_latest;
   assign M_inst_result = (M_exc_any)? { M_pc_plus_one, 2'b00 } :
     (M_ctrl_rd_ctl_reg)? M_rdctl_data_inst_result :
+    (M_ctrl_ld)? M_ram_rd_data :
     M_alu_result;
 
   assign A_dc_want_fill = 1'b0;
@@ -6943,7 +7018,7 @@ reg              wait_for_one_post_bret_inst;
   assign M_exc_allowed = M_valid_from_E & ~M_ignore_exc;
   assign M_exc_higher_priority_than_tlb_data = 0;
   assign M_udtlb_refetch = 0;
-  assign M_refetch = 0;
+  assign M_refetch = M_dtcm_raw_hazard;
   assign M_non_flushing_wrctl = 0;
   assign A_pipe_flush_nxt = (((M_ctrl_flush_pipe_always & ~M_non_flushing_wrctl) | M_refetch | M_exc_any) & 
     M_valid_from_E & ~A_pipe_flush) | A_refetch_required;
@@ -7109,6 +7184,15 @@ reg              wait_for_one_post_bret_inst;
     end
 
 
+  always @(posedge clk or negedge reset_n)
+    begin
+      if (reset_n == 0)
+          A_sel_tightly_coupled_data_master_0 <= 0;
+      else if (A_en)
+          A_sel_tightly_coupled_data_master_0 <= M_sel_tightly_coupled_data_master_0;
+    end
+
+
   assign A_sel_dtcm = ~A_sel_data_master;
   assign A_dtcm_ld = A_ctrl_ld & A_sel_dtcm;
   assign A_dtcm_st = A_ctrl_st & A_sel_dtcm & A_st_writes_mem;
@@ -7210,7 +7294,7 @@ reg              wait_for_one_post_bret_inst;
     end
 
 
-  assign A_slow_inst_sel_nxt = A_en ? 0 : A_exc_wr_sstatus|A_ctrl_div|A_ctrl_custom_multi|A_ctrl_ld;
+  assign A_slow_inst_sel_nxt = A_en ? 0 : A_exc_wr_sstatus|A_ctrl_div|A_ctrl_custom_multi|(A_ctrl_ld & A_sel_data_master);
   always @(posedge clk or negedge reset_n)
     begin
       if (reset_n == 0)
@@ -7473,8 +7557,8 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
   assign E_sth_data = E_src2_reg[15 : 0];
   assign E_stw_data = E_src2_reg[31 : 0];
   assign E_stb_data = E_src2_reg[7 : 0];
-  assign E_st_data = (E_ctrl_mem8)? {E_stb_data, E_stb_data, E_stb_data, E_stb_data} :
-    (E_ctrl_mem16)? {E_sth_data, E_sth_data} :
+  assign E_st_data = ({E_ctrl_mem16, E_ctrl_mem8} == 2'b01)? {E_stb_data, E_stb_data, E_stb_data, E_stb_data} :
+    ({E_ctrl_mem16, E_ctrl_mem8} == 2'b10)? {E_sth_data, E_sth_data} :
     E_stw_data;
 
   assign E_mem_byte_en = ({E_ctrl_mem16, E_ctrl_mem8, E_mem_baddr[1 : 0]} == {2'b01, 2'b00})? 4'b0001 :
@@ -8194,6 +8278,43 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     end
 
 
+  assign E_dtcm0_port_hazard = A_ctrl_st & A_st_writes_mem & A_valid & A_sel_tightly_coupled_data_master_0 &
+    E_ctrl_ld & E_valid & E_sel_tightly_coupled_data_master_0 & ~(M_exc_any & M_exc_allowed);
+
+  assign dtcm0_writedata = A_st_data;
+  assign dtcm0_byteenable = M_dtcm_port_hazard_pulse ? M_mem_byte_en : 
+    A_dtcm0_want_wr     ? A_mem_byte_en :
+    E_mem_byte_en;
+
+  assign A_dtcm0_want_wr = A_ctrl_st & A_st_writes_mem & A_valid & A_sel_tightly_coupled_data_master_0;
+  assign dtcm0_address = M_dtcm_port_hazard_pulse ? { 3'h4, M_mem_baddr[12 : 0] } : 
+    A_dtcm0_want_wr     ? { 3'h4, A_mem_baddr[12 : 0] } : 
+    { 3'h4, E_mem_baddr[12 : 0] };
+
+  assign dtcm0_write = (A_dtcm0_want_wr) & ~M_dtcm_port_hazard_pulse;
+  assign dtcm0_read = 1'b1;
+  assign dtcm0_clken = A_en | M_dtcm_port_hazard_pulse;
+  assign E_dtcm_port_hazard = E_dtcm0_port_hazard;
+  assign M_dtcm_raw_hazard = M_valid_ignoring_refetch & 
+    (
+    A_dtcm_st & A_valid & (M_mem_waddr == A_mem_waddr) &
+    (
+    (M_dtcm_ld & (0 | ((M_mem_byte_en & A_mem_byte_en) != 0))) |
+    (M_dtcm_st_non32 & 0)
+    )
+    );
+
+  assign E_dtcm_port_hazard_start_stall = E_dtcm_port_hazard;
+  assign M_dtcm_port_hazard_stop_stall_unqualified = M_dtcm_port_hazard_pulse;
+  always @(posedge clk or negedge reset_n)
+    begin
+      if (reset_n == 0)
+          M_dtcm_port_hazard_pulse <= 0;
+      else 
+        M_dtcm_port_hazard_pulse <= E_dtcm_port_hazard & M_en;
+    end
+
+
   always @(posedge clk or negedge reset_n)
     begin
       if (reset_n == 0)
@@ -8251,8 +8372,19 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     end
 
 
-  assign A_mem_stall_start_nxt = A_en & (M_data_master_start_stall);
-  assign A_mem_stall_stop_nxt = A_data_master_stop_stall;
+  always @(posedge clk or negedge reset_n)
+    begin
+      if (reset_n == 0)
+          A_mem_stall_start_everyone_but_dtcm_port_hazard <= 0;
+      else if (A_en)
+          A_mem_stall_start_everyone_but_dtcm_port_hazard <= M_data_master_start_stall;
+    end
+
+
+  assign A_mem_stall_start_nxt = A_en & (M_data_master_start_stall|E_dtcm_port_hazard_start_stall);
+  assign A_mem_stall_stop_nxt = A_data_master_stop_stall|(M_dtcm_port_hazard_stop_stall_unqualified &
+    ~A_mem_stall_start_everyone_but_dtcm_port_hazard);
+
   assign A_mem_stall_nxt = A_mem_stall ? ~A_mem_stall_stop_nxt : A_mem_stall_start_nxt;
   always @(posedge clk or negedge reset_n)
     begin
@@ -8263,7 +8395,56 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
     end
 
 
-  assign A_inst_result_aligned = A_inst_result;
+  always @(posedge clk or negedge reset_n)
+    begin
+      if (reset_n == 0)
+          M_data_ram_ld_align_sign_bit_16_hi <= 0;
+      else if (M_en)
+          M_data_ram_ld_align_sign_bit_16_hi <= (E_mem_baddr[0]) | E_ctrl_ld16;
+    end
+
+
+  assign M_data_ram_ld_align_sign_bit_16 = M_mem_baddr[1] ? 
+    {M_ram_rd_data[31], M_ram_rd_data[23]} : 
+    {M_ram_rd_data[15], M_ram_rd_data[7]};
+
+  assign M_data_ram_ld_align_sign_bit = M_data_ram_ld_align_sign_bit_16_hi ?
+    M_data_ram_ld_align_sign_bit_16[1] : 
+    M_data_ram_ld_align_sign_bit_16[0];
+
+  assign M_data_ram_ld_align_fill_bit = M_data_ram_ld_align_sign_bit & M_ctrl_ld_signed;
+  always @(posedge clk or negedge reset_n)
+    begin
+      if (reset_n == 0)
+          A_data_ram_ld_align_fill_bit <= 0;
+      else if (A_en)
+          A_data_ram_ld_align_fill_bit <= M_data_ram_ld_align_fill_bit;
+    end
+
+
+  assign A_data_ram_ld16_data = A_ld_align_sh16 ? 
+    A_inst_result[31 : 16] :
+    A_inst_result[15 : 0];
+
+  assign A_data_ram_ld_byte0_data = A_ld_align_sh8 ? 
+    A_data_ram_ld16_data[15 : 8] :
+    A_data_ram_ld16_data[7 : 0];
+
+  assign A_data_ram_ld_byte1_data = A_ld_align_byte1_fill ? 
+    {8 {A_data_ram_ld_align_fill_bit}} : 
+    A_data_ram_ld16_data[15 : 8];
+
+  assign A_data_ram_ld_byte2_data = A_ld_align_byte2_byte3_fill ? 
+    {8 {A_data_ram_ld_align_fill_bit}} : 
+    A_inst_result[23 : 16];
+
+  assign A_data_ram_ld_byte3_data = A_ld_align_byte2_byte3_fill ? 
+    {8 {A_data_ram_ld_align_fill_bit}} : 
+    A_inst_result[31 : 24];
+
+  assign A_inst_result_aligned = {A_data_ram_ld_byte3_data, A_data_ram_ld_byte2_data, 
+    A_data_ram_ld_byte1_data, A_data_ram_ld_byte0_data};
+
   altera_nios2_gen2_rtl_module the_nios2_rtl
     (
       .A_cancel (A_cancel),
@@ -13077,6 +13258,8 @@ defparam controller_nios_0_cpu_register_bank_b.lpm_file = "controller_nios_0_cpu
   assign A_exc_record_baddr = 0;
   //data_master, which is an e_avalon_master
   //instruction_master, which is an e_avalon_master
+  //tightly_coupled_data_master_0, which is an e_avalon_master
+  //tightly_coupled_instruction_master_0, which is an e_avalon_master
 
 //synthesis translate_off
 //////////////// SIMULATION-ONLY CONTENTS

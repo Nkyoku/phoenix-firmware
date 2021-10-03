@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_0' in SOPC Builder design 'controller'
  * SOPC Builder design path: ../../controller.sopcinfo
  *
- * Generated: Sun Feb 14 16:33:03 JST 2021
+ * Generated: Sun Oct 03 00:43:42 JST 2021
  */
 
 /*
@@ -66,7 +66,7 @@
  */
 
 #define DATA_RAM_0_REGION_BASE 0x8000
-#define DATA_RAM_0_REGION_SPAN 4096
+#define DATA_RAM_0_REGION_SPAN 8192
 #define DATA_RAM_1_REGION_BASE 0xb000
 #define DATA_RAM_1_REGION_SPAN 1024
 #define INSTRUCTION_ROM_0_REGION_BASE 0x20

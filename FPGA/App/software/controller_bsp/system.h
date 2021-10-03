@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios_0' in SOPC Builder design 'controller'
  * SOPC Builder design path: ../../controller.sopcinfo
  *
- * Generated: Sun Mar 14 23:53:06 JST 2021
+ * Generated: Sat Oct 02 23:49:44 JST 2021
  */
 
 /*
@@ -367,8 +367,8 @@
 #define DATA_RAM_0_READ_DURING_WRITE_MODE "OLD_DATA"
 #define DATA_RAM_0_SINGLE_CLOCK_OP 1
 #define DATA_RAM_0_SIZE_MULTIPLE 1
-#define DATA_RAM_0_SIZE_VALUE 4096
-#define DATA_RAM_0_SPAN 4096
+#define DATA_RAM_0_SIZE_VALUE 8192
+#define DATA_RAM_0_SPAN 8192
 #define DATA_RAM_0_TYPE "altera_avalon_onchip_memory2"
 #define DATA_RAM_0_WRITABLE 1
 
@@ -717,7 +717,7 @@
 #define SYSID_QSYS_0_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_0_NAME "/dev/sysid_qsys_0"
 #define SYSID_QSYS_0_SPAN 8
-#define SYSID_QSYS_0_TIMESTAMP 1615649612
+#define SYSID_QSYS_0_TIMESTAMP 1633185741
 #define SYSID_QSYS_0_TYPE "altera_avalon_sysid_qsys"
 
 

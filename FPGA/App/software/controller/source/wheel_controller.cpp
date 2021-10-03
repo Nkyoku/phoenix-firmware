@@ -9,21 +9,29 @@
 
 using namespace Eigen;
 
-/// 並進速度指令値の最大値[m/s]
+/// 並進速度指令値の最大値 [m/s]
 static constexpr float MAX_TRANSLATION_REFERENCE = 20.0f;
 
-/// 回転速度指令の最大値[m/s]
+/// 回転速度指令の最大値 [m/s]
 static constexpr float MAX_OMEGA_REFERENCE = 20.0f;
 
-/// 電流指令値の最大値[A]
-static constexpr float MAX_CURRENT_LIMIT_PER_MOTOR = 4.0f;
+/// 電流制限値の最小値 [A]
+static constexpr float MIN_CURRENT_LIMIT_PER_MOTOR = 0.2f;
 
-/// 全てのモーターの電流指令値の絶対合計の最大値 [A]
-static constexpr float TOTAL_CURRENT_LIMIT = 8.0f;
+/// 電流制限値の最大値 [A]
+static constexpr float MAX_CURRENT_LIMIT_PER_MOTOR = 2.0f;
 
-/// ある方向への電流制限値の最小値 [A]
-/// 電流制限が掛けられたとしても最低でもこの数値の分の加速が可能となる
-static constexpr float MINIMUM_ASSIGNED_CURRENT = 0.5f;
+/// スリップ抑制ゲイン [A/(m/s)]
+static constexpr float ANTI_SLIP_GAIN = 0.5f;
+
+/// 並進加速度の最大値 [m/s^2]
+static constexpr float MAX_TRANSLATION_ACCELERATION = 10.0f;
+
+/// 角加速度の最大値 [m/s^2]
+static constexpr float MAX_ANGULAR_ACCELERATION = 100.0f;
+
+/// 加速度指令値の減衰
+static constexpr float REF_ACCEL_DECAY = 0.995f;
 
 /// モータードライバのベース消費電力 [W]
 static constexpr float BASE_POWER_CONSUMPTION_PER_MOTOR = 0.25f;
@@ -36,9 +44,6 @@ static constexpr float BRAKE_DISABLE_THRESHOLD = -0.005f;
 
 /// 過電流閾値[A]
 static constexpr float OVER_CURRENT_THRESHOLD = 5.0f;
-
-/// モーターの摩擦力に打ち勝つのに要する電流 [A]
-static constexpr float FRICTION_CURRENT = 0.1f;
 
 /**
  * @brief 車輪速度ベクトルを車体速度ベクトルに変換する
@@ -59,6 +64,23 @@ static Eigen::Vector4f velocityVectorComposition(const Eigen::Vector4f &wheel_ve
  * @param body_velocity 車体速度ベクトル X [m/s], Y [m/s], ω [rad/s], C [m/s]
  * @return 車輪速度ベクトル [m/s]
  */
+static Eigen::Vector4f velocityVectorDecomposition(const Eigen::Vector3f &body_velocity) {
+    Eigen::Vector4f wheel_velocity;
+    float vx = body_velocity(0) * (WHEEL_POS_Y / sqrt(WHEEL_POS_R_2));
+    float vy = body_velocity(1) * (WHEEL_POS_X / sqrt(WHEEL_POS_R_2));
+    float omega = body_velocity(2) * sqrt(WHEEL_POS_R_2);
+    wheel_velocity(0) = omega - vx + vy;
+    wheel_velocity(1) = omega + vx + vy;
+    wheel_velocity(2) = omega + vx - vy;
+    wheel_velocity(3) = omega - vx - vy;
+    return wheel_velocity;
+}
+
+/**
+ * @brief 車体速度ベクトルを車輪速度ベクトルに変換する
+ * @param body_velocity 車体速度ベクトル X [m/s], Y [m/s], ω [rad/s], C [m/s]
+ * @return 車輪速度ベクトル [m/s]
+ */
 static Eigen::Vector4f velocityVectorDecomposition(const Eigen::Vector4f &body_velocity) {
     Eigen::Vector4f wheel_velocity;
     float vx = body_velocity(0) * (WHEEL_POS_Y / sqrt(WHEEL_POS_R_2));
@@ -70,19 +92,6 @@ static Eigen::Vector4f velocityVectorDecomposition(const Eigen::Vector4f &body_v
     wheel_velocity(2) = omega + vx - vy + cancel;
     wheel_velocity(3) = omega - vx - vy - cancel;
     return wheel_velocity;
-}
-
-/**
- * @brief 車輪の駆動力ベクトルを車体の加速度ベクトルに変換する
- * @param wheel_force 車輪の駆動力ベクトル [N]
- * @return 車体の加速度ベクトル dx^2/dt^2 [m/s^2], dy^2/dt^2 [m/s^2], dω/dt [rad/s^2]
- */
-static Eigen::Vector3f forceVectorComposition(const Eigen::Vector4f &wheel_force, float mass, float inertia) {
-    Eigen::Vector3f body_acceleration;
-    body_acceleration(0) = (wheel_force(1) - wheel_force(0) + wheel_force(2) - wheel_force(3)) * ((WHEEL_POS_Y / sqrt(WHEEL_POS_R_2)) / mass);
-    body_acceleration(1) = (wheel_force(0) + wheel_force(1) - wheel_force(2) - wheel_force(3)) * ((WHEEL_POS_X / sqrt(WHEEL_POS_R_2)) / mass);
-    body_acceleration(2) = (wheel_force(0) + wheel_force(1) + wheel_force(2) + wheel_force(3)) * (sqrt(WHEEL_POS_R_2) / inertia);
-    return body_acceleration;
 }
 
 void WheelController::startControl(void) {
@@ -100,12 +109,7 @@ void WheelController::stopControl(void) {
 void WheelController::initializeState(void) {
     _gravity_filter.reset();
     _velocity_filter.reset();
-    _driving_force_observer[0].reset();
-    _driving_force_observer[1].reset();
-    _driving_force_observer[2].reset();
-    _driving_force_observer[3].reset();
     _last_velocity_error = Vector4f::Zero();
-    _ref_body_accel_unlimit = Vector4f::Zero();
     _ref_body_accel = Vector4f::Zero();
     _ref_wheel_current = Vector4f::Zero();
     _regeneration_energy = Vector4f::Zero();
@@ -127,18 +131,6 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     // センサーデータを取得する
     auto &motion = DataHolder::motionData();
 
-    // 駆動力を推定する
-    for (int index = 0; index < 4; index++) {
-        _driving_force_observer[index].update(motion.wheel_velocity(index), motion.wheel_current_q(index), FRICTION_CURRENT);
-    }
-    Vector4f wheel_force = {
-        _driving_force_observer[0].drivingForce(),
-        _driving_force_observer[1].drivingForce(),
-        _driving_force_observer[2].drivingForce(),
-        _driving_force_observer[3].drivingForce(),
-    };
-    Vector3f body_acceleration_by_wheels = forceVectorComposition(wheel_force, MACHINE_WEIGHT, MACHINE_INERTIA);
-
     // 車輪速度を取得し車体速度に換算する
     Vector4f wheel_velocity = motion.wheel_velocity;
     Vector4f body_velocity_by_wheels = velocityVectorComposition(wheel_velocity);
@@ -157,7 +149,7 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
 
     // 車体速度を推定する
     _gravity_filter.update(motion.accelerometer, motion.gyroscope);
-    _velocity_filter.update(bodyAcceleration(), motion.gyroscope, body_velocity_by_wheels, body_acceleration_by_wheels);
+    _velocity_filter.update(bodyAcceleration(), motion.gyroscope, wheel_velocity, motion.wheel_current_q);
 
     // 以下で制御を行う
     if (speed_ok && !sensor_only && !VectorController::isFault()) {
@@ -203,19 +195,58 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
         }
 #else
         // 車体加速度の指令値を求める
-        Vector4f body_velocity = {bodyVelocity()(0), bodyVelocity()(1), bodyVelocity()(2), body_velocity_by_wheels(3)};
+        Vector4f body_velocity;
+        body_velocity[0] = bodyVelocity()[0];
+        body_velocity[1] = bodyVelocity()[1];
+        body_velocity[2] = bodyVelocity()[2];
+        body_velocity[3] = body_velocity_by_wheels[3];
+        Vector4f ref_body_accel_unlimit;
         for (int index = 0; index < 4; index++) {
-            float error = ref_body_velocity(index) - body_velocity(index);
+            float error = ref_body_velocity[index] - body_velocity[index];
             float p_gain = parameters.speed_gain_p[index];
             float i_gain = parameters.speed_gain_i[index];
-            _ref_body_accel_unlimit(index) = _ref_body_accel(index) + p_gain * (error - _last_velocity_error(index)) + i_gain * error;
-            _last_velocity_error(index) = error;
+            float accel = _ref_body_accel[index] + p_gain * (error - _last_velocity_error[index]) + i_gain * error;
+            _last_velocity_error[index] = error;
+            if (index != 2) {
+                ref_body_accel_unlimit[index] = fpu::clamp(accel, -MAX_TRANSLATION_ACCELERATION, MAX_TRANSLATION_ACCELERATION);
+            }
+            else {
+                ref_body_accel_unlimit[index] = fpu::clamp(accel, -MAX_ANGULAR_ACCELERATION, MAX_ANGULAR_ACCELERATION);
+            }
         }
 
-        // 加速度を制限する
-        // 角速度誤差が大きいほどX,Yの最大加速度を小さくする
-        float max_accel = fpu::max(1.0f, fpu::min(10.0f, 10.0f - fabsf(ref_body_velocity(2) - motion.gyroscope(2)) * 10.0f));
-        limitAcceleration(max_accel);
+        // 各モーターへの電流の割り当てと制限を行う
+        Vector4f current_limit, ref_current;
+        Vector4f velocity_error = velocityVectorDecomposition(bodyVelocity()) - wheel_velocity;
+        current_limit[0] = fpu::clamp(MAX_CURRENT_LIMIT_PER_MOTOR - fabsf(velocity_error[0]), MIN_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        current_limit[1] = fpu::clamp(MAX_CURRENT_LIMIT_PER_MOTOR - fabsf(velocity_error[1]), MIN_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        current_limit[2] = fpu::clamp(MAX_CURRENT_LIMIT_PER_MOTOR - fabsf(velocity_error[2]), MIN_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        current_limit[3] = fpu::clamp(MAX_CURRENT_LIMIT_PER_MOTOR - fabsf(velocity_error[3]), MIN_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        AccelerationLimitter limitter;
+        limitter.compute(ref_body_accel_unlimit, current_limit, _ref_body_accel, ref_current);
+        if (!isnan(ref_current[0])) {
+            // 電流割り当ての結果、加速度が元の指令値より大きくなったときは次の制御ループに伝搬する加速度の値を制限する
+            for (int index = 0; index < 4; index++) {
+                float accel = fabsf(ref_body_accel_unlimit[index]);
+                _ref_body_accel[index] = fpu::clamp(_ref_body_accel[index] * REF_ACCEL_DECAY, -accel, accel);
+            }
+
+            // 速度推定値から求めた車輪速度と実際の車輪速度の誤差に係数を掛けて電流指示値に加える
+            _ref_wheel_current[0] = fpu::clamp(ref_current[0] + ANTI_SLIP_GAIN * velocity_error[0], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+            _ref_wheel_current[1] = fpu::clamp(ref_current[1] + ANTI_SLIP_GAIN * velocity_error[1], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+            _ref_wheel_current[2] = fpu::clamp(ref_current[2] + ANTI_SLIP_GAIN * velocity_error[2], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+            _ref_wheel_current[3] = fpu::clamp(ref_current[3] + ANTI_SLIP_GAIN * velocity_error[3], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        }
+        else {
+            _ref_body_accel[0] = 0.0f;
+            _ref_body_accel[1] = 0.0f;
+            _ref_body_accel[2] = 0.0f;
+            _ref_body_accel[3] = 0.0f;
+            _ref_wheel_current[0] = 0.0f;
+            _ref_wheel_current[1] = 0.0f;
+            _ref_wheel_current[2] = 0.0f;
+            _ref_wheel_current[3] = 0.0f;
+        }
 #endif
 
         // 回生エネルギーを計算し電気ブレーキを掛ける
@@ -272,53 +303,9 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     }
 }
 
-static const Vector4f LIMIT_ACCEL_K{
-    WHEEL_RADIUS / MOTOR_TORQUE_CONSTANT * MACHINE_WEIGHT * sqrt(WHEEL_POS_R_2) / WHEEL_POS_Y / 4,
-    WHEEL_RADIUS / MOTOR_TORQUE_CONSTANT *MACHINE_WEIGHT *sqrt(WHEEL_POS_R_2) / WHEEL_POS_X / 4,
-    WHEEL_RADIUS / MOTOR_TORQUE_CONSTANT *MACHINE_INERTIA / sqrt(WHEEL_POS_R_2) / 4,
-    WHEEL_RADIUS / MOTOR_TORQUE_CONSTANT,
-};
-
-static const Vector4f LIMIT_ACCEL_INV_K{
-    1.0f / LIMIT_ACCEL_K(0),
-    1.0f / LIMIT_ACCEL_K(1),
-    1.0f / LIMIT_ACCEL_K(2),
-    1.0f / LIMIT_ACCEL_K(3),
-};
-
-void WheelController::limitAcceleration(float max_accel) {
-    _ref_wheel_current = Vector4f::Zero();
-    _ref_body_accel = Vector4f::Zero();
-
-    // C, ω, Y, Xの順に電流制限を行う
-    for (int index = 4; 0 <= --index;) {
-        float current_limit = (TOTAL_CURRENT_LIMIT - _ref_wheel_current.cwiseAbs().sum() - MINIMUM_ASSIGNED_CURRENT * index) * 0.25f;
-
-        float accel = _ref_body_accel_unlimit(index);
-        if (index <= 1) {
-            accel = fpu::max(-max_accel, fpu::min(accel, max_accel));
-        }
-
-        float abs_accel = fpu::min(fabsf(LIMIT_ACCEL_K(index) * accel), current_limit) * LIMIT_ACCEL_INV_K(index);
-        _ref_body_accel(index) = (0.0f <= accel) ? abs_accel : -abs_accel;
-        Vector4f current = LIMIT_ACCEL_K.cwiseProduct(_ref_body_accel);
-        _ref_wheel_current(0) = current(2) - current(0) + current(1) + current(3);
-        _ref_wheel_current(1) = current(2) + current(0) + current(1) - current(3);
-        _ref_wheel_current(2) = current(2) + current(0) - current(1) + current(3);
-        _ref_wheel_current(3) = current(2) - current(0) - current(1) - current(3);
-    }
-
-    // 電流を個別に制限する
-    for (int index = 0; index < 4; index++) {
-        _ref_wheel_current(index) = fpu::clamp(_ref_wheel_current(index), -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
-    }
-}
-
 GravityFilter WheelController::_gravity_filter;
 VelocityFilter WheelController::_velocity_filter;
-DrivingForceObserver WheelController::_driving_force_observer[4];
 Eigen::Vector4f WheelController::_last_velocity_error;
-Eigen::Vector4f WheelController::_ref_body_accel_unlimit;
 Eigen::Vector4f WheelController::_ref_body_accel;
 Eigen::Vector4f WheelController::_ref_wheel_current;
 Eigen::Vector4f WheelController::_regeneration_energy;

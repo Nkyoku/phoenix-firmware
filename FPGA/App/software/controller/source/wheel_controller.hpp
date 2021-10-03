@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 #include "filter/gravity_filter.hpp"
 #include "filter/velocity_filter.hpp"
-#include "filter/driving_force_observer.hpp"
+#include "filter/acceleration_limitter.hpp"
 
 /**
  * 車輪制御を行う
@@ -48,9 +48,9 @@ public:
 
     /**
      * @brief 速度フィルタへアクセスする
-     * @return 速度フィルタ 
+     * @return 速度フィルタ
      */
-    static const VelocityFilter& velocityFilter(void) { 
+    static const VelocityFilter& velocityFilter(void) {
         return _velocity_filter;
     }
 
@@ -66,20 +66,8 @@ public:
      * @brief 車体速度の推定値を取得する
      * @return 車体速度 X [m/s], Y [m/s], ω [rad/s]
      */
-    static const Eigen::Vector3f& bodyVelocity(void) {
+    static Eigen::Vector3f bodyVelocity(void) {
         return _velocity_filter.bodyVelocity();
-    }
-
-    /**
-     * @brief 車輪の駆動力の推定値を取得する
-     * @return 駆動力 [N]
-     */
-    static float drivingForce(int index) {
-        return _driving_force_observer[index].drivingForce();
-    }
-
-    static Eigen::Vector4f referenceAccelerationUnlimited(void) {
-        return _ref_body_accel_unlimit;
     }
 
     static Eigen::Vector4f referenceAcceleration(void) {
@@ -97,29 +85,16 @@ private:
      */
     static void initializeRegisters(void);
 
-    /**
-     * @brief 加速度を制限する。
-     * 加速度は_ref_body_accel_unlimitから入力し、_ref_body_accelと_ref_wheel_currentへ出力する。
-     * @param max_accel X,Y方向への最大加速度 [m/s^2]
-     */
-    static void limitAcceleration(float max_accel);
-    
     /// IMUの加速度から重力を分離するフィルタ
     static GravityFilter _gravity_filter;
 
     /// IMUとエンコーダから車体速度を求めるカルマンフィルタ
     static VelocityFilter _velocity_filter;
 
-    /// モーターが車体に与える駆動力を推定する駆動力オブザーバ
-    static DrivingForceObserver _driving_force_observer[4];
-
     /// 前回の制御ループでの速度誤差
     static Eigen::Vector4f _last_velocity_error;
 
-    /// 車体加速度の指令値(制限前の値)
-    static Eigen::Vector4f _ref_body_accel_unlimit;
-
-    /// 車体加速度の指令値(制限後の値)
+    /// 車体加速度の指令値
     static Eigen::Vector4f _ref_body_accel;
 
     /// 電流制御の指令値 [A]

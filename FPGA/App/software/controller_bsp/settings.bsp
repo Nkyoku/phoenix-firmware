@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Aug 24, 2021 11:23:41 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1629815021915</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>Oct 3, 2021 12:43:42 AM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1633189422555</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>C:\work\Robocup\phoenix-firmware\FPGA\App\software\controller_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\controller.sopcinfo</SopcDesignFile>
@@ -1326,8 +1326,8 @@
         </MemoryMap>
         <MemoryMap>
                 <slaveDescriptor>data_ram_0</slaveDescriptor>
-                <addressRange>0x00008000 - 0x00008FFF</addressRange>
-                <addressSpan>4096</addressSpan>
+                <addressRange>0x00008000 - 0x00009FFF</addressRange>
+                <addressSpan>8192</addressSpan>
                 <attributes>memory</attributes>
         </MemoryMap>
         <MemoryMap>

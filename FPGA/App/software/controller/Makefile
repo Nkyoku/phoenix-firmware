@@ -100,6 +100,8 @@ CXX_SRCS += source/stream_transmitter.cpp
 CXX_SRCS += source/peripheral/msgdma.cpp
 CXX_SRCS += source/data_holder.cpp
 CXX_SRCS += source/shared_memory_manager.cpp
+CXX_SRCS += source/filter/velocity_filter.cpp
+CXX_SRCS += source/filter/acceleration_limitter.cpp
 ASM_SRCS :=
 
 
@@ -121,7 +123,7 @@ APP_CFLAGS_UNDEFINED_SYMBOLS :=
 APP_CFLAGS_OPTIMIZATION := -Os
 APP_CFLAGS_DEBUG_LEVEL := -g
 APP_CFLAGS_WARNINGS := -Wall
-APP_CFLAGS_USER_FLAGS := -ffunction-sections -fdata-sections -g -fno-exceptions -fno-rtti
+APP_CFLAGS_USER_FLAGS := -ffunction-sections -fdata-sections -g -fno-exceptions -fno-rtti -ffast-math
 
 APP_ASFLAGS_USER :=
 APP_LDFLAGS_USER := -Wl,--gc-sections
