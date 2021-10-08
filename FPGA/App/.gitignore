@@ -7,6 +7,4 @@
 !/output_files/*.sof
 *.tcl~
 *.log
-/software/*/obj
 /software/.metadata
-/software/controller_bsp/newlib-build-tmp

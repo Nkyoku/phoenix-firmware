@@ -1,0 +1,4 @@
+/newlib-build-tmp
+/build-newlib*
+/obj
+*.a

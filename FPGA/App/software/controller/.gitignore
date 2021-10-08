@@ -1,5 +1,6 @@
 /mem_init/hdl_sim
 /NiosII
+/obj
 *.map
 *.objdump
 *.elf
