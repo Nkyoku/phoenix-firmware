@@ -1,3 +1,10 @@
+/**
+ * @file park_transform.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module park_transform #(
         parameter int CHANNEL_WIDTH = 1,
         parameter int DATA_WIDTH = 16,

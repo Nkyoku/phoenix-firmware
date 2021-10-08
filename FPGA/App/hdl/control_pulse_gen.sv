@@ -1,3 +1,10 @@
+/**
+ * @file control_pulse_gen.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 (* altera_attribute = {"-name SDC_STATEMENT \"set_false_path -from {*ControlPulseGenerator:*|clk_32khz} -to {*ControlPulseGenerator:*|clk_32khz_ff[0]}\""} *)
 module ControlPulseGenerator #(
         parameter PULSE_1KHZ_START = 5

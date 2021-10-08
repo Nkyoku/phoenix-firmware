@@ -1,3 +1,10 @@
+/**
+ * @file deglitch.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 // Unipolar Deglitch Circuit for Synchronized Input
 module deglitch #(
         parameter int COUNTER_VALUE = 1,

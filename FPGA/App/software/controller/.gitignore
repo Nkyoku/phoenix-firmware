@@ -1,1 +1,6 @@
 /mem_init/hdl_sim
+/NiosII
+*.map
+*.objdump
+*.elf
+/.vscode/settings.json

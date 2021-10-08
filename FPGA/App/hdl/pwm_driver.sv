@@ -1,3 +1,10 @@
+/**
+ * @file pwm_driver.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module pwm_driver #(
         parameter int PWM_PERIOD_CYCLES = 1,
         parameter int PWM_MAX_ON_CYCLES = 1,

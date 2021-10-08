@@ -1,3 +1,10 @@
+/**
+ * @file serial_to_parallel.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module SerialToParallel #(
         parameter PRESCALER_WIDTH = 1,
         parameter INVERSE = 0

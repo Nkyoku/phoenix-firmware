@@ -1,3 +1,10 @@
+/**
+ * @file avalon_st_byte_converter.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module avalon_st_byte_converter #(
         parameter CHANNEL_WIDTH = 8,
         parameter SYMBOL_WIDTH = 8,

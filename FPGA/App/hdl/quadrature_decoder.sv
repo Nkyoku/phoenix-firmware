@@ -1,3 +1,10 @@
+/**
+ * @file quadrature_decoder.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module quadrature_decoder #(
         parameter INVERSE = 0,
         parameter DATA_WIDTH = 16

@@ -1,3 +1,10 @@
+/**
+ * @file reset_synchronizer.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 (* altera_attribute = {"-name SDC_STATEMENT \"set_false_path -to [get_registers *ResetSynchronizer:*\|ff1]\"; -name SDC_STATEMENT \"set_false_path -to [get_registers *ResetSynchronizer:*\|ff2]\""} *)
 module ResetSynchronizer (
         input  wire clk,

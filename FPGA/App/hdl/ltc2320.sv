@@ -1,3 +1,10 @@
+/**
+ * @file ltc2320.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 (* altera_attribute = {"-name SDC_STATEMENT \"set_false_path -from [get_registers *ltc2320:*|sdo*_sr[*]] -to [get_registers *ltc2320:*|ain*_data[*]]\"; -name SDC_STATEMENT \"set_false_path -from [get_registers *ltc2320:*|conv_output_ff[0]] -to [get_registers *ltc2320:*|conv_to_acquire_ff[0]]\"; -name SDC_STATEMENT \"set_false_path -from [get_registers *ltc2320:*|conv_output_ff[0]] -to [get_registers *ltc2320:*|conv_to_valid_ff[0]]\""} *)
 module ltc2320 (
         input  wire        clk_sys,

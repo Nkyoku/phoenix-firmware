@@ -1,3 +1,10 @@
+/**
+ * @file ds_pwm_driver.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module ds_pwm_driver #(
         parameter int INITIAL_DIRECTION = 0,
         parameter int PERIOD            = 3000,

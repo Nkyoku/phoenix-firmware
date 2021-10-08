@@ -1,3 +1,10 @@
+/**
+ * @file current_fir_filter.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 // サンプリング周波数 Fs = 50kHz 
 // カットオフ周波数   Fc = 4kHz (-3dB)
 

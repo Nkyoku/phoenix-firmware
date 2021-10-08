@@ -1,3 +1,10 @@
+/**
+ * @file avalon_st_uart_bridge.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module AvalonStUartBridge
     #(
         parameter FULL_DUPLEX = 0,

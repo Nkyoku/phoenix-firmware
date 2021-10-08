@@ -1,3 +1,10 @@
+/**
+ * @file position_estimator.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module position_estimator #(
         parameter int THETA_WIDTH = 9
     ) (

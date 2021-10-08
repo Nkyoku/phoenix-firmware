@@ -1,3 +1,10 @@
+/**
+ * @file pi_controller.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module pi_controller #(
         parameter int SCALE = 16,
         parameter int GAIN_WIDTH = 16,

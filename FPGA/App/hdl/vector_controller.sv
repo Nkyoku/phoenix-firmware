@@ -1,3 +1,10 @@
+/**
+ * @file vector_controller.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module vector_controller #(
         parameter int INVERSE_ENCODER = 0,
         parameter int THETA_WIDTH = 9,

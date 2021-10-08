@@ -1,3 +1,10 @@
+/**
+ * @file space_vector_modulator.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module space_vector_modulator #(
         parameter int DATA_WIDTH = 16,
         parameter int OUT_WIDTH = 12,

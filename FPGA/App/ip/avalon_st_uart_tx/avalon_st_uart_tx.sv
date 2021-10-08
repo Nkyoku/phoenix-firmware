@@ -1,3 +1,10 @@
+/**
+ * @file avalon_st_uart_tx.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module avalon_st_uart_tx
     #(
         parameter PRESCALER = 2

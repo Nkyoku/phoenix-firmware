@@ -1,3 +1,10 @@
+/**
+ * @file top.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 module PhoenixFPGA (
         input  wire ADC1_CLKOUT,
         output wire ADC1_SCK,

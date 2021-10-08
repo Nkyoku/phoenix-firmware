@@ -1,3 +1,10 @@
+/**
+ * @file avalon_st_clock_bridge.sv
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 (* altera_attribute = {"-name SDC_STATEMENT \"set_false_path -from [get_registers *avalon_st_clock_bridge:*|source_data[*]]\"; -name SDC_STATEMENT \"set_false_path -from [get_registers *avalon_st_clock_bridge:*|source_channel[*]]\"; -name SDC_STATEMENT \"set_false_path -from [get_registers *avalon_st_clock_bridge:*|req] -to [get_registers *avalon_st_clock_bridge:*|req_ff1]\"; -name SDC_STATEMENT \"set_false_path -from [get_registers *avalon_st_clock_bridge:*|ack] -to [get_registers *avalon_st_clock_bridge:*|ack_ff1]\""} *)
 module avalon_st_clock_bridge #(
         parameter DATA_WIDTH = 8,
