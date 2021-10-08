@@ -3,6 +3,7 @@
 #include <math.h>
 #include <fpu.hpp>
 #include <Eigen/Core>
+#include "board.hpp"
 
 /**
  * @brief IMUの測定値から重力の影響を取り除くフィルタ
@@ -60,7 +61,7 @@ public:
         // 重力加速度ベクトルの大きさを徐々に加速度の大きさに近づける
         // 重力が小さいときは大きさではなくベクトルそのものを使って補正する
         float accel_scale = fpu::sqrt(accel.squaredNorm());
-        if (GRAVITY_LOW_THRESHOLD < accel_scale) {
+        if (GRAVITY_LOW_THRESHOLD < fpu::min(accel_scale, gravity_scale)) {
             _gravity *= ((1.0f - GRAVITY_COMPENSATION) + GRAVITY_COMPENSATION * accel_scale / gravity_scale);
         }
         else {

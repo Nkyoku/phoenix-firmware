@@ -18,7 +18,7 @@
 using namespace Eigen;
 
 /// 車輪速度の標準偏差 [m/s]
-static constexpr float SIGMA_VELOCITY = 0.001f;
+static constexpr float SIGMA_VELOCITY = 0.002f;
 
 /// 電流測定値の標準偏差 [A]
 static constexpr float SIGMA_CURRENT = 0.01f;

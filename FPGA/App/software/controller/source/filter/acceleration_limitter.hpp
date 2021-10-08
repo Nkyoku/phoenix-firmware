@@ -19,5 +19,5 @@ public:
      * @param accel_out 制限された加速度
      * @param current_out 各車輪の目標電流
      */
-    int compute(const Eigen::Vector4f& accel_in, const Eigen::Vector4f& current_limit, Eigen::Vector4f& accel_out, Eigen::Vector4f& current_out);
+    bool compute(const Eigen::Vector4f& accel_in, const Eigen::Vector4f& current_limit, Eigen::Vector4f& accel_out, Eigen::Vector4f& current_out);
 };

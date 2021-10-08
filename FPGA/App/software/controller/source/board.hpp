@@ -40,10 +40,10 @@ static constexpr float MOTOR_RESISTANCE = 6.89f;
 static constexpr float ENCODER_PPR = 4096;
 
 /// 車輪とモーターの慣性モーメント [kgm^2]
-static constexpr float WHEEL_INERTIA = 4.0E-5f;
+static constexpr float WHEEL_INERTIA = 3.6e-5f;
 
 /// 機体の質量 [kg]
-static constexpr float MACHINE_WEIGHT = 2.0f;
+static constexpr float MACHINE_WEIGHT = 3.3f;
 
 /// 機体の慣性モーメント [kgm^2]
-static constexpr float MACHINE_INERTIA = 0.007f;
+static constexpr float MACHINE_INERTIA = 0.01f;

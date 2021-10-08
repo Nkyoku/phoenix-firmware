@@ -1,9 +1,5 @@
 #pragma once
 
-#include <math.h> // math.h内のfmaxf,fminfを後でカスタム命令版に置き換えるため最初にincludeする
-#include <system.h>
-#include "board.hpp"
-#include "data_holder.hpp"
 #include <Eigen/Core>
 #include "filter/gravity_filter.hpp"
 #include "filter/velocity_filter.hpp"
@@ -70,6 +66,10 @@ public:
         return _velocity_filter.bodyVelocity();
     }
 
+    /**
+     * @brief 目標車体加速度を取得する
+     * @return 目標車体加速度 X [m/s^2], Y [m/s^2], ω [rad/s^2], C [m/s^2]
+     */
     static Eigen::Vector4f referenceAcceleration(void) {
         return _ref_body_accel;
     }

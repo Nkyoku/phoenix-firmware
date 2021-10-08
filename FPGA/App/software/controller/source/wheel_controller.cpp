@@ -1,9 +1,13 @@
 #include "wheel_controller.hpp"
+#include "centralized_monitor.hpp"
+#include "shared_memory_manager.hpp"
+#include "data_holder.hpp"
+#include "board.hpp"
 #include <peripheral/vector_controller.hpp>
 #include <status_flags.hpp>
 #include <fpu.hpp>
-#include "centralized_monitor.hpp"
-#include "shared_memory_manager.hpp"
+#include <system.h>
+#include <math.h>
 
 #define USE_SIMPLE_CONTROL 0
 
@@ -19,10 +23,10 @@ static constexpr float MAX_OMEGA_REFERENCE = 20.0f;
 static constexpr float MIN_CURRENT_LIMIT_PER_MOTOR = 0.2f;
 
 /// 電流制限値の最大値 [A]
-static constexpr float MAX_CURRENT_LIMIT_PER_MOTOR = 2.0f;
+static constexpr float MAX_CURRENT_LIMIT_PER_MOTOR = 3.0f;
 
 /// スリップ抑制ゲイン [A/(m/s)]
-static constexpr float ANTI_SLIP_GAIN = 0.5f;
+static constexpr float ANTI_SLIP_GAIN = 0.25f;
 
 /// 並進加速度の最大値 [m/s^2]
 static constexpr float MAX_TRANSLATION_ACCELERATION = 10.0f;
@@ -109,10 +113,10 @@ void WheelController::stopControl(void) {
 void WheelController::initializeState(void) {
     _gravity_filter.reset();
     _velocity_filter.reset();
-    _last_velocity_error = Vector4f::Zero();
-    _ref_body_accel = Vector4f::Zero();
-    _ref_wheel_current = Vector4f::Zero();
-    _regeneration_energy = Vector4f::Zero();
+    _last_velocity_error.setZero();
+    _ref_body_accel.setZero();
+    _ref_wheel_current.setZero();
+    _regeneration_energy.setZero();
 }
 
 void WheelController::initializeRegisters(void) {
@@ -138,18 +142,18 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     // 速度指令値が異常でないことを確認する
     // 速度が速すぎるかNaNならspeed_ok==falseとなる
     auto &parameters = SharedMemoryManager::getParameters();
-    bool speed_ok = false;
-    if (fabsf(parameters.speed_x) <= MAX_TRANSLATION_REFERENCE) {
-        if (fabsf(parameters.speed_y) <= MAX_TRANSLATION_REFERENCE) {
-            if (fabsf(parameters.speed_omega) <= MAX_OMEGA_REFERENCE) {
-                speed_ok = true;
-            }
-        }
-    }
+    bool speed_ok = true;
+    speed_ok &= fabsf(parameters.speed_x) <= MAX_TRANSLATION_REFERENCE;
+    speed_ok &= fabsf(parameters.speed_y) <= MAX_TRANSLATION_REFERENCE;
+    speed_ok &= fabsf(parameters.speed_omega) <= MAX_OMEGA_REFERENCE;
 
     // 車体速度を推定する
     _gravity_filter.update(motion.accelerometer, motion.gyroscope);
     _velocity_filter.update(bodyAcceleration(), motion.gyroscope, wheel_velocity, motion.wheel_current_q);
+    if (!isfinite(bodyVelocity()[0]) || !isfinite(bodyVelocity()[1]) || !isfinite(bodyVelocity()[2])) {
+        CentralizedMonitor::setErrorFlags(ErrorArithmetic);
+        return;
+    }
 
     // 以下で制御を行う
     if (speed_ok && !sensor_only && !VectorController::isFault()) {
@@ -190,7 +194,7 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
             static const float p_gain = 5.0f;
             static const float i_gain = 0.05f;
             float current = _ref_wheel_current(index) + p_gain * (error - _last_velocity_error(index)) + i_gain * error;
-            _ref_wheel_current(index) = fpu::clamp(current, -TOTAL_CURRENT_LIMIT / 4, TOTAL_CURRENT_LIMIT / 4);
+            _ref_wheel_current(index) = fpu::clamp(current, -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
             _last_velocity_error(index) = error;
         }
 #else
@@ -223,30 +227,22 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
         current_limit[2] = fpu::clamp(MAX_CURRENT_LIMIT_PER_MOTOR - fabsf(velocity_error[2]), MIN_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
         current_limit[3] = fpu::clamp(MAX_CURRENT_LIMIT_PER_MOTOR - fabsf(velocity_error[3]), MIN_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
         AccelerationLimitter limitter;
-        limitter.compute(ref_body_accel_unlimit, current_limit, _ref_body_accel, ref_current);
-        if (!isnan(ref_current[0])) {
-            // 電流割り当ての結果、加速度が元の指令値より大きくなったときは次の制御ループに伝搬する加速度の値を制限する
-            for (int index = 0; index < 4; index++) {
-                float accel = fabsf(ref_body_accel_unlimit[index]);
-                _ref_body_accel[index] = fpu::clamp(_ref_body_accel[index] * REF_ACCEL_DECAY, -accel, accel);
-            }
+        if (!limitter.compute(ref_body_accel_unlimit, current_limit, _ref_body_accel, ref_current)) {
+            CentralizedMonitor::setErrorFlags(ErrorArithmetic);
+            return;
+        }
 
-            // 速度推定値から求めた車輪速度と実際の車輪速度の誤差に係数を掛けて電流指示値に加える
-            _ref_wheel_current[0] = fpu::clamp(ref_current[0] + ANTI_SLIP_GAIN * velocity_error[0], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
-            _ref_wheel_current[1] = fpu::clamp(ref_current[1] + ANTI_SLIP_GAIN * velocity_error[1], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
-            _ref_wheel_current[2] = fpu::clamp(ref_current[2] + ANTI_SLIP_GAIN * velocity_error[2], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
-            _ref_wheel_current[3] = fpu::clamp(ref_current[3] + ANTI_SLIP_GAIN * velocity_error[3], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        // 電流割り当ての結果、加速度が元の指令値より大きくなったときは次の制御ループに伝搬する加速度の値を制限する
+        for (int index = 0; index < 4; index++) {
+            float accel = fabsf(ref_body_accel_unlimit[index]);
+            _ref_body_accel[index] = fpu::clamp(_ref_body_accel[index] * REF_ACCEL_DECAY, -accel, accel);
         }
-        else {
-            _ref_body_accel[0] = 0.0f;
-            _ref_body_accel[1] = 0.0f;
-            _ref_body_accel[2] = 0.0f;
-            _ref_body_accel[3] = 0.0f;
-            _ref_wheel_current[0] = 0.0f;
-            _ref_wheel_current[1] = 0.0f;
-            _ref_wheel_current[2] = 0.0f;
-            _ref_wheel_current[3] = 0.0f;
-        }
+
+        // 速度推定値から求めた車輪速度と実際の車輪速度の誤差に係数を掛けて電流指示値に加える
+        _ref_wheel_current[0] = fpu::clamp(ref_current[0] + ANTI_SLIP_GAIN * velocity_error[0], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        _ref_wheel_current[1] = fpu::clamp(ref_current[1] + ANTI_SLIP_GAIN * velocity_error[1], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        _ref_wheel_current[2] = fpu::clamp(ref_current[2] + ANTI_SLIP_GAIN * velocity_error[2], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
+        _ref_wheel_current[3] = fpu::clamp(ref_current[3] + ANTI_SLIP_GAIN * velocity_error[3], -MAX_CURRENT_LIMIT_PER_MOTOR, MAX_CURRENT_LIMIT_PER_MOTOR);
 #endif
 
         // 回生エネルギーを計算し電気ブレーキを掛ける
