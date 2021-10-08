@@ -1,3 +1,10 @@
+/**
+ * @file acceleration_limitter.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "acceleration_limitter.hpp"
 #include "const_matrix.hpp"
 #include "fpu.hpp"

@@ -1,3 +1,10 @@
+/**
+ * @file data_holder.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "data_holder.hpp"
 #include "board.hpp"
 #include <driver/adc2.hpp>

@@ -1,3 +1,10 @@
+/**
+ * @file main.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include <peripheral/motor_controller.hpp>
 #include <peripheral/vector_controller.hpp>
 #include <driver/adc2.hpp>

@@ -1,3 +1,10 @@
+/**
+ * @file shared_memory_manager.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "shared_memory_manager.hpp"
 
 bool SharedMemoryManager::updateParameters(void){

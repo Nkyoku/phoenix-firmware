@@ -1,3 +1,10 @@
+/**
+ * @file centralized_monitor.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "centralized_monitor.hpp"
 #include <driver/critical_section.hpp>
 #include <driver/load_switch.hpp>

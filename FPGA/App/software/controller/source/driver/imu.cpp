@@ -1,3 +1,10 @@
+/**
+ * @file imu.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "imu.hpp"
 #include <altera_avalon_spi.h>
 #include <sys/unistd.h>

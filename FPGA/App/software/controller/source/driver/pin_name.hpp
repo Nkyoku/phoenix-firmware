@@ -1,3 +1,10 @@
+/**
+ * @file pin_name.hpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 enum Pio0Bit {

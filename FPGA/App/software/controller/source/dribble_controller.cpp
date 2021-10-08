@@ -1,3 +1,10 @@
+/**
+ * @file dribble_controller.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "dribble_controller.hpp"
 #include "board.hpp"
 #include "data_holder.hpp"

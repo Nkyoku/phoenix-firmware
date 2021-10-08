@@ -1,3 +1,10 @@
+/**
+ * @file wheel_controller.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "wheel_controller.hpp"
 #include "centralized_monitor.hpp"
 #include "shared_memory_manager.hpp"

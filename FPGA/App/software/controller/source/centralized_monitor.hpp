@@ -1,3 +1,10 @@
+/**
+ * @file centralized_monitor.hpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 #include <stdint.h>

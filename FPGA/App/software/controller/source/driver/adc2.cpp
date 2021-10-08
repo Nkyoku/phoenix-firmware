@@ -1,3 +1,10 @@
+/**
+ * @file adc2.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "adc2.hpp"
 #include <sys/alt_irq.h>
 #include <centralized_monitor.hpp>

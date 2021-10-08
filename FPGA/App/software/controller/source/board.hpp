@@ -1,3 +1,10 @@
+/**
+ * @file board.hpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 /// ADC1の出力値と電流との換算係数 [A/LSB]

@@ -1,3 +1,10 @@
+/**
+ * @file stream_transmitter.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "stream_transmitter.hpp"
 #include "centralized_monitor.hpp"
 #include <fpu.hpp>

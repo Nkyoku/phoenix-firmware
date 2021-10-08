@@ -1,3 +1,10 @@
+/**
+ * @file velocity_filter.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "velocity_filter.hpp"
 #include "board.hpp"
 #include "fpu.hpp"

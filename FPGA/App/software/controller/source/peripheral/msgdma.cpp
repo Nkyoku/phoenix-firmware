@@ -1,3 +1,10 @@
+/**
+ * @file msgdma.cpp
+ * @author Fujii Naomichi
+ * @copyright (c) 2021 Fujii Naomichi
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "msgdma.hpp"
 #include <sys/unistd.h>
 #include <altera_msgdma_descriptor_regs.h>
