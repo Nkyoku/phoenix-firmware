@@ -43,17 +43,17 @@ struct SharedMemory {
         uint32_t frame_number;
 
         /**
-         * 車体左右の並進移動速度指令[m/s]
+         * 車体左右の目標車体速度 [m/s]
          */
         float speed_x;
 
         /**
-         * 車体前後の並進移動速度指令[m/s]
+         * 車体前後の目標車体速度 [m/s]
          */
         float speed_y;
 
         /**
-         * 回転速度指令[rad/s]
+         * 目標車体角速度 [rad/s]
          */
         float speed_omega;
 
@@ -63,13 +63,13 @@ struct SharedMemory {
         float dribble_power;
 
         /**
-         * 速度制御のゲイン
+         * 速度制御器のゲイン
          */
         float speed_gain_p[4], speed_gain_i[4];
 
         /**
          * チェックサムを計算する
-         * この関数はParametersが4の倍数バイトの大きさであることを前提にしている
+         * この関数はparametersが4の倍数バイトの大きさであることを前提にしている
          * @return チェックサム
          */
         uint32_t calculateChecksum(void) const {
@@ -85,7 +85,7 @@ struct SharedMemory {
 
     /**
      * 末尾のチェックサム
-     * head_checksumとtail_checksumが等しいときにのみParametersは有効として扱われる
+     * head_checksumとtail_checksumが等しいときにのみparametersは有効として扱われる
      */
     uint32_t tail_checksum;
 };
