@@ -14,7 +14,7 @@
 #include "wheel_controller.hpp"
 
 void DataHolder::fetchOnPreControlLoop(void) {
-    static constexpr float ENCODER_SCALE = IMU_OUTPUT_RATE / ENCODER_PPR * WHEEL_CIRCUMFERENCE;
+    static constexpr float ENCODER_SCALE = IMU_OUTPUT_RATE / ENCODER_PPR * 2 * PI * WHEEL_RADIUS;
     _motion_data.accelerometer.x() = IMU_SPIM_GetAccelDataX(IMU_SPIM_BASE) * IMU_ACCELEROMETER_SCALE;
     _motion_data.accelerometer.y() = IMU_SPIM_GetAccelDataY(IMU_SPIM_BASE) * IMU_ACCELEROMETER_SCALE;
     _motion_data.accelerometer.z() = IMU_SPIM_GetAccelDataZ(IMU_SPIM_BASE) * IMU_ACCELEROMETER_SCALE;
@@ -34,6 +34,9 @@ void DataHolder::fetchOnPreControlLoop(void) {
     _motion_data.wheel_current_q(2) = VectorController::getCurrentMeasurementQ(3) * ADC1_CURRENT_SCALE;
     _motion_data.wheel_current_q(3) = VectorController::getCurrentMeasurementQ(4) * ADC1_CURRENT_SCALE;
 }
+
+extern Eigen::Vector4f global_current_limit;
+extern Eigen::Vector4f global_unlimited_accel;
 
 void DataHolder::fetchOnPostControlLoop(void) {
     _motion_data.gravity = WheelController::gravityFilter().gravity();

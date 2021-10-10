@@ -11,6 +11,7 @@
 #include "filter/gravity_filter.hpp"
 #include "filter/velocity_filter.hpp"
 #include "filter/acceleration_limitter.hpp"
+#include "filter/hpf.hpp"
 
 /**
  * 車輪制御を行う
@@ -92,14 +93,21 @@ private:
      */
     static void initializeRegisters(void);
 
+    /**
+     * @brief モーターの出力[W]を制限する電流制限値を計算する
+     * @param velocity 車輪速度 [m/s]
+     * @return 電流制限値 [A]
+     */
+    static float limitPower(float velocity);
+
     /// IMUの加速度から重力を分離するフィルタ
     static GravityFilter _gravity_filter;
 
     /// IMUとエンコーダから車体速度を求めるカルマンフィルタ
     static VelocityFilter _velocity_filter;
 
-    /// 前回の制御ループでの速度誤差
-    static Eigen::Vector4f _last_velocity_error;
+    /// 誤差の不完全微分を行うHPF
+    static Hpf1stOrder5 _error_hpf[4];
 
     /// 車体加速度の指令値
     static Eigen::Vector4f _ref_body_accel;

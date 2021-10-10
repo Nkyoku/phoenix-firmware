@@ -11,11 +11,22 @@
 #include "board.hpp"
 #include <math.h>
 
+#if 0
+#include <stdio.h>
+#define DEBUG_PRINTF(...) printf(__VA_ARGS__)
+#else
+#define DEBUG_PRINTF(...)
+#endif
+
 // 目的関数の重み
 static constexpr float WEIGHT_X = 1.0f;
 static constexpr float WEIGHT_Y = 1.0f;
 static constexpr float WEIGHT_W = 1.0f;
 static constexpr float WEIGHT_C = 4.0f;
+
+// ほぼ0だと見なす閾値
+static constexpr float EPS = 1e-5f;
+static constexpr float OC_EPS = 1e-3f;
 
 using namespace Eigen;
 using namespace ctmath;
@@ -109,17 +120,17 @@ bool AccelerationLimitter::compute(const Vector4f& accel_in, const Vector4f& cur
         KW * WEIGHT_W * accel_in(2),
         KC * WEIGHT_C * accel_in(3),
     };
-    constexpr ConstMatrix4f Q = {WEIGHT_X, 0, 0, 0, 0, WEIGHT_Y, 0, 0, 0, 0, WEIGHT_W, 0, 0, 0, 0, WEIGHT_C};
-    constexpr ConstMatrix4f D = {-1, 1, 1, 1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, -1};
-    constexpr int ROUND_BIT = 10;
+    constexpr ConstMatrix4 Q = {WEIGHT_X, 0, 0, 0, 0, WEIGHT_Y, 0, 0, 0, 0, WEIGHT_W, 0, 0, 0, 0, WEIGHT_C};
+    constexpr ConstMatrix4 D = {-1, 1, 1, 1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, -1};
+    constexpr int ROUND_BIT = 16;
 
     float x[4] = {0, 0, 0, 0};
     int active_set_bits = 0;
     int active_set_signs = 0;
 
     // 反復は最大5回で終了する
-    int iteration;
-    for (iteration = 0; iteration < 5; iteration++) {
+    bool result = false;
+    for (int iteration = 0; iteration < 5; iteration++) {
         // 現在の制約下でラグランジュの未定乗数法を解く
         float y[4], l[4];
         l[0] = std::numeric_limits<float>::infinity();
@@ -232,19 +243,25 @@ bool AccelerationLimitter::compute(const Vector4f& accel_in, const Vector4f& cur
             break;
         }
 
-        // printf("y=[%f; %f; %f; %f], lambda=[%f; %f; %f; %f]\n", y[0], y[1], y[2], y[3], l[0], l[1], l[2], l[3]);
+        DEBUG_PRINTF("y=[%f; %f; %f; %f], lambda=[%f; %f; %f; %f]\n", y[0], y[1], y[2], y[3], l[0], l[1], l[2], l[3]);
 
         float current[4];
         current[0] = D(0, 0) * y[0] + D(0, 1) * y[1] + D(0, 2) * y[2] + D(0, 3) * y[3];
         current[1] = D(1, 0) * y[0] + D(1, 1) * y[1] + D(1, 2) * y[2] + D(1, 3) * y[3];
         current[2] = D(2, 0) * y[0] + D(2, 1) * y[1] + D(2, 2) * y[2] + D(2, 3) * y[3];
         current[3] = D(3, 0) * y[0] + D(3, 1) * y[1] + D(3, 2) * y[2] + D(3, 3) * y[3];
+        current_out[0] = fpu::clamp(current[0], -current_limit[0], current_limit[0]);
+        current_out[1] = fpu::clamp(current[1], -current_limit[1], current_limit[1]);
+        current_out[2] = fpu::clamp(current[2], -current_limit[2], current_limit[2]);
+        current_out[3] = fpu::clamp(current[3], -current_limit[3], current_limit[3]);
+
+        DEBUG_PRINTF("current=[%f; %f; %f; %f]\n", current[0], current[1], current[2], current[3]);
 
         // yが実行可能か調べる
         float over_current = fpu::max(fpu::max(fabs(current[0]) - current_limit[0], fabs(current[1]) - current_limit[1]),
                                       fpu::max(fabs(current[2]) - current_limit[2], fabs(current[3]) - current_limit[3]));
         float norm2 = (sqr(y[0] - x[0]) + sqr(y[1] - x[1]) + sqr(y[2] - x[2]) + sqr(y[3] - x[3]));
-        if ((over_current < 1e-6f) || (norm2 < 1e-12f)) {
+        if ((over_current < OC_EPS) || (norm2 < EPS)) {
             // yは実行可能領域内にある
             x[0] = y[0];
             x[1] = y[1];
@@ -254,16 +271,9 @@ bool AccelerationLimitter::compute(const Vector4f& accel_in, const Vector4f& cur
             // 収束判定
             if (0.0f <= fpu::min(fpu::min(l[0], l[1]), fpu::min(l[2], l[3]))) {
                 // 収束した
-                accel_out[0] = x[0] * (1.0f / KX);
-                accel_out[1] = x[1] * (1.0f / KY);
-                accel_out[2] = x[2] * (1.0f / KW);
-                accel_out[3] = x[3] * (1.0f / KC);
-                current_out[0] = fpu::clamp(current[0], -current_limit[0], current_limit[0]);
-                current_out[1] = fpu::clamp(current[1], -current_limit[1], current_limit[1]);
-                current_out[2] = fpu::clamp(current[2], -current_limit[2], current_limit[2]);
-                current_out[3] = fpu::clamp(current[3], -current_limit[3], current_limit[3]);
-                // printf("Finished\n");
-                return true;
+                DEBUG_PRINTF("Finished\n");
+                result = true;
+                break;
             }
             else {
                 // 収束しなかった
@@ -283,7 +293,7 @@ bool AccelerationLimitter::compute(const Vector4f& accel_in, const Vector4f& cur
                     index = 3;
                 }
                 active_set_bits &= ~(1 << index);
-                // printf("Delete set %d, lambda=%f\n", index, min_lambda);
+                DEBUG_PRINTF("Delete set %d, lambda = %f\n", (active_set_signs & (1 << index)) ? (-index - 1) : (index + 1), min_lambda);
             }
         }
         else {
@@ -336,14 +346,18 @@ bool AccelerationLimitter::compute(const Vector4f& accel_in, const Vector4f& cur
                 float reci_ad = 1.0f / ad;
                 float lb_t = (-current_limit[index] - ax) * reci_ad;
                 float ub_t = (current_limit[index] - ax) * reci_ad;
-                if ((0.0f <= lb_t) && (lb_t < min_lower_bound_t)) {
+                if ((EPS < lb_t) && (lb_t < min_lower_bound_t)) {
                     min_lower_bound_t = lb_t;
                     min_lower_bound_index = index;
                 }
-                if ((0.0f <= ub_t) && (ub_t < min_upper_bound_t)) {
+                if ((EPS < ub_t) && (ub_t < min_upper_bound_t)) {
                     min_upper_bound_t = ub_t;
                     min_upper_bound_index = index;
                 }
+            }
+            float min_t = fpu::min(min_lower_bound_t, min_upper_bound_t);
+            if (1.0f < min_t) {
+                break;
             }
             if (min_lower_bound_t < min_upper_bound_t) {
                 x[0] += min_lower_bound_t * d[0];
@@ -352,7 +366,7 @@ bool AccelerationLimitter::compute(const Vector4f& accel_in, const Vector4f& cur
                 x[3] += min_lower_bound_t * d[3];
                 active_set_bits |= 1 << min_lower_bound_index;
                 active_set_signs |= 1 << min_lower_bound_index;
-                // printf("New set -%d, t=%f\n", min_lower_bound_index, min_lower_bound_t);
+                DEBUG_PRINTF("New set -%d, t=%f\n", min_lower_bound_index + 1, min_lower_bound_t);
             }
             else {
                 x[0] += min_upper_bound_t * d[0];
@@ -361,10 +375,15 @@ bool AccelerationLimitter::compute(const Vector4f& accel_in, const Vector4f& cur
                 x[3] += min_upper_bound_t * d[3];
                 active_set_bits |= 1 << min_upper_bound_index;
                 active_set_signs &= ~(1 << min_upper_bound_index);
-                // printf("New set %d, t=%f\n", min_upper_bound_index, min_upper_bound_t);
+                DEBUG_PRINTF("New set %d, t=%f\n", min_upper_bound_index + 1, min_upper_bound_t);
             }
         }
     }
 
-    return false;
+    accel_out[0] = x[0] * (1.0f / KX);
+    accel_out[1] = x[1] * (1.0f / KY);
+    accel_out[2] = x[2] * (1.0f / KW);
+    accel_out[3] = x[3] * (1.0f / KC);
+
+    return result;
 }

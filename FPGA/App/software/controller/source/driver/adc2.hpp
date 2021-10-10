@@ -96,7 +96,7 @@ private:
 
     // 非同期的にシングルショット変換を開始する
     static void convertAsync(MUX_t mux, FSR_t fsr) {
-        uint16_t config = 0x8103 | (mux << 12) | (fsr << 9); // 128 SPS
+        uint16_t config = 0x8103 | (mux << 12) | (fsr << 9) | (0x1 << 5); // 250 SPS
         int txdata = (config >> 8) | (config << 8);
         I2CM_WriteRegister2Byte(I2C_BASE, ADS1015_CONFIGURATION, txdata);
     }
