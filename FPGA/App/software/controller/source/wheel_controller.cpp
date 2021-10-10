@@ -164,7 +164,7 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
     _gravity_filter.update(motion.accelerometer, motion.gyroscope);
     _velocity_filter.update(bodyAcceleration(), motion.gyroscope, wheel_velocity, motion.wheel_current_q);
     if (!isfinite(bodyVelocity()[0]) || !isfinite(bodyVelocity()[1]) || !isfinite(bodyVelocity()[2])) {
-        CentralizedMonitor::setErrorFlags(ErrorArithmetic);
+        CentralizedMonitor::setErrorFlags(ErrorCauseArithmetic);
         return;
     }
 
@@ -239,7 +239,7 @@ void WheelController::update(bool new_parameters, bool sensor_only) {
         current_limit[3] = fpu::max(limitPower(wheel_velocity[3]) - fabsf(velocity_error[3]), MIN_CURRENT_LIMIT_PER_MOTOR);
         AccelerationLimitter limitter;
         if (!limitter.compute(ref_body_accel_unlimit, current_limit, _ref_body_accel, ref_current)) {
-            CentralizedMonitor::setErrorFlags(ErrorArithmetic);
+            CentralizedMonitor::setErrorFlags(ErrorCauseArithmetic);
             return;
         }
 

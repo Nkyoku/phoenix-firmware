@@ -40,7 +40,7 @@ enum ErrorCause_t {
     ErrorCauseMotor5HallSensor = 1u << 13,
 
     /// 算術エラー
-    ErrorArithmetic = 1u << 14,
+    ErrorCauseArithmetic = 1u << 14,
 };
 
 /**
