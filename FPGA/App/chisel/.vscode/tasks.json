@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Scala: Run Main (Current File)",
+            "group": "build",
+            "type": "shell",
+            "command": "sbt",
+            "args": [
+                "'runMain ${fileBasenameNoExtension} --target-dir generated'"
+            ]
+        },
+        {
+            "label": "Scala: Run Test (Current File)",
+            "group": "test",
+            "type": "shell",
+            "command": "sbt",
+            "args": [
+                "'testOnly ${fileBasenameNoExtension} -- -DwriteVcd=1'"
+            ]
+        },
+        {
+            "label": "Scala: Run Quick Test",
+            "group": "test",
+            "type": "shell",
+            "command": "sbt",
+            "args": [
+                "~testQuick"
+            ]
+        },
+        {
+            "label": "Scala: Run All Main",
+            "group": "build",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "all"
+            ]
+        },
+        {
+            "label": "Scala: Run All Test Main",
+            "group": "test",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "test-all"
+            ]
+        }
+    ]
+}

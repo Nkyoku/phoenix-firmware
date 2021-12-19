@@ -23,7 +23,7 @@ using namespace Eigen;
 /// 並進速度指令値の最大値 [m/s]
 static constexpr float MAX_TRANSLATION_REFERENCE = 20.0f;
 
-/// 回転速度指令の最大値 [m/s]
+/// 回転速度指令の最大値 [rad/s]
 static constexpr float MAX_OMEGA_REFERENCE = 20.0f;
 
 /// 電流制限値の最小値 [A]
@@ -38,7 +38,7 @@ static constexpr float ANTI_SLIP_GAIN = 0.25f;
 /// 並進加速度の最大値 [m/s^2]
 static constexpr float MAX_TRANSLATION_ACCELERATION = 10.0f;
 
-/// 角加速度の最大値 [m/s^2]
+/// 角加速度の最大値 [rad/s^2]
 static constexpr float MAX_ANGULAR_ACCELERATION = 100.0f;
 
 /// PI-P制御の比例項の比率

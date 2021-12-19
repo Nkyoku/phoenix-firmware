@@ -1,0 +1,11 @@
+/.metals/
+/.bsp/
+/.metals/
+/.bloop/
+/project/
+/target/
+/test_run_dir/
+/.vscode/settings.json
+*.anno.json
+*.fir
+*.vcd
