@@ -26,10 +26,10 @@ static constexpr float IMU_OUTPUT_RATE = 1000;
 static constexpr float WHEEL_RADIUS = 0.0275f;
 
 /// 車体中心を原点とした車輪のX座標[m]
-static constexpr float WHEEL_POS_X = 0.063f;
+static constexpr float WHEEL_POS_X = 0.0629f;
 
 /// 車体中心を原点とした車輪のY座標[m]
-static constexpr float WHEEL_POS_Y = 0.042f;
+static constexpr float WHEEL_POS_Y = 0.040848f;
 
 /// 車体中心から車輪までの距離の二乗[m]
 static constexpr float WHEEL_POS_R_2 = WHEEL_POS_X * WHEEL_POS_X + WHEEL_POS_Y * WHEEL_POS_Y;
@@ -50,7 +50,7 @@ static constexpr float ENCODER_PPR = 4096;
 static constexpr float WHEEL_INERTIA = 3.6e-5f;
 
 /// 車体の質量 [kg]
-static constexpr float MACHINE_WEIGHT = 3.3f;
+static constexpr float MACHINE_WEIGHT = 2.9f;
 
 /// 車体の慣性モーメント [kgm^2]
 static constexpr float MACHINE_INERTIA = 0.01f;
